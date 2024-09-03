@@ -32,8 +32,7 @@ const server = http.createServer((req, res) => {
             req.on('end', () => {
                 const { email, password } = JSON.parse(body);
 
-                pool.query(
-                    'SELECT * FROM logins WHERE email = ? AND password = ?', [email, password],
+                pool.query('SELECT * FROM logins WHERE email = ? AND password = ?', [email, password],
                     (error, results) => {
                         if (error) {
                             res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -53,6 +52,29 @@ const server = http.createServer((req, res) => {
                         }
                     }
                 );
+            });
+        }
+        if (req.url === "/create-account") {
+            console.log("Received request to create account");
+            let body = '';
+            req.on('data', chunk => {
+                body += chunk.toString();
+            });
+            req.on('end', () => {
+                const { email, firstName, lastName, password } = JSON.parse(body);
+                pool.query('INSERT INTO logins (email, firstName, lastName, password) VALUES (?, ?, ?, ?)',
+                    [email, firstName, lastName, password],
+                    (error, result) => {
+                        if (error) {
+                            res.writeHead(500, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ success: false, message: 'Server Error' }));
+                            return;
+                        } // Else
+                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ success: true }));
+                        console.log("Successfully created account");
+                    }
+                )
             });
         }
     }

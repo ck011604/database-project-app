@@ -1,15 +1,31 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from 'axios';
 
 const CreateAccount = () => {
 
     const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+
+    const navigate = useNavigate();
 
     const handleCreateAccount = async (e) => {
         e.preventDefault();
-    }
+        try {
+            const response = await axios.post('http://localhost:3001/create-account', { email, firstName, lastName, password });
+            if (response.data.success)
+                navigate("/login");
+        }
+        catch (err) {
+            if (err.response && err.response.data && err.response.data.message)
+                setError(err.response.data.message);
+            else
+                setError('An error has occured');
+        }
+    };
 
     return ( <div className="create-account-page">
         <div className="create-account-box">
@@ -52,6 +68,7 @@ const CreateAccount = () => {
                     />
                 </div>
                 <button>Create Account</button>
+                {error && <p>{error}</p>}
             </form>
         </div>
     </div> );
