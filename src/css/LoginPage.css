@@ -1,4 +1,78 @@
+.login-page {
+    background-color: cornflowerblue;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    height: 100vh;
+}
+.login-button {
+    width: 30%;
+    padding: 10px;
+    background-color: green;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.login-box {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+}
 .login-box label {
     text-align: center;
     display: block;
+}
+.error {
+    color: red;
+    font-weight: bold;
+}
+.label-input {
+    margin-bottom: 10px;
+}
+.separator-container {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+    /* Spacing around separator */
+}
+
+.separator {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    position: relative;
+}
+
+.separator::before,
+.separator::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid #ccc;
+    /* Line color */
+    margin: 0 10px;
+}
+
+.separator span {
+    background-color: #ffffff;
+    /* Match background of login box */
+    padding: 0 10px;
+    color: #000000;
+    /* Text color */
+    font-weight: bold;
+}
+.create-account-button {
+    background-color: #4CAF50;
+    /* Green background */
+    color: white;
+    /* White text */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    /* Full width */
 }
