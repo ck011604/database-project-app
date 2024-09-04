@@ -4,7 +4,7 @@
 
 ### `npm install`
 
-node_modules never gets put into the repository because of the large size. By running this command, it downloads all of the packages needed. Do this everytime.
+node_modules never gets put into the repository because of the large size. By running this command, it downloads all of the packages needed. Do this everytime. Usually it will say there are high issues or something like that. Ignore them and whatever you do don't npm audit them or they will cause more issues.
 
 ## Turn local server on
 
