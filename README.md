@@ -41,3 +41,5 @@ Make sure you are in a directory you can access. Add sql bin to your enviroment 
 ### `mysqldump -u root -p databaseproject > databaseproject.sql`
 
 Go to the directory to retrieve the .sql file and place it in the root of the repo when transferring.
+
+If you have the mysql extension, you can right click on the database and select "Dump struct and data"

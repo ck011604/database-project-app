@@ -1,14 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../css/LoginPage.css";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import axios from 'axios';
 
 const LoginPage = () => {
 
+    const navigate = useNavigate();
+    const location = useLocation();
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-    const navigate = useNavigate();
+    const [successCreation, setSuccessCreation] = useState("");
+
+    useEffect(() => {
+      if (location.state) {
+        const { email, message} = location.state;
+        setEmail(email || "");
+        setSuccessCreation(message || "");
+        navigate(location.pathname, { replace: true }); // Navigate to itself clearing creation states passed
+      }
+    }, [location.state, navigate]);
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -53,6 +65,9 @@ const LoginPage = () => {
             <button className="login-button">Login</button>
             <div className="error">
               {error && <p>{error}</p>}
+            </div>
+            <div className="success-account-creation">
+              {successCreation && <p>{successCreation}</p>}
             </div>
             <div className="separator-container">
               <div className="separator">

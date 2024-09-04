@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
+import "../css/CreateAccount.css";
 
 const CreateAccount = () => {
 
@@ -17,7 +18,7 @@ const CreateAccount = () => {
         try {
             const response = await axios.post('http://localhost:3001/create-account', { email, firstName, lastName, password });
             if (response.data.success)
-                navigate("/login");
+                navigate("/login", {replace: true, state: {email: email, message: 'Account successfully created!'}});
         }
         catch (err) {
             if (err.response && err.response.data && err.response.data.message)
@@ -67,7 +68,7 @@ const CreateAccount = () => {
                         onChange={(e) => setPassword(e.target.value)}
                     />
                 </div>
-                <button>Create Account</button>
+                <button className="create-account-button">Create Account</button>
                 {error && <p>{error}</p>}
             </form>
         </div>
