@@ -10,11 +10,11 @@ node_modules never gets put into the repository because of the large size. By ru
 
 If you chose to not have it start up with windows, run cmd as administrator and type:
 
-### 'net start mysql90'
+### `net start mysql90`
 
 Assuming you downloaded the same mysql version. To stop the server you do the following. Note that shutting down the computer, the server stops as well.
 
-### 'net stop mysql90'
+### `net stop mysql90`
 
 ## Import sql file
 
@@ -22,9 +22,9 @@ Assuming you downloaded the same mysql version. To stop the server you do the fo
 
 ## Start server
 
-Navigate to the server.js file 'cd src/server' then the js file.
+Navigate to the server.js file `cd src/server` then the js file.
 
-### 'node server.js'
+### `node server.js`
 
 ## Start react app
 
@@ -38,6 +38,6 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
 Make sure you are in a directory you can access. Add sql bin to your enviroment path to run in any directory. Dump the database using the following command:
 
-### 'mysqldump -u root -p databaseproject > databaseproject.sql'
+### `mysqldump -u root -p databaseproject > databaseproject.sql`
 
 Go to the directory to retrieve the .sql file and place it in the root of the repo when transferring.
