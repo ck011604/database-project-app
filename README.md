@@ -2,7 +2,7 @@
 
 ## Download dependencies
 
-### 'npm install'
+### `npm install`
 
 node_modules never gets put into the repository because of the large size. By running this command, it downloads all of the packages needed. Do this everytime.
 
