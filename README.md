@@ -1,70 +1,43 @@
-# Getting Started with Create React App
+# How to run project
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Download dependencies
 
-## Available Scripts
+### 'npm install'
 
-In the project directory, you can run:
+node_modules never gets put into the repository because of the large size. By running this command, it downloads all of the packages needed. Do this everytime.
+
+## Turn local server on
+
+If you chose to not have it start up with windows, run cmd as administrator and type:
+
+### 'net start mysql90'
+
+Assuming you downloaded the same mysql version. To stop the server you do the following. Note that shutting down the computer, the server stops as well.
+
+### 'net stop mysql90'
+
+## Import sql file
+
+### If you are using the "MySQL" Extension by Weijan Chen, right click the database, click import sql, and select the file. (Should be in the root folder of the repo)
+
+## Start server
+
+Navigate to the server.js file 'cd src/server' then the js file.
+
+### 'node server.js'
+
+## Start react app
 
 ### `npm start`
 
-Runs the app in the development mode.\
+For development only. Note the website will actively update as your code changes. Right click > inspect > console to see console.logs().
+
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Transfer database
 
-### `npm test`
+Make sure you are in a directory you can access. Add sql bin to your enviroment path to run in any directory. Dump the database using the following command:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 'mysqldump -u root -p databaseproject > databaseproject.sql'
 
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Go to the directory to retrieve the .sql file and place it in the root of the repo when transferring.
