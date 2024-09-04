@@ -18,7 +18,7 @@ Assuming you downloaded the same mysql version. To stop the server you do the fo
 
 ## Import sql file
 
-### If you are using the "MySQL" Extension by Weijan Chen, right click the database, click import sql, and select the file. (Should be in the root folder of the repo)
+ If you are using the "MySQL" Extension by Weijan Chen, right click the database, click import sql, and select the file. (Should be in the root folder of the repo)
 
 ## Start server
 
