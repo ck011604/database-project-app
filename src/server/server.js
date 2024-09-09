@@ -36,7 +36,7 @@ const server = http.createServer((req, res) => {
                     (error, results) => {
                         if (error) {
                             res.writeHead(500, { 'Content-Type': 'application/json' });
-                            res.end(JSON.stringify({ success: false, message: 'Server Error' }));
+                            res.end(JSON.stringify({ success: false, message: 'Server Error fetching logins' }));
                             console.log('Server Error', error);
                             return;
                         }
@@ -67,7 +67,7 @@ const server = http.createServer((req, res) => {
                     (error, result) => {
                         if (error) {
                             res.writeHead(500, { 'Content-Type': 'application/json' });
-                            res.end(JSON.stringify({ success: false, message: 'Server Error' }));
+                            res.end(JSON.stringify({ success: false, message: 'Server Error inserting into logins' }));
                             return;
                         } // Else
                         res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -76,6 +76,23 @@ const server = http.createServer((req, res) => {
                     }
                 )
             });
+        }
+    }
+    if(req.method === "GET") {
+        if (req.url === "/menu") {
+            console.log("Received request to get menu")
+            pool.query('SELECT * FROM recipes', (error, results) => {
+                if (error) {
+                    res.writeHead(500, { 'Content-Type': 'application/json'});
+                    res.end(JSON.stringify({ success: false, message: 'Server Error fetching menu'}))
+                    console.log("Error fetching menu")
+                    return;
+                } // Else
+                console.log("Successfully fetched menu")
+                res.writeHead(200, { "Content-Type": "application/json" });
+                console.log(results);
+                res.end(JSON.stringify({ success: true, menu: results}));
+            })
         }
     }
 })

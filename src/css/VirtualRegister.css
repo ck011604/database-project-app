@@ -1,0 +1,12 @@
+.virtual-register {
+  display: flex;
+  justify-content: space-between;
+}
+
+.item-container {
+    width: 80%;
+}
+.order-container {
+    width: 30%
+    
+}

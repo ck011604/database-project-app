@@ -1,0 +1,28 @@
+.header {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px 5%;
+    background: rgb(3, 71, 173);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.header a {
+    text-decoration: none;
+}
+.logo {
+    font-size: 32px;
+    color: white;
+    font-weight: 700;
+}
+.navbar a {
+    font-size: 18px;
+    color: white;
+    font-weight: 500;
+    margin-left: 40px;
+    
+}
