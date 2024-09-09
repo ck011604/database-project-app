@@ -1,0 +1,10 @@
+.item-box {
+    background-color: aqua;
+    width: 100px;
+    padding: 10px;
+    text-align: center;
+}
+.item-image {
+    width: 100px;
+    height: auto;
+}

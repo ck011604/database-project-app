@@ -8,7 +8,7 @@ const pool = mysql.createPool({
     host: 'localhost',   //  database host
     user: 'root', //  MySQL username
     password: 'P@sswordDB123', //  MySQL password
-    database: 'databaseproject' // database name
+    database: 'restaurantDB' // database name
 });
 
 const server = http.createServer((req, res) => {
