@@ -81,7 +81,7 @@ const server = http.createServer((req, res) => {
     if(req.method === "GET") {
         if (req.url === "/menu") {
             console.log("Received request to get menu")
-            pool.query('SELECT * FROM recipes', (error, results) => {
+            pool.query('SELECT * FROM menu ORDER BY price DESC', (error, results) => {
                 if (error) {
                     res.writeHead(500, { 'Content-Type': 'application/json'});
                     res.end(JSON.stringify({ success: false, message: 'Server Error fetching menu'}))

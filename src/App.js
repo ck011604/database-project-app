@@ -6,11 +6,13 @@ import Home from "./components/Home";
 import CreateAccount from "./components/CreateAccount";
 import Navbar from "./components/Navbar";
 import VirtualRegister from "./components/VirtualRegister";
+import Footer from "./components/Footer";
 
 function App() {
 
   const location = useLocation(); // Get current location
   const hideNavbarRoutes = ["/login", "/create-account"]
+  const hideFooterRoutes = ["/login", "/create-account"]
 
   return (
     <div className="App">
@@ -24,6 +26,7 @@ function App() {
           <Route path="/virtual-register" element={<VirtualRegister />} />
         </Routes>
       </div>
+      {!hideFooterRoutes.includes(location.pathname) && <Footer />}
     </div>
   );
 }

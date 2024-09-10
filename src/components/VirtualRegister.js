@@ -5,16 +5,20 @@ import MenuItem from "./MenuItem";
 
 const VirtualRegister = () => {
 
+    const [originalItems, setOriginalItems] = useState([]);
     const [items, setItems] = useState([]);
     const [selectedItems, setSelectedItems] = useState([]);
+    const [menuFilter, setMenuFilter] = useState("ALL");
+    const [subtotal, setSubtotal] = useState(0);
     const [error, setError] = useState("");
 
-    useEffect(() => {
+    useEffect(() => { // Load menu
         const fetchMenu = async () => {
             try {
                 const response = await axios.get('http://localhost:3001/menu');
                 setItems(response.data.menu);
-                console.log(typeof items)
+                setOriginalItems(response.data.menu);
+                 // console.log(typeof items)
             } catch(err) {
                 if (err.response && err.response.data && err.response.data.message)
                     setError(err.response.data.message);
@@ -57,15 +61,39 @@ const VirtualRegister = () => {
         setSelectedItems(updatedItems);
     };
 
-    useEffect(() => { // For testing
-        console.log("Updated Selected Items:", selectedItems);
+    useEffect(() => { // update subtotal
+        const calculateSubtotal = () => {
+            let newTotal = 0.00;
+            for (let i = 0; i < selectedItems.length; i++)
+                newTotal += selectedItems[i].quantity * selectedItems[i].price;
+            setSubtotal(newTotal.toFixed(2));
+        }
+        calculateSubtotal();
     }, [selectedItems]);
+
+    useEffect(() => { // manage menu filter
+        if (menuFilter === "ALL") {
+            setItems(originalItems);
+        }
+        else if (menuFilter === "MAIN") {
+            setItems(originalItems.filter(item => item.type === "main"))
+        }
+        else if (menuFilter === "SIDES") {
+            setItems(originalItems.filter(item => item.type === "side"))
+        }
+        else if (menuFilter === "DRINKS") {
+            setItems(originalItems.filter(item => item.type === "drink"))
+        }
+    }, [menuFilter])
 
     return ( 
         <div className="virtual-register">
             <div className="menu-container">
                 <div className="menu-navbar">
-                    <h1>Menu</h1>
+                    <button onClick={() => setMenuFilter("ALL")}>All</button>
+                    <button onClick={() => setMenuFilter("MAIN")}>Main</button>
+                    <button onClick={() => setMenuFilter("SIDES")}>Sides</button>
+                    <button onClick={() => setMenuFilter("DRINKS")}>Drinks</button>
                 </div>
                 <div className="menu-options">
                     {items.map(item => (
@@ -74,15 +102,21 @@ const VirtualRegister = () => {
                 </div>
             </div>
             <div className="order-container">
-                {selectedItems.map(item => (
-                    <div key={item.recipe_id} className="selected-items">
-                        <span className="receipt-item-name">{item.name}</span>
-                        <button onClick={() => handleQuantityChange(item.recipe_id, -1)}>-</button>
-                        <span className="receipt-item-quantity">{item.quantity}</span>
-                        <button onClick={() => handleQuantityChange(item.recipe_id, 1)}>+</button>
-                    </div>
-                ))}
+                <div className="selection-list">
+                    {selectedItems.map(item => (
+                        <div key={item.recipe_id} className="selected-items">
+                            <span className="receipt-item-name">{item.name}</span>
+                            <button className="remove-item-button" onClick={() => handleQuantityChange(item.recipe_id, -1)}>-</button>
+                            <span className="receipt-item-quantity">{item.quantity}</span>
+                            <button className="add-item-button" onClick={() => handleQuantityChange(item.recipe_id, 1)}>+</button>
+                        </div>
+                    ))}
+                </div>
                 {!error && <p>{error}</p>}
+                <div className="finish-order">
+                    <p>Subtotal: ${subtotal}</p>
+                    <button className="checkout-button">Checkout</button>
+                </div>
             </div>
         </div>
      );

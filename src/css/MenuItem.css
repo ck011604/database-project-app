@@ -1,10 +1,26 @@
 .item-box {
-    background-color: aqua;
+    background-color: #A5C4D4;
     width: 100px;
+    height: 150px;
     padding: 10px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: 1px solid black;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
     text-align: center;
 }
 .item-image {
     width: 100px;
     height: auto;
+}
+.item-box img.loaded {
+    display: block;
+}
+.item-box:hover {
+    background-color: #8aa4b0;
+    transform: scale(1.05);
 }
