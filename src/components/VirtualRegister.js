@@ -103,6 +103,7 @@ const VirtualRegister = () => {
             </div>
             <div className="order-container">
                 <div className="selection-list">
+                    {!error && <p>{error}</p>}
                     {selectedItems.map(item => (
                         <div key={item.recipe_id} className="selected-items">
                             <span className="receipt-item-name">{item.name}</span>
@@ -112,7 +113,7 @@ const VirtualRegister = () => {
                         </div>
                     ))}
                 </div>
-                {!error && <p>{error}</p>}
+                {selectedItems.length > 0 && <button className="clear-list-button" onClick={() => setSelectedItems([])}>Clear All</button>}
                 <div className="finish-order">
                     <p>Subtotal: ${subtotal}</p>
                     <button className="checkout-button">Checkout</button>

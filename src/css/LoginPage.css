@@ -16,18 +16,18 @@
 .login-button {
     width: 30%;
     padding: 10px;
-    background-color: green;
+    background-color: #003366;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 20px;
     cursor: pointer;
     margin: 0px 35%; /*100 - 30 / 2 */
 }
 .login-box {
-    background-color: white;
+    background-color: #EEF2F8;
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 1);
     width: 300px;
     display: flex;
     flex-direction: column;
@@ -48,7 +48,6 @@
     display: flex;
     align-items: center;
     margin: 20px 0;
-    /* Spacing around separator */
 }
 
 .separator {
@@ -68,17 +67,22 @@
 }
 
 .separator span {
-    background-color: #ffffff;
     padding: 0 10px;
     color: #000000;
     font-weight: bold;
 }
 .create-account-option {
-    background-color: #4CAF50;
+    background-color: #003366;
     color: white;
     border: none;
     padding: 10px 20px;
-    border-radius: 5px;
+    border-radius: 20px;
     cursor: pointer;
     width: 100%;
+}
+.login-box input[type="email"],
+.login-box input[type="password"] {
+    border: 1px solid #D6E0EF;
+    border-radius: 5px;
+    font-size: 16px;
 }

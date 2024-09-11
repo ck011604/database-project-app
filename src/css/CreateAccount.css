@@ -16,15 +16,15 @@
 .create-account-button {
     width: 70%;
     padding: 10px;
-    background-color: #4CAF50;
+    background-color: #003366;
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 20px;
     cursor: pointer;
     margin: 0px 15%; /*100 - 70 / 2*/
 }
 .create-account-box {
-    background-color: white;
+    background-color: #EEF2F8;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -44,4 +44,12 @@
 
 .label-input {
     margin-bottom: 10px;
+}
+.create-account-box input[type="email"],
+.create-account-box input[type="password"],
+.create-account-box input[type="text"]
+{
+    border: 1px solid #D6E0EF;
+    border-radius: 5px;
+    font-size: 16px;
 }
