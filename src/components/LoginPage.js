@@ -39,44 +39,46 @@ const LoginPage = () => {
     };
 
     return (
-      <div className="login-page">
-        <div className="login-box">
-          <h2>Login Page</h2>
-          <form onSubmit={handleLogin}>
-            <div className="label-input">
-              <label>Email:</label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div className="label-input">
-              <label>Password:</label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            <button className="login-button">Login</button>
-            <div className="error">
-              {error && <p>{error}</p>}
-            </div>
-            <div className="success-account-creation">
-              {successCreation && <p>{successCreation}</p>}
-            </div>
-            <div className="separator-container">
-              <div className="separator">
-                <span>or</span>
+      <div className="login-background-container">
+        <div className="login-page">
+          <div className="login-box">
+            <h2>Login Page</h2>
+            <form onSubmit={handleLogin}>
+              <div className="label-input">
+                <label>Email:</label>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
               </div>
-            </div>
-          </form>
-          <Link to="/create-account">
-            <button className="create-account-button">Create Account</button>
-          </Link>
+              <div className="label-input">
+                <label>Password:</label>
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+              <button className="login-button">Login</button>
+              <div className="error">
+                {error && <p>{error}</p>}
+              </div>
+              <div className="success-account-creation">
+                {successCreation && <p>{successCreation}</p>}
+              </div>
+              <div className="separator-container">
+                <div className="separator">
+                  <span>or</span>
+                </div>
+              </div>
+            </form>
+            <Link to="/create-account">
+              <button className="create-account-option">Create Account</button>
+            </Link>
+          </div>
         </div>
       </div>
     );
