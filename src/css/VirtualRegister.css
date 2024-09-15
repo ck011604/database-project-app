@@ -13,6 +13,11 @@
   width: 80%;
   margin-right: 20px;
 }
+.out-of-stock {
+  filter: grayscale(100%);
+  opacity: 1;
+  pointer-events: none;
+}
 .menu-navbar {
   display: flex;
   justify-content: space-around;

@@ -90,9 +90,28 @@ const server = http.createServer((req, res) => {
                 } // Else
                 console.log("Successfully fetched menu")
                 res.writeHead(200, { "Content-Type": "application/json" });
-                console.log(results);
                 res.end(JSON.stringify({ success: true, menu: results}));
             })
+        }
+        if (req.url === "/inventory-stock") {
+          console.log("Received request to get inventory stock");
+          pool.query("SELECT ingredient_id, amount FROM inventory", (error, results) => {
+              if (error) {
+                res.writeHead(500, { "Content-Type": "application/json" });
+                res.end(
+                  JSON.stringify({
+                    success: false,
+                    message: "Server Error fetching inventory",
+                  })
+                );
+                console.log("Error fetching inventory");
+                return;
+              } // Else
+              console.log("Successfully fetched inventory");
+              res.writeHead(200, { "Content-Type": "application/json" });
+              res.end(JSON.stringify({ success: true, inventory: results }));
+            }
+          );
         }
     }
 })

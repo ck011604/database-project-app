@@ -8,6 +8,7 @@ const VirtualRegister = () => {
     const [originalItems, setOriginalItems] = useState([]);
     const [items, setItems] = useState([]);
     const [selectedItems, setSelectedItems] = useState([]);
+    const [inventoryStock, setInventoryStock] = useState([]);
     const [menuFilter, setMenuFilter] = useState("ALL");
     const [subtotal, setSubtotal] = useState(0);
     const [error, setError] = useState("");
@@ -15,18 +16,29 @@ const VirtualRegister = () => {
     useEffect(() => { // Load menu
         const fetchMenu = async () => {
             try {
-                const response = await axios.get('http://localhost:3001/menu');
-                setItems(response.data.menu);
-                setOriginalItems(response.data.menu);
-                 // console.log(typeof items)
+                const menuResponse = await axios.get('http://localhost:3001/menu');
+                setItems(menuResponse.data.menu);
+                setOriginalItems(menuResponse.data.menu);
             } catch(err) {
-                if (err.response && err.response.data && err.response.data.message)
-                    setError(err.response.data.message);
+                if (err.response && err.menuResponse.data && err.menuResponse.data.message)
+                    setError(err.menuResponse.data.message);
                 else
-                    setError('An error has occured');
+                    setError('An error has occured fetching the menu');
             }
         };
+        const fetchInventory = async () => {
+            try {
+                const inventoryResponse = await axios.get('http://localhost:3001/inventory-stock');
+                setInventoryStock(inventoryResponse.data.inventory);
+            } catch(err) {
+                if (err.response && err.inventoryResponse.data && err.inventoryResponse.data.message)
+                    setError(err.inventoryResponse.data.message);
+                else
+                    setError('An error has occured fetching the inventory');
+            }
+        }
         fetchMenu();
+        fetchInventory();
     }, []);
 
     const handleSelect = (item) => {
@@ -47,6 +59,7 @@ const VirtualRegister = () => {
         }
         setSelectedItems(updatedItems); // Update selected items
     }
+
     const handleQuantityChange = (itemID, delta) => {
         console.log("Changing", {itemID}, "Quantity by", {delta})
         const updatedItems = selectedItems.map(item => {
@@ -60,6 +73,25 @@ const VirtualRegister = () => {
         }).filter(item => item.quantity > 0); // Remove items with quantity 0 or less
         setSelectedItems(updatedItems);
     };
+
+    const isItemOutOfStock = (item) => {
+      let outOfStock = false; // Assume the item is in stock by default
+
+      // Loop through each ingredient the item needs
+      item.ingredients.forEach((ingredient) => {
+        // Find the ingredient in the inventory by its ID
+        const stockItem = inventoryStock.find(
+          (stock) => stock.ingredient_id === ingredient.ingredient_id
+        );
+
+        // Check if the ingredient is not found or if there's not enough in stock
+        if (!stockItem || stockItem.amount < ingredient.quantity) {
+            outOfStock = true; // If any ingredient is out of stock, mark the item as out of stock
+        }
+      });
+
+      return outOfStock; // Return true if out of stock, false if fully available
+    }
 
     useEffect(() => { // update subtotal
         const calculateSubtotal = () => {
@@ -86,6 +118,10 @@ const VirtualRegister = () => {
         }
     }, [menuFilter])
 
+    useEffect(() => {
+        console.log("inventory: ", inventoryStock);
+    }, [inventoryStock])
+
     return ( 
         <div className="virtual-register">
             <div className="menu-container">
@@ -97,7 +133,7 @@ const VirtualRegister = () => {
                 </div>
                 <div className="menu-options">
                     {items.map(item => (
-                        <MenuItem key={item.recipe_id} item={item} onSelect={handleSelect} />
+                        <MenuItem key={item.recipe_id} className={isItemOutOfStock(item) ? 'out-of-stock' : ''} item={item} onSelect={handleSelect} />
                     ))}
                 </div>
             </div>
