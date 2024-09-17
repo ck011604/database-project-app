@@ -37,7 +37,7 @@ CREATE TABLE `inventory` (
 --
 
 /*!40000 ALTER TABLE `inventory` DISABLE KEYS */;
-INSERT INTO `inventory` VALUES (1,'mozzarella',100,20,100),(2,'tomato sauce',100,10,100),(3,'dough',50,10,50),(4,'pepperoni',200,50,100),(5,'cheddar cheese',100,20,100),(6,'beef patty',100,20,50),(7,'lettuce',100,20,50),(8,'tomato',100,20,50),(9,'pasta',100,20,50),(10,'chicken',100,20,70),(11,'garlic',100,20,50),(12,'fish fillets',50,10,30),(13,'tortillas',100,20,50),(14,'cabbage',100,20,50),(15,'lime',100,40,50),(16,'sour cream',50,20,50),(17,'milk',70,20,50),(18,'butter',100,30,100),(19,'flour',100,40,200),(20,'hamburger bun',100,20,75),(21,'hot dog sausage',100,20,50),(22,'hot dog bun',100,30,100),(23,'mustard',100,40,100),(24,'ketchup',100,30,100),(25,'relish',50,20,45),(26,'potatoes',100,30,100),(27,'carrots',100,20,60),(28,'mayonnaise',60,10,40),(29,'bread',100,10,40),(30,'corn',100,10,50),(31,'salt',100,40,100),(32,'Sprite',100,20,100),(33,'Coca-Cola',100,20,100),(34,'Pepsi',100,20,100),(35,'Dr. Pepper',100,20,100),(36,'Fanta Orange',0,20,100),(37,'Diet Coke',100,20,100),(38,'Black Tea',100,20,70),(39,'Sugar',100,20,100);
+INSERT INTO `inventory` VALUES (1,'mozzarella',100,20,100),(2,'tomato sauce',100,10,100),(3,'dough',50,10,50),(4,'pepperoni',200,50,100),(5,'cheddar cheese',100,20,100),(6,'beef patty',100,20,50),(7,'lettuce',100,20,50),(8,'tomato',100,20,50),(9,'pasta',100,20,50),(10,'chicken',100,20,70),(11,'garlic',100,20,50),(12,'fish fillets',50,10,30),(13,'tortillas',100,20,50),(14,'cabbage',100,20,50),(15,'lime',100,40,50),(16,'sour cream',50,20,50),(17,'milk',70,20,50),(18,'butter',100,30,100),(19,'flour',100,40,200),(20,'hamburger bun',100,20,75),(21,'hot dog sausage',100,20,50),(22,'hot dog bun',100,30,100),(23,'mustard',100,40,100),(24,'ketchup',100,30,100),(25,'relish',50,20,45),(26,'potatoes',100,30,100),(27,'carrots',100,20,60),(28,'mayonnaise',60,10,40),(29,'bread',100,10,40),(30,'corn',15,10,50),(31,'salt',100,40,100),(32,'Sprite',100,20,100),(33,'Coca-Cola',100,20,100),(34,'Pepsi',100,20,100),(35,'Dr. Pepper',100,20,100),(36,'Fanta Orange',0,20,100),(37,'Diet Coke',100,20,100),(38,'Black Tea',100,20,70),(39,'Sugar',100,20,100);
 /*!40000 ALTER TABLE `inventory` ENABLE KEYS */;
 
 --
@@ -134,4 +134,4 @@ CREATE TABLE `orders` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-09-15 18:02:47
+-- Dump completed on 2024-09-17 16:34:09

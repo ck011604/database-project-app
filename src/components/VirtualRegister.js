@@ -8,6 +8,7 @@ const VirtualRegister = () => {
     const [originalItems, setOriginalItems] = useState([]);
     const [items, setItems] = useState([]);
     const [selectedItems, setSelectedItems] = useState([]);
+    const [originalInventoryStock, setOriginalInventoryStock] = useState([]);
     const [inventoryStock, setInventoryStock] = useState([]);
     const [menuFilter, setMenuFilter] = useState("ALL");
     const [subtotal, setSubtotal] = useState(0);
@@ -30,6 +31,7 @@ const VirtualRegister = () => {
             try {
                 const inventoryResponse = await axios.get('http://localhost:3001/inventory-stock');
                 setInventoryStock(inventoryResponse.data.inventory);
+                setOriginalInventoryStock(inventoryResponse.data.inventory);
             } catch(err) {
                 if (err.response && err.inventoryResponse.data && err.inventoryResponse.data.message)
                     setError(err.inventoryResponse.data.message);
@@ -61,7 +63,6 @@ const VirtualRegister = () => {
     }
 
     const handleQuantityChange = (itemID, delta) => {
-        console.log("Changing", {itemID}, "Quantity by", {delta})
         const updatedItems = selectedItems.map(item => {
             if (item.recipe_id === itemID) { // If this is the item we are updating, change its quantity
                 return {
@@ -100,7 +101,20 @@ const VirtualRegister = () => {
                 newTotal += selectedItems[i].quantity * selectedItems[i].price;
             setSubtotal(newTotal.toFixed(2));
         }
+        const calculateInventory = () => { // update local inventory
+            let newInventoryStock = originalInventoryStock.map(item => ({
+                ...item
+            }));
+            for (let i = 0; i < selectedItems.length; i++)
+                for (let j = 0; j < selectedItems[i].ingredients.length; j++) {
+                    let ingredient = selectedItems[i].ingredients[j];
+                    let inventoryItem = newInventoryStock.find(item => item.ingredient_id === ingredient.ingredient_id)
+                    inventoryItem.amount -= selectedItems[i].quantity * ingredient.quantity
+                }
+            setInventoryStock(newInventoryStock)
+        }
         calculateSubtotal();
+        calculateInventory();
     }, [selectedItems]);
 
     useEffect(() => { // manage menu filter
@@ -118,10 +132,9 @@ const VirtualRegister = () => {
         }
     }, [menuFilter])
 
-    useEffect(() => {
-        console.log("inventory: ", inventoryStock);
+    useEffect(() => { // For testing purposes
+        console.log(inventoryStock)
     }, [inventoryStock])
-
     return ( 
         <div className="virtual-register">
             <div className="menu-container">
