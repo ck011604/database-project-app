@@ -2,6 +2,7 @@ import axios from "axios";
 import "../css/VirtualRegister.css"
 import { useEffect, useState } from "react";
 import MenuItem from "./MenuItem";
+import CheckoutPopup from "./CheckoutPopup";
 
 const VirtualRegister = () => {
 
@@ -12,6 +13,7 @@ const VirtualRegister = () => {
     const [inventoryStock, setInventoryStock] = useState([]);
     const [menuFilter, setMenuFilter] = useState("ALL");
     const [subtotal, setSubtotal] = useState(0);
+    const [isCheckoutVisible, setIsCheckoutVisible] = useState(false);
     const [error, setError] = useState("");
 
     useEffect(() => { // Load menu
@@ -73,6 +75,9 @@ const VirtualRegister = () => {
             return item; // Else return unchanged
         }).filter(item => item.quantity > 0); // Remove items with quantity 0 or less
         setSelectedItems(updatedItems);
+    };
+    const handlePopupOnClose = () => {
+        setIsCheckoutVisible(false);
     };
 
     const isItemOutOfStock = (item) => {
@@ -165,9 +170,10 @@ const VirtualRegister = () => {
                 {selectedItems.length > 0 && <button className="clear-list-button" onClick={() => setSelectedItems([])}>Clear All</button>}
                 <div className="finish-order">
                     <p>Subtotal: ${subtotal}</p>
-                    <button className="checkout-button">Checkout</button>
+                    <button className="checkout-button" onClick={() => setIsCheckoutVisible(true)}>Checkout</button>
                 </div>
             </div>
+            {isCheckoutVisible && <CheckoutPopup onClose={handlePopupOnClose}/>}
         </div>
      );
 }
