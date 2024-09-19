@@ -173,7 +173,7 @@ const VirtualRegister = () => {
                     <button className="checkout-button" onClick={() => setIsCheckoutVisible(true)}>Checkout</button>
                 </div>
             </div>
-            {isCheckoutVisible && <CheckoutPopup onClose={handlePopupOnClose}/>}
+            {isCheckoutVisible && <CheckoutPopup onClose={handlePopupOnClose} subtotal={subtotal}/>}
         </div>
      );
 }
