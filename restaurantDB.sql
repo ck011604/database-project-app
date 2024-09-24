@@ -101,17 +101,20 @@ DROP TABLE IF EXISTS `orders`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `orders` (
-  `order_id` int NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
-  `items` text NOT NULL COMMENT 'JSON format list of Recipes and Quantity',
-  `waiter_id` int unsigned NOT NULL,
-  `table_id` int unsigned NOT NULL,
-  `customer_id` int unsigned NOT NULL,
-  `amount_due` decimal(10,2) unsigned NOT NULL,
-  `tip` decimal(10,2) unsigned NOT NULL,
-  `amount_paid` decimal(10,2) unsigned NOT NULL,
-  `change` decimal(10,2) unsigned NOT NULL,
+  `order_id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
+  `items` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci COMMENT 'JSON format list of Recipes and Quantity',
+  `waiter_id` int unsigned DEFAULT NULL,
+  `table_id` int unsigned DEFAULT NULL,
+  `customer_id` int unsigned DEFAULT NULL,
+  `subtotal` decimal(10,2) DEFAULT NULL,
+  `tip_percent` int unsigned DEFAULT NULL,
+  `tip_amount` decimal(10,2) unsigned DEFAULT NULL,
+  `total` decimal(10,2) DEFAULT NULL,
+  `received_amount` decimal(10,2) DEFAULT NULL,
+  `change_amount` decimal(10,2) DEFAULT NULL,
+  `tax_amount` decimal(10,2) unsigned zerofill DEFAULT NULL,
   PRIMARY KEY (`order_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Table to hold items';
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Table to hold items';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -119,6 +122,7 @@ CREATE TABLE `orders` (
 --
 
 /*!40000 ALTER TABLE `orders` DISABLE KEYS */;
+INSERT INTO `orders` VALUES (9,NULL,999,999,999,61.89,5,3.09,70.09,75.00,4.91,00000005.11);
 /*!40000 ALTER TABLE `orders` ENABLE KEYS */;
 
 --
@@ -134,4 +138,4 @@ CREATE TABLE `orders` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-09-18 10:35:30
+-- Dump completed on 2024-09-23 23:54:19

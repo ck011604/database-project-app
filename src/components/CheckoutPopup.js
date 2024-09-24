@@ -1,7 +1,8 @@
+import axios from "axios";
 import { useEffect, useState } from "react";
 import "../css/CheckoutPopup.css";
 
-const CheckoutPopup = ({ onClose, subtotal }) => {
+const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset }) => {
   const [tax, setTax] = useState(0.0);
   const [total, setTotal] = useState(0.0);
   const [tableNumber, setTableNumber] = useState(0);
@@ -11,6 +12,10 @@ const CheckoutPopup = ({ onClose, subtotal }) => {
   const [changeAmount, setChangeAmount] = useState(0.00);
   const [error, setError] = useState("");
   const [confirmOrderButton, setConfrimOrderButton] = useState("Confrim Order");
+  const [waiterID, setWaiterID,] = useState(999); //For testing, needs to be passed along from login
+  const [customerID, setCustomerID] = useState(999); // For testing, needs to be passed along from virtual register
+  const [orderButtonLock, setOrderButtonLock] = useState(false);
+  const [successfulOrder, setSuccessfulOrder] = useState(false); // Needed for reseting selected items when closing
 
   useEffect(() => { // Handle all of the calculations
     const numericSubtotal = parseFloat(subtotal); // Treat as number, not string
@@ -29,7 +34,15 @@ const CheckoutPopup = ({ onClose, subtotal }) => {
     setChangeAmount(calculateChange.toFixed(2))
   }, [subtotal, tipPercent, receivedAmount]);
 
-  const handleConfirmOrder = (e) => {
+  const handleOnClose = () => {
+    if (successfulOrder)
+      onReset();
+    setOrderButtonLock(false);
+    setConfrimOrderButton("Confirm Order");
+    setSuccessfulOrder(false);
+    onClose();
+  }
+  const handleConfirmOrder = async (e) => {
     e.preventDefault();
     if (changeAmount < 0) {
       const neededMoney = (changeAmount * -1).toFixed(2);
@@ -41,8 +54,18 @@ const CheckoutPopup = ({ onClose, subtotal }) => {
     else {
       setError("");
       setConfrimOrderButton("Loading...");
-      // send to server
-      setConfrimOrderButton("Confirm Order");
+      try {
+          const response = await axios.post('http://localhost:3001/confirm-order', {waiterID, tableNumber, customerID, subtotal, tax, tipPercent, tipAmount, total, receivedAmount, changeAmount});
+          if (response.data.success)
+            setOrderButtonLock(true);
+            setSuccessfulOrder(true);
+            setConfrimOrderButton("Success!");
+      }
+      catch(err) {
+        if (err.response && err.response.data && err.response.data.message)
+          setError(err.response.data.message);
+        else setError("An error has occured");
+      }
     }
   }
 
@@ -51,7 +74,7 @@ const CheckoutPopup = ({ onClose, subtotal }) => {
       <div className="checkout-popup-content">
         <div className="checkout-header">
           <h1>Payment</h1>
-          <button onClick={onClose}>Close</button>
+          <button onClick={handleOnClose}>Close</button>
         </div>
         <form onSubmit={handleConfirmOrder}>
           <div className="checkout-label">
@@ -109,7 +132,7 @@ const CheckoutPopup = ({ onClose, subtotal }) => {
             </div>
           }
           {error && <p className="confirm-order-error">{error}</p>}
-          <button className="confirm-order-button">{confirmOrderButton}</button>
+          <button className="confirm-order-button" disabled={orderButtonLock}>{confirmOrderButton}</button>
         </form>
       </div>
     </div>

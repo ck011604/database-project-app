@@ -63,6 +63,10 @@ const VirtualRegister = () => {
         }
         setSelectedItems(updatedItems); // Update selected items
     }
+    const resetSelectedItems = () => {
+        setSelectedItems([]);
+        console.log("Reseting selected items", selectedItems)
+    }
 
     const handleQuantityChange = (itemID, delta) => {
         const updatedItems = selectedItems.map(item => {
@@ -137,9 +141,9 @@ const VirtualRegister = () => {
         }
     }, [menuFilter])
 
-    useEffect(() => { // For testing purposes
-        console.log(inventoryStock)
-    }, [inventoryStock])
+    // useEffect(() => { // For testing purposes
+    //     console.log(inventoryStock)
+    // }, [inventoryStock])
     return ( 
         <div className="virtual-register">
             <div className="menu-container">
@@ -167,13 +171,13 @@ const VirtualRegister = () => {
                         </div>
                     ))}
                 </div>
-                {selectedItems.length > 0 && <button className="clear-list-button" onClick={() => setSelectedItems([])}>Clear All</button>}
+                {selectedItems.length > 0 && <button className="clear-list-button" onClick={resetSelectedItems}>Clear All</button>}
                 <div className="finish-order">
                     <p>Subtotal: ${subtotal}</p>
                     <button className="checkout-button" onClick={() => setIsCheckoutVisible(true)}>Checkout</button>
                 </div>
             </div>
-            {isCheckoutVisible && <CheckoutPopup onClose={handlePopupOnClose} subtotal={subtotal}/>}
+            {isCheckoutVisible && <CheckoutPopup onClose={handlePopupOnClose} subtotal={subtotal} selectedItems={selectedItems} onReset={resetSelectedItems} />}
         </div>
      );
 }

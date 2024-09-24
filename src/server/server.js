@@ -77,6 +77,36 @@ const server = http.createServer((req, res) => {
                 )
             });
         }
+        if (req.url === "/confirm-order") {
+          console.log("Received request to add order");
+          let body = "";
+          req.on("data", (chunk) => {
+            body += chunk.toString();
+          });
+          req.on("end", () => {
+            const { selectedItems, waiterID, tableNumber, customerID, subtotal, tax, tipPercent, tipAmount, total, receivedAmount, changeAmount } = JSON.parse(body);
+            pool.query(
+              "INSERT INTO orders (waiter_id, table_id, customer_id, subtotal, tip_percent, tip_amount, total, received_amount, change_amount, tax_amount) VALUES (?,?,?,?,?,?,?,?,?,?)",
+              [waiterID, tableNumber, customerID, subtotal, tipPercent, tipAmount, total, receivedAmount, changeAmount, tax],
+              (error, result) => {
+                if (error) {
+                  res.writeHead(500, { "Content-Type": "application/json" });
+                  res.end(
+                    JSON.stringify({
+                      success: false,
+                      message: "Server Error inserting into orders",
+                    })
+                  );
+                  console.log(error)
+                  return;
+                } // Else
+                res.writeHead(200, { "Content-Type": "application/json" });
+                res.end(JSON.stringify({ success: true }));
+                console.log("Successfully added order");
+              }
+            );
+          });
+        }
     }
     if(req.method === "GET") {
         if (req.url === "/menu") {
