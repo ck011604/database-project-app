@@ -86,8 +86,8 @@ const server = http.createServer((req, res) => {
           req.on("end", () => {
             const { selectedItems, waiterID, tableNumber, customerID, subtotal, tax, tipPercent, tipAmount, total, receivedAmount, changeAmount } = JSON.parse(body);
             pool.query(
-              "INSERT INTO orders (waiter_id, table_id, customer_id, subtotal, tip_percent, tip_amount, total, received_amount, change_amount, tax_amount) VALUES (?,?,?,?,?,?,?,?,?,?)",
-              [waiterID, tableNumber, customerID, subtotal, tipPercent, tipAmount, total, receivedAmount, changeAmount, tax],
+              "INSERT INTO orders (items, waiter_id, table_id, customer_id, subtotal, tip_percent, tip_amount, total, received_amount, change_amount, tax_amount) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+              [selectedItems, waiterID, tableNumber, customerID, subtotal, tipPercent, tipAmount, total, receivedAmount, changeAmount, tax],
               (error, result) => {
                 if (error) {
                   res.writeHead(500, { "Content-Type": "application/json" });
@@ -125,7 +125,7 @@ const server = http.createServer((req, res) => {
         }
         if (req.url === "/inventory-stock") {
           console.log("Received request to get inventory stock");
-          pool.query("SELECT ingredient_id, amount FROM inventory", (error, results) => {
+          pool.query("SELECT ingredient_id, name, amount FROM inventory", (error, results) => {
               if (error) {
                 res.writeHead(500, { "Content-Type": "application/json" });
                 res.end(
