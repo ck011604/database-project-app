@@ -90,6 +90,7 @@
     border: none;
     padding: 10px 20px;
 }
-.confirm-order-error {
+.confirm-order-error, .affected-items {
     color: red;
+    margin: 0;
 }

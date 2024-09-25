@@ -181,7 +181,8 @@ const VirtualRegister = () => {
                 subtotal={subtotal} 
                 selectedItems={selectedItems} 
                 onReset={resetSelectedItems} 
-                fetchInventory={fetchInventory} />}
+                fetchInventory={fetchInventory}
+                setSelectedItemsVR={setSelectedItems} />}
         </div>
      );
 }

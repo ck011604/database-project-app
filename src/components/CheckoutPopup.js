@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import "../css/CheckoutPopup.css";
 
-const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInventory }) => {
+const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInventory, setSelectedItemsVR }) => {
   const [tax, setTax] = useState(0.0);
   const [total, setTotal] = useState(0.0);
   const [tableNumber, setTableNumber] = useState(0);
@@ -14,10 +14,11 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
   const [confirmOrderButton, setConfrimOrderButton] = useState("Confrim Order");
   const [waiterID, setWaiterID,] = useState(999); //For testing, needs to be passed along from login
   const [customerID, setCustomerID] = useState(999); // For testing, needs to be passed along from virtual register
-  const [orderButtonLock, setOrderButtonLock] = useState(false);
+  const [formLock, setFormLock] = useState(false);
   const [successfulOrder, setSuccessfulOrder] = useState(false); // Needed for reseting selected items when closing
-  //const [inventoryStock, setInventoryStock] = useState([]);
-  //const [selectedItemsIngredients, setSelectedItemsIngredients] = useState([]);
+  const [conflictingIngredients, setConflictingIngredients] = useState([]); // Name and ID of conIng
+  const [updatedSelectedItems, setUpdatedSelectiveItems] = useState([]); // New list after removing items with conIng
+  const [itemsWithConIng, setItemsWithConIng] = useState([]); // List of items containing a conIng
 
   useEffect(() => { // Handle all of the calculations
     const numericSubtotal = parseFloat(subtotal); // Treat as number, not string
@@ -39,7 +40,13 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
   const handleOnClose = () => {
     if (successfulOrder)
       onReset();
-    setOrderButtonLock(false);
+    else if (conflictingIngredients.length > 0) {
+      setConflictingIngredients([]);
+      setSelectedItemsVR(updatedSelectedItems);
+      setUpdatedSelectiveItems([]);
+      setItemsWithConIng([]);
+    }
+    setFormLock(false);
     setConfrimOrderButton("Confirm Order");
     setSuccessfulOrder(false);
     fetchInventory();
@@ -71,7 +78,6 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
       let inventoryStock = [];
       try {
         const inventoryResponse = await axios.get('http://localhost:3001/inventory-stock');
-        //setInventoryStock(inventoryResponse.data.inventory);
         inventoryStock = inventoryResponse.data.inventory;
       } catch(err) {
         if (err.response && err.inventoryResponse.data && err.inventoryResponse.data.message)
@@ -79,23 +85,37 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
         else
           setError('An error has occured fetching the inventory');
       }
-      let conflictingIngredients =[]; // Name of out of stock ingredients
+      //let conflictingIngredients =[]; // Name and ID of out of stock ingredients
       requiredIngredients.forEach(reqIng => {
         const ingredient = inventoryStock.find(ing => ing.ingredient_id === reqIng.ingredient_id);
         if (!ingredient) {
           setError("Invalid Ingredient");
           setConfrimOrderButton("Error");
-          setOrderButtonLock(true);
+          setFormLock(true);
           return;
         }
         else if (reqIng.quantity > ingredient.amount) {
-          conflictingIngredients.push(ingredient.name)
+          conflictingIngredients.push({ name: ingredient.name, ingredient_id: ingredient.ingredient_id });
         }
       });
       if (conflictingIngredients.length > 0) { // There is an out of stock ingredient
-        setError(`Out of stock ingredients: ${conflictingIngredients}`)
+        setError(`Out of stock ingredients: ${conflictingIngredients.map(conIng => conIng.name).join(", ")}`);
         setConfrimOrderButton("Error");
-        setOrderButtonLock(true);
+        setFormLock(true);
+        // filters out items without a conflicting ingredient
+        setUpdatedSelectiveItems(selectedItems.filter(item => 
+          { return !item.ingredients.some(ingredient =>
+            conflictingIngredients.some(conIng => conIng.ingredient_id === ingredient.ingredient_id)
+            ) 
+          })
+        );
+        // filters out items with a conflicting ingredient
+        setItemsWithConIng(selectedItems.filter(item => {
+          return item.ingredients.some(ingredient =>
+            conflictingIngredients.some(conIng => conIng.ingredient_id === ingredient.ingredient_id)
+          )
+        })
+        );
         return;
       }
       // Passed checks, order can continue...
@@ -105,7 +125,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
       try {
           const response = await axios.post('http://localhost:3001/confirm-order', {selectedItems:itemsJSON, waiterID, tableNumber, customerID, subtotal, tax, tipPercent, tipAmount, total, receivedAmount, changeAmount});
           if (response.data.success)
-            setOrderButtonLock(true);
+            setFormLock(true);
             setSuccessfulOrder(true);
             setConfrimOrderButton("Success!");
       }
@@ -134,6 +154,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
               min="0"
               placeholder="1"
               required
+              disabled={formLock}
             />
           </div>
           <div className="checkout-label">
@@ -157,6 +178,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
               value={tipPercent}
               onChange={(e) => setTipPercent(e.target.value)}
               required
+              disabled={formLock}
             />
           </div>
           <div className="checkout-label">
@@ -171,6 +193,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
               onChange={(e) => setReceivedAmount(e.target.value)}
               min="0"
               placeholder="0.00"
+              disabled={formLock}
             />
           </div>
           {changeAmount > 0 &&
@@ -180,7 +203,10 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
             </div>
           }
           {error && <p className="confirm-order-error">{error}</p>}
-          <button className="confirm-order-button" disabled={orderButtonLock}>{confirmOrderButton}</button>
+          {itemsWithConIng.length > 0 && <p className="affected-items">Affected items: {
+            itemsWithConIng.map(item => item.name).join(', ')
+          }</p>}
+          <button className="confirm-order-button" disabled={formLock}>{confirmOrderButton}</button>
         </form>
       </div>
     </div>
