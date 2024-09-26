@@ -3,7 +3,6 @@ const url = require('url');
 const virtualRegisterController = require('./controllers/virtualRegister_controller');
 const employee_controller = require("./controllers/employee_controller")
 const pool = require("./pool") // put const pool = require("../pool") into controller files
-// const querystring = require('querystring');
 
 const server = http.createServer((req, res) => {
     // Set CORS headers
@@ -95,6 +94,9 @@ const server = http.createServer((req, res) => {
     if (req.method === "PATCH") {
         if (req.url.startsWith("/api/employees/")) {
             employee_controller.employee_update_patch(req, res);
+        }
+        if (req.url === "/subtract-inventory") {
+            virtualRegisterController.subtract_inventory(req, res);
         }
     }
     if (req.method === "DELETE") {

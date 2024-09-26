@@ -19,6 +19,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
   const [conflictingIngredients, setConflictingIngredients] = useState([]); // Name and ID of conIng
   const [updatedSelectedItems, setUpdatedSelectiveItems] = useState([]); // New list after removing items with conIng
   const [itemsWithConIng, setItemsWithConIng] = useState([]); // List of items containing a conIng
+  const [ingredientsNeeded, setIngredientsNeeded] = useState([]); // List of ingredients and quantity for the order
 
   useEffect(() => { // Handle all of the calculations
     const numericSubtotal = parseFloat(subtotal); // Treat as number, not string
@@ -74,6 +75,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
             requiredIngredients.push({ingredient_id: ingredient.ingredient_id, quantity: ingredient.quantity * item.quantity});
         });
       });
+      setIngredientsNeeded(requiredIngredients);
       //Check inventory one last time in case another waiter ordered food
       let inventoryStock = [];
       try {
@@ -123,11 +125,20 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
       setError("");
       setConfrimOrderButton("Loading...");
       try {
-          const response = await axios.post('http://localhost:3001/confirm-order', {selectedItems:itemsJSON, waiterID, tableNumber, customerID, subtotal, tax, tipPercent, tipAmount, total, receivedAmount, changeAmount});
+          const response = await axios.post('http://localhost:3001/confirm-order', {selectedItems: itemsJSON, waiterID, tableNumber, customerID, subtotal, tax, tipPercent, tipAmount, total, receivedAmount, changeAmount});
           if (response.data.success)
             setFormLock(true);
             setSuccessfulOrder(true);
             setConfrimOrderButton("Success!");
+            try { // Subtract from inventory
+              console.log("Client sending patch request to subtract inventory", requiredIngredients)
+              await axios.patch('http://localhost:3001/subtract-inventory', { ingredientsNeeded: requiredIngredients });
+            }
+            catch (err) {
+              if (err.response && err.response.data && err.response.data.message)
+                setError(err.response.data.message);
+              else setError("An error has occured");
+            }
       }
       catch(err) {
         if (err.response && err.response.data && err.response.data.message)
@@ -192,6 +203,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
               value={receivedAmount}
               onChange={(e) => setReceivedAmount(e.target.value)}
               min="0"
+              step="0.01"
               placeholder="0.00"
               disabled={formLock}
             />
