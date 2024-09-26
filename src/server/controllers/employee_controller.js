@@ -1,6 +1,6 @@
 const pool = require("../pool")
 
-exports.index = (req, res) => {
+exports.index = (req, res) => { // Get list of all employees
     console.log("Recieved request to get employees");
     // Query database for all employees
     pool.query("SELECT * FROM employees WHERE is_active = true", (error, results) => {
@@ -13,13 +13,14 @@ exports.index = (req, res) => {
             );
             console.log("Error fetching employees", error);
             return;
-        } // Else
+        }
         console.log("Successfully fetched employees");
         res.writeHead(200, {"Content-Type": "application/json"});
         res.end(JSON.stringify({success: true, employees: results}));
     });
 }
-exports.employee_detail = (req, res) => {
+exports.employee_detail = (req, res) => { // Get info of an employee
+    console.log("Recieved request to get find an employee");
     // Getting the ID from the URL
     const employeeId = req.url.split("/")[3];
     if (!employeeId) {
@@ -33,23 +34,30 @@ exports.employee_detail = (req, res) => {
             res.writeHead(500, { "Content-Type": "application/json" });
             res.end(
                 JSON.stringify({ 
-                    success: false, message: "Server Error fetching employee details",
-                }));
+                    success: false,
+                    message: "Server Error fetching employee details",
+                })
+            );
             console.error("Error fetching employee details:", error);
             return;
         }
         if (results.length === 0) {
             // No employee is found with the given ID
             res.writeHead(404, {"Content-Type": "application/json"});
-            res.end(JSON.stringify({success: false, message: "Employee not found"}));
+            res.end(
+                JSON.stringify({
+                    success: false,
+                    message: "Employee not found",
+                })
+            );
             return;
         }
         // If the employee is found, return details
         res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ success: true, employee: results[0] }));
+        res.end(JSON.stringify({ success: true, employee: results[0]}));
     });
 }
-exports.employee_create_post = (req, res) => {
+exports.employee_create_post = (req, res) => { // Add an employee to database
     // Create employee
     console.log("Received request to add employee");
     let body = '';
@@ -78,9 +86,9 @@ exports.employee_create_post = (req, res) => {
                             message: "Server Error inserting into employees"
                         })
                     );
-                    console.log(error)
+                    console.log(error);
                     return;
-                } // Else
+                }
                 res.writeHead(200, {'Content-Type': 'application/json'});
                 res.end(JSON.stringify({success: true}));
                 console.log("Successfully added employee");
@@ -88,32 +96,39 @@ exports.employee_create_post = (req, res) => {
         )
     });
 }
-exports.employee_update_patch = (req, res) => {
+exports.employee_update_patch = (req, res) => { // Update employee details
     console.log("Received request to update employee");
+    // Get ID from URL
     const employeeId = req.url.split("/")[3];
+
     let body = '';
     req.on('data', chunk => {
         body += chunk.toString();
     });
     req.on('end', () => {
-        const { first_name, last_name, email, role, is_active } = JSON.parse(body);
+        const {first_name, last_name, email, role, is_active } = JSON.parse(body);
+        // Check if there are fields to update
         if (!first_name && !last_name && !email && !role && is_active === undefined) {
             res.writeHead(400, { 'Content-Type': 'application/json'});
             res.end(JSON.stringify({ success: false, message: "No fields to update"}));
             return;
         }
-        // Prepare the update query
-        let query = "UPDATE employees SET ";
+        // Construct SQL query
+        let query_string = "UPDATE employees SET ";
         const params = [];
-        if (first_name) { query += "first_name = ?, "; params.push(first_name); }
-        if (last_name) { query += "last_name = ?, "; params.push(last_name); }
-        if (email) { query += "email = ?, "; params.push(email); }
-        if (role) { query += "role = ?, "; params.push(role); }
-        if (is_active !== undefined) { query += "is_active = ? "; params.push(is_active); }
-        // Remove the last comma and space, then add the WHERE clause
-        query = query.replace(/, $/, ' WHERE employee_id = ?');
-        params.push(employeeId); // Add employeeId to the end of params for the WHERE clause
-        pool.query(query, params, (error, result) => {
+        // Query provided fields and add to params array (allows for single changes)
+        if (first_name) { query_string += "first_name = ?, "; params.push(first_name); }
+        if (last_name) { query_string += "last_name = ?, "; params.push(last_name); }
+        if (email) { query_string += "email = ?, "; params.push(email); }
+        if (role) { query_string += "role = ?, "; params.push(role); }
+        if (is_active !== undefined) { query_string += "is_active = ? "; params.push(is_active); }
+        // Remove trailing comma and spaces in array
+        // Specify which employee
+        query_string = query_string.replace(/, $/, ' WHERE employee_id = ?');
+        // Include employee_ID to array for WHERE
+        params.push(employeeId);
+        // Query the string and params array
+        pool.query(query_string, params, (error, result) => {
             if (error) {
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ success: false, message: 'Server Error updating employee' }));
@@ -127,7 +142,8 @@ exports.employee_update_patch = (req, res) => {
     });
 }
 exports.employee_delete = (req, res) => {
-    const employeeId = req.url.split("/")[3]; // Extract employee ID from the URL
+    // Get employee ID from the URL
+    const employeeId = req.url.split("/")[3];
     if (!employeeId) {
         res.writeHead(400, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ success: false, message: "Employee ID is required" }));
