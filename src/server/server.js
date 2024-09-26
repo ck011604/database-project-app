@@ -1,20 +1,13 @@
 const http = require('http');
-const mysql = require('mysql2');
 const url = require('url');
+const employee_controller = require("./controllers/employee_controller")
+const pool = require("./pool") // put const pool = require("../pool") into controller files
 // const querystring = require('querystring');
-
-// Create a connection pool
-const pool = mysql.createPool({
-    host: 'localhost',   //  database host
-    user: 'root', //  MySQL username
-    password: 'P@sswordDB123', //  MySQL password
-    database: 'restaurantDB' // database name
-});
 
 const server = http.createServer((req, res) => {
     // Set CORS headers
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, GET, PATCH, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     console.log("Creating Server");
     if (req.method === 'OPTIONS') {
@@ -107,6 +100,9 @@ const server = http.createServer((req, res) => {
             );
           });
         }
+        if (req.url === "/api/employees") {
+            employee_controller.employee_create_post(req, res);
+        }
     }
     if(req.method === "GET") {
         if (req.url === "/menu") {
@@ -143,6 +139,78 @@ const server = http.createServer((req, res) => {
             }
           );
         }
+        if (req.url === "/api/employees") {
+            employee_controller.index(req, res);
+        }
+        if (req.url.startsWith("/api/employees/")) {
+            employee_controller.employee_detail(req, res);
+        }
+    if (req.method === "PATCH" && req.url.startsWith("/api/employees/")) {
+        console.log("Received request to update employee");
+        const employeeId = req.url.split("/")[3];
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString();
+        });
+        req.on('end', () => {
+            const { first_name, last_name, email, role, is_active } = JSON.parse(body);
+            if (!first_name && !last_name && !email && !role && is_active === undefined) {
+                res.writeHead(400, { 'Content-Type': 'application/json'});
+                res.end(JSON.stringify({ success: false, message: "No fields to update"}));
+                return;
+            }
+            // Prepare the update query
+            let query = "UPDATE employees SET ";
+            const params = [];
+            if (first_name) { query += "first_name = ?, "; params.push(first_name); }
+            if (last_name) { query += "last_name = ?, "; params.push(last_name); }
+            if (email) { query += "email = ?, "; params.push(email); }
+            if (role) { query += "role = ?, "; params.push(role); }
+            if (is_active !== undefined) { query += "is_active = ? "; params.push(is_active); }
+            // Remove the last comma and space, then add the WHERE clause
+            query = query.replace(/, $/, ' WHERE employee_id = ?');
+            params.push(employeeId); // Add employeeId to the end of params for the WHERE clause
+            pool.query(query, params, (error, result) => {
+                if (error) {
+                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ success: false, message: 'Server Error updating employee' }));
+                    console.log(error);
+                    return;
+                }
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ success: true }));
+                console.log("Successfully updated employee");
+            });
+        });
+        }
+
+    }
+    if (req.method === "DELETE" && req.url.startsWith("/api/employees/")) {
+        const employeeId = req.url.split("/")[3]; // Extract employee ID from the URL
+        if (!employeeId) {
+            res.writeHead(400, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ success: false, message: "Employee ID is required" }));
+            return;
+        }
+        
+        // Soft delete the employee by setting is_active to false
+        pool.query("UPDATE employees SET is_active = false WHERE employee_id = ?", [employeeId], (error, result) => {
+            if (error) {
+                res.writeHead(500, { "Content-Type": "application/json" });
+                res.end(JSON.stringify({ success: false, message: "Server Error deleting employee" }));
+                console.error("Error deleting employee:", error);
+                return;
+            }
+            if (result.affectedRows === 0) {
+                // No employee was found with the given ID
+                res.writeHead(404, { "Content-Type": "application/json" });
+                res.end(JSON.stringify({ success: false, message: "Employee not found" }));
+                return;
+            }
+            res.writeHead(200, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ success: true, message: "Employee deleted successfully" }));
+            console.log("Successfully deleted employee");
+        });
     }
 })
 

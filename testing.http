@@ -1,0 +1,18 @@
+
+POST http://localhost:3001/api/employees
+content-type: application/json
+
+{
+    "first_name": "Daz",
+    "last_name": "Pir",
+    "email": "daz@example.com",
+    "role": "Chef"
+}
+
+###
+
+Get http://localhost:3001/api/employees
+
+###
+
+Get http://localhost:3001/api/employees/1
