@@ -16,6 +16,18 @@ const VirtualRegister = () => {
     const [isCheckoutVisible, setIsCheckoutVisible] = useState(false);
     const [error, setError] = useState("");
 
+    const fetchInventory = async () => {
+        try {
+            const inventoryResponse = await axios.get('http://localhost:3001/inventory-stock');
+            setInventoryStock(inventoryResponse.data.inventory);
+            setOriginalInventoryStock(inventoryResponse.data.inventory);
+        } catch (err) {
+            if (err.response && err.inventoryResponse.data && err.inventoryResponse.data.message)
+                setError(err.inventoryResponse.data.message);
+            else
+                setError('An error has occured fetching the inventory');
+        }
+    }
     useEffect(() => { // Load menu
         const fetchMenu = async () => {
             try {
@@ -29,18 +41,6 @@ const VirtualRegister = () => {
                     setError('An error has occured fetching the menu');
             }
         };
-        const fetchInventory = async () => {
-            try {
-                const inventoryResponse = await axios.get('http://localhost:3001/inventory-stock');
-                setInventoryStock(inventoryResponse.data.inventory);
-                setOriginalInventoryStock(inventoryResponse.data.inventory);
-            } catch(err) {
-                if (err.response && err.inventoryResponse.data && err.inventoryResponse.data.message)
-                    setError(err.inventoryResponse.data.message);
-                else
-                    setError('An error has occured fetching the inventory');
-            }
-        }
         fetchMenu();
         fetchInventory();
     }, []);
@@ -65,7 +65,6 @@ const VirtualRegister = () => {
     }
     const resetSelectedItems = () => {
         setSelectedItems([]);
-        console.log("Reseting selected items", selectedItems)
     }
 
     const handleQuantityChange = (itemID, delta) => {
@@ -177,7 +176,13 @@ const VirtualRegister = () => {
                     <button className="checkout-button" onClick={() => setIsCheckoutVisible(true)}>Checkout</button>
                 </div>
             </div>
-            {isCheckoutVisible && <CheckoutPopup onClose={handlePopupOnClose} subtotal={subtotal} selectedItems={selectedItems} onReset={resetSelectedItems} />}
+            {isCheckoutVisible && <CheckoutPopup 
+                onClose={handlePopupOnClose} 
+                subtotal={subtotal} 
+                selectedItems={selectedItems} 
+                onReset={resetSelectedItems} 
+                fetchInventory={fetchInventory}
+                setSelectedItemsVR={setSelectedItems} />}
         </div>
      );
 }

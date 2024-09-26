@@ -37,7 +37,7 @@ CREATE TABLE `inventory` (
 --
 
 /*!40000 ALTER TABLE `inventory` DISABLE KEYS */;
-INSERT INTO `inventory` VALUES (1,'mozzarella',100,20,100),(2,'tomato sauce',100,10,100),(3,'dough',50,10,50),(4,'pepperoni',200,50,100),(5,'cheddar cheese',100,20,100),(6,'beef patty',100,20,50),(7,'lettuce',100,20,50),(8,'tomato',100,20,50),(9,'pasta',100,20,50),(10,'chicken',100,20,70),(11,'garlic',100,20,50),(12,'fish fillets',50,10,30),(13,'tortillas',100,20,50),(14,'cabbage',100,20,50),(15,'lime',100,40,50),(16,'sour cream',50,20,50),(17,'milk',70,20,50),(18,'butter',100,30,100),(19,'flour',100,40,200),(20,'hamburger bun',100,20,75),(21,'hot dog sausage',100,20,50),(22,'hot dog bun',100,30,100),(23,'mustard',100,40,100),(24,'ketchup',100,30,100),(25,'relish',50,20,45),(26,'potatoes',100,30,100),(27,'carrots',100,20,60),(28,'mayonnaise',60,10,40),(29,'bread',100,10,40),(30,'corn',15,10,50),(31,'salt',100,40,100),(32,'Sprite',100,20,100),(33,'Coca-Cola',100,20,100),(34,'Pepsi',100,20,100),(35,'Dr. Pepper',100,20,100),(36,'Fanta Orange',0,20,100),(37,'Diet Coke',100,20,100),(38,'Black Tea',100,20,70),(39,'Sugar',100,20,100);
+INSERT INTO `inventory` VALUES (1,'mozzarella',100,20,100),(2,'tomato sauce',100,10,100),(3,'dough',100,10,50),(4,'pepperoni',200,50,100),(5,'cheddar cheese',100,20,100),(6,'beef patty',100,20,50),(7,'lettuce',100,20,50),(8,'tomato',100,20,50),(9,'pasta',100,20,50),(10,'chicken',100,20,70),(11,'garlic',100,20,50),(12,'fish fillets',50,10,30),(13,'tortillas',100,20,50),(14,'cabbage',100,20,50),(15,'lime',100,40,50),(16,'sour cream',50,20,50),(17,'milk',70,20,50),(18,'butter',100,30,100),(19,'flour',100,40,200),(20,'hamburger bun',100,20,75),(21,'hot dog sausage',100,20,50),(22,'hot dog bun',100,30,100),(23,'mustard',100,40,100),(24,'ketchup',100,30,100),(25,'relish',50,20,45),(26,'potatoes',100,30,100),(27,'carrots',100,20,60),(28,'mayonnaise',60,10,40),(29,'bread',100,10,40),(30,'corn',15,10,50),(31,'salt',100,40,100),(32,'Sprite',100,20,100),(33,'Coca-Cola',100,20,100),(34,'Pepsi',100,20,100),(35,'Dr. Pepper',100,20,100),(36,'Fanta Orange',0,20,100),(37,'Diet Coke',100,20,100),(38,'Black Tea',100,20,70),(39,'Sugar',100,20,100);
 /*!40000 ALTER TABLE `inventory` ENABLE KEYS */;
 
 --
@@ -113,8 +113,9 @@ CREATE TABLE `orders` (
   `received_amount` decimal(10,2) DEFAULT NULL,
   `change_amount` decimal(10,2) DEFAULT NULL,
   `tax_amount` decimal(10,2) unsigned zerofill DEFAULT NULL,
+  `status` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'In-Queue',
   PRIMARY KEY (`order_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Table to hold items';
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Table to hold items';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -122,7 +123,7 @@ CREATE TABLE `orders` (
 --
 
 /*!40000 ALTER TABLE `orders` DISABLE KEYS */;
-INSERT INTO `orders` VALUES (9,NULL,999,999,999,61.89,5,3.09,70.09,75.00,4.91,00000005.11);
+INSERT INTO `orders` VALUES (14,'[{\"recipe_id\":2,\"name\":\"Pepperoni Pizza\",\"ingredients\":[{\"quantity\":1,\"ingredient_id\":2},{\"quantity\":5,\"ingredient_id\":1},{\"quantity\":1,\"ingredient_id\":3},{\"quantity\":20,\"ingredient_id\":4}],\"price\":\"15.99\",\"image\":\"pepperoni_pizza.jpg\",\"type\":\"main\",\"quantity\":4}]',999,45,999,63.96,0,0.00,69.24,70.00,0.76,00000005.28,'In-Queue'),(15,'[{\"recipe_id\":2,\"name\":\"Pepperoni Pizza\",\"ingredients\":[{\"quantity\":1,\"ingredient_id\":2},{\"quantity\":5,\"ingredient_id\":1},{\"quantity\":1,\"ingredient_id\":3},{\"quantity\":20,\"ingredient_id\":4}],\"price\":\"15.99\",\"image\":\"pepperoni_pizza.jpg\",\"type\":\"main\",\"quantity\":4}]',999,555,999,63.96,0,0.00,69.24,70.00,0.76,00000005.28,'In-Queue'),(16,'[{\"recipe_id\":1,\"name\":\"Cheese Pizza\",\"ingredients\":[{\"quantity\":1,\"ingredient_id\":2},{\"quantity\":5,\"ingredient_id\":1},{\"quantity\":1,\"ingredient_id\":3}],\"price\":\"15.99\",\"image\":\"cheese_pizza.jpg\",\"type\":\"main\",\"quantity\":6},{\"recipe_id\":2,\"name\":\"Pepperoni Pizza\",\"ingredients\":[{\"quantity\":1,\"ingredient_id\":2},{\"quantity\":5,\"ingredient_id\":1},{\"quantity\":1,\"ingredient_id\":3},{\"quantity\":20,\"ingredient_id\":4}],\"price\":\"15.99\",\"image\":\"pepperoni_pizza.jpg\",\"type\":\"main\",\"quantity\":1}]',999,56,999,111.93,0,0.00,121.16,300.00,178.84,00000009.23,'In-Queue'),(17,'[{\"recipe_id\":2,\"name\":\"Pepperoni Pizza\",\"ingredients\":[{\"quantity\":1,\"ingredient_id\":2},{\"quantity\":5,\"ingredient_id\":1},{\"quantity\":1,\"ingredient_id\":3},{\"quantity\":20,\"ingredient_id\":4}],\"price\":\"15.99\",\"image\":\"pepperoni_pizza.jpg\",\"type\":\"main\",\"quantity\":5},{\"recipe_id\":1,\"name\":\"Cheese Pizza\",\"ingredients\":[{\"quantity\":1,\"ingredient_id\":2},{\"quantity\":5,\"ingredient_id\":1},{\"quantity\":1,\"ingredient_id\":3}],\"price\":\"15.99\",\"image\":\"cheese_pizza.jpg\",\"type\":\"main\",\"quantity\":1}]',999,56,999,95.94,0,0.00,103.86,105.00,1.14,00000007.92,'In-Queue');
 /*!40000 ALTER TABLE `orders` ENABLE KEYS */;
 
 --
@@ -138,4 +139,4 @@ INSERT INTO `orders` VALUES (9,NULL,999,999,999,61.89,5,3.09,70.09,75.00,4.91,00
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-09-23 23:54:19
+-- Dump completed on 2024-09-24 16:13:51
