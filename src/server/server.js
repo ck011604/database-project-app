@@ -145,45 +145,11 @@ const server = http.createServer((req, res) => {
         if (req.url.startsWith("/api/employees/")) {
             employee_controller.employee_detail(req, res);
         }
-    if (req.method === "PATCH" && req.url.startsWith("/api/employees/")) {
-        console.log("Received request to update employee");
-        const employeeId = req.url.split("/")[3];
-        let body = '';
-        req.on('data', chunk => {
-            body += chunk.toString();
-        });
-        req.on('end', () => {
-            const { first_name, last_name, email, role, is_active } = JSON.parse(body);
-            if (!first_name && !last_name && !email && !role && is_active === undefined) {
-                res.writeHead(400, { 'Content-Type': 'application/json'});
-                res.end(JSON.stringify({ success: false, message: "No fields to update"}));
-                return;
-            }
-            // Prepare the update query
-            let query = "UPDATE employees SET ";
-            const params = [];
-            if (first_name) { query += "first_name = ?, "; params.push(first_name); }
-            if (last_name) { query += "last_name = ?, "; params.push(last_name); }
-            if (email) { query += "email = ?, "; params.push(email); }
-            if (role) { query += "role = ?, "; params.push(role); }
-            if (is_active !== undefined) { query += "is_active = ? "; params.push(is_active); }
-            // Remove the last comma and space, then add the WHERE clause
-            query = query.replace(/, $/, ' WHERE employee_id = ?');
-            params.push(employeeId); // Add employeeId to the end of params for the WHERE clause
-            pool.query(query, params, (error, result) => {
-                if (error) {
-                    res.writeHead(500, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ success: false, message: 'Server Error updating employee' }));
-                    console.log(error);
-                    return;
-                }
-                res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ success: true }));
-                console.log("Successfully updated employee");
-            });
-        });
+    }
+    if (req.method === "PATCH") {
+        if (req.url.startsWith("/api/employees/")) {
+            employee_controller.employee_update_patch(req, res);
         }
-
     }
     if (req.method === "DELETE" && req.url.startsWith("/api/employees/")) {
         const employeeId = req.url.split("/")[3]; // Extract employee ID from the URL

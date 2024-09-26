@@ -16,3 +16,12 @@ Get http://localhost:3001/api/employees
 ###
 
 Get http://localhost:3001/api/employees/1
+
+###
+
+PATCH http://localhost:3001/api/employees/1
+content-type: application/json
+
+{
+    "role": "Manager"
+}
