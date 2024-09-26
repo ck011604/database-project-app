@@ -126,3 +126,29 @@ exports.employee_update_patch = (req, res) => {
         });
     });
 }
+exports.employee_delete = (req, res) => {
+    const employeeId = req.url.split("/")[3]; // Extract employee ID from the URL
+    if (!employeeId) {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: false, message: "Employee ID is required" }));
+        return;
+    }
+    // Soft delete the employee by setting is_active to false
+    pool.query("UPDATE employees SET is_active = false WHERE employee_id = ?", [employeeId], (error, result) => {
+        if (error) {
+            res.writeHead(500, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ success: false, message: "Server Error deleting employee" }));
+            console.error("Error deleting employee:", error);
+            return;
+        }
+        if (result.affectedRows === 0) {
+            // No employee was found with the given ID
+            res.writeHead(404, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ success: false, message: "Employee not found" }));
+            return;
+        }
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: true, message: "Employee deleted successfully" }));
+        console.log("Successfully deleted employee");
+    });
+}
