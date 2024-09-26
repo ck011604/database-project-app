@@ -63,7 +63,7 @@ const LoginPage = () => {
                 />
               </div>
               <button className="login-button">Login</button>
-              <div className="error">
+              <div className="error-login-page">
                 {error && <p>{error}</p>}
               </div>
               <div className="success-account-creation">
@@ -76,7 +76,7 @@ const LoginPage = () => {
               </div>
             </form>
             <Link to="/create-account">
-              <button className="create-account-option">Create Account</button>
+              <button className="create-account-option">Sign up for Rewards</button>
             </Link>
           </div>
         </div>

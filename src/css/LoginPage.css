@@ -37,9 +37,15 @@
     text-align: center;
     display: block;
 }
-.error {
+.error-login-page {
     color: red;
     font-weight: bold;
+    text-align: center;
+}
+.success-account-creation {
+    color: green;
+    font-weight: bold;
+    text-align: center;
 }
 .label-input {
     margin-bottom: 10px;

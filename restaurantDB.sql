@@ -29,6 +29,7 @@ CREATE TABLE `employees` (
   `email` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `role` varchar(50) NOT NULL,
   `is_active` tinyint(1) DEFAULT '1',
+  `password` varchar(50) NOT NULL,
   PRIMARY KEY (`employee_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -38,7 +39,7 @@ CREATE TABLE `employees` (
 --
 
 /*!40000 ALTER TABLE `employees` DISABLE KEYS */;
-INSERT INTO `employees` VALUES (1,'Amy','Lee','amy@example.com','Manager',1),(2,'Bob','Ross','bob@example.com','Waiter',0),(3,'Sam','Do','sam@example.com','Chef',0),(4,'Taylor','Swift','taylor@example.com','Manager',1),(5,'Dan','Pie','dan@example.com','Chef',0),(6,'Daz','Pir','daz@example.com','Chef',0),(7,'Daz','Pir','daz@example.com','Chef',0);
+INSERT INTO `employees` VALUES (1,'Amy','Lee','amy@example.com','Manager',1,'123'),(2,'Bob','Ross','bob@example.com','Waiter',0,'123'),(3,'Sam','Do','sam@example.com','Chef',0,'123'),(4,'Taylor','Swift','taylor@example.com','Manager',1,'123'),(5,'Dan','Pie','dan@example.com','Chef',0,'123'),(6,'Daz','Pir','daz@example.com','Chef',0,'123'),(7,'Daz','Pir','daz@example.com','Chef',0,'123');
 /*!40000 ALTER TABLE `employees` ENABLE KEYS */;
 
 --
@@ -232,6 +233,33 @@ CREATE TABLE `shifts` (
 /*!40000 ALTER TABLE `shifts` ENABLE KEYS */;
 
 --
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `users` (
+  `user_id` int NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
+  `first_name` varchar(50) NOT NULL,
+  `last_name` varchar(50) NOT NULL,
+  `email` varchar(50) NOT NULL,
+  `password` varchar(50) NOT NULL,
+  `role` varchar(50) NOT NULL DEFAULT 'user',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `users`
+--
+
+/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES (1,'Mike','Ross','mikeross@gmail.com','mike123','user',1),(2,'Tony','Smith','ts@example.com','ts123','user',1);
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+
+--
 -- Dumping routines for database 'restaurantdb'
 --
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -244,4 +272,4 @@ CREATE TABLE `shifts` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-09-26 14:20:45
+-- Dump completed on 2024-09-26 15:42:10
