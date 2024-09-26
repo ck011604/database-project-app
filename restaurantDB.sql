@@ -68,33 +68,6 @@ INSERT INTO `inventory` VALUES (1,'mozzarella',100,20,100),(2,'tomato sauce',100
 /*!40000 ALTER TABLE `inventory` ENABLE KEYS */;
 
 --
--- Table structure for table `logins`
---
-
-DROP TABLE IF EXISTS `logins`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `logins` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `email` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `password` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `FirstName` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `LastName` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `Role` varchar(50) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Table for storing login information';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `logins`
---
-
-/*!40000 ALTER TABLE `logins` DISABLE KEYS */;
-INSERT INTO `logins` VALUES (1,'realuser@gmail.com','password','Mike','Smith','Customer'),(4,'manager@gmail.com','mpass','John','Doe','Manager');
-/*!40000 ALTER TABLE `logins` ENABLE KEYS */;
-
---
 -- Table structure for table `menu`
 --
 
@@ -272,4 +245,4 @@ INSERT INTO `users` VALUES (1,'Mike','Ross','mikeross@gmail.com','mike123','user
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-09-26 15:42:10
+-- Dump completed on 2024-09-26 18:06:13
