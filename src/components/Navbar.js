@@ -1,4 +1,5 @@
 import "../css/Navbar.css";
+import { Link } from 'react-router-dom';
 
 const Navbar = () => {
     return ( 
@@ -9,7 +10,7 @@ const Navbar = () => {
                 <a href="">Tab2</a>
                 <a href="">Tab3</a>
                 <a href="">Tab4</a>
-                <a href="">Tab5</a>
+                <a href="/schedule">Schedule</a>
             </nav>
         </header>
      );
