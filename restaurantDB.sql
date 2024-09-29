@@ -23,7 +23,7 @@ DROP TABLE IF EXISTS `employees`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `employees` (
-  `employee_id` int NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
+  `employee_id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
   `first_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `last_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `email` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE `employees` (
   `is_active` tinyint(1) DEFAULT '1',
   `password` varchar(50) NOT NULL,
   PRIMARY KEY (`employee_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='employee accounts';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -50,13 +50,13 @@ DROP TABLE IF EXISTS `inventory`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `inventory` (
-  `ingredient_id` int NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
+  `ingredient_id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `amount` int unsigned NOT NULL,
   `restock_threshold` int unsigned NOT NULL,
   `restock_amount` int unsigned NOT NULL,
   PRIMARY KEY (`ingredient_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Table to hold items';
+) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='inventory of ingredients';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -75,14 +75,14 @@ DROP TABLE IF EXISTS `menu`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `menu` (
-  `recipe_id` int NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
+  `recipe_id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `ingredients` json NOT NULL COMMENT 'JSON format list of ingredientID and Quantity',
   `price` decimal(10,2) unsigned NOT NULL,
   `image` varchar(255) NOT NULL COMMENT 'Path to the image',
   `type` varchar(50) NOT NULL COMMENT 'menu type (Ex: main, side, drink)',
   PRIMARY KEY (`recipe_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Table to hold items';
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='resturant menu items';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -102,20 +102,26 @@ DROP TABLE IF EXISTS `orders`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `orders` (
   `order_id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
-  `items` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci COMMENT 'JSON format list of Recipes and Quantity',
-  `waiter_id` int unsigned DEFAULT NULL,
-  `table_id` int unsigned DEFAULT NULL,
+  `items` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'JSON format list of Recipes and Quantity',
+  `waiter_id` int unsigned NOT NULL,
+  `table_id` int unsigned NOT NULL,
   `customer_id` int unsigned DEFAULT NULL,
-  `subtotal` decimal(10,2) unsigned DEFAULT NULL,
-  `tip_percent` int unsigned DEFAULT NULL,
-  `tip_amount` decimal(10,2) unsigned DEFAULT NULL,
-  `total` decimal(10,2) unsigned DEFAULT NULL,
-  `received_amount` decimal(10,2) unsigned DEFAULT NULL,
-  `change_amount` decimal(10,2) unsigned DEFAULT NULL,
-  `tax_amount` decimal(10,2) unsigned DEFAULT NULL,
+  `subtotal` decimal(10,2) unsigned NOT NULL,
+  `tip_percent` int unsigned NOT NULL,
+  `tip_amount` decimal(10,2) unsigned NOT NULL,
+  `total` decimal(10,2) unsigned NOT NULL,
+  `received_amount` decimal(10,2) unsigned NOT NULL,
+  `change_amount` decimal(10,2) unsigned NOT NULL,
+  `tax_amount` decimal(10,2) unsigned NOT NULL,
   `status` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'In-Queue',
-  PRIMARY KEY (`order_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Table to hold items';
+  PRIMARY KEY (`order_id`),
+  KEY `fk_orders_waiter_id` (`waiter_id`),
+  KEY `fk_orders_table_id` (`table_id`),
+  KEY `fk_orders_customer_id` (`customer_id`),
+  CONSTRAINT `fk_orders_customer_id` FOREIGN KEY (`customer_id`) REFERENCES `users` (`user_id`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_orders_table_id` FOREIGN KEY (`table_id`) REFERENCES `restaurant_tables` (`table_id`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_orders_waiter_id` FOREIGN KEY (`waiter_id`) REFERENCES `employees` (`employee_id`) ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='receipt and payment info';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -123,7 +129,7 @@ CREATE TABLE `orders` (
 --
 
 /*!40000 ALTER TABLE `orders` DISABLE KEYS */;
-INSERT INTO `orders` VALUES (1,'[{\"recipe_id\":1,\"name\":\"Cheese Pizza\",\"ingredients\":[{\"quantity\":1,\"ingredient_id\":2},{\"quantity\":5,\"ingredient_id\":1},{\"quantity\":1,\"ingredient_id\":3}],\"price\":\"15.99\",\"image\":\"cheese_pizza.jpg\",\"type\":\"main\",\"quantity\":20}]',999,987,999,319.80,15,47.97,394.15,400.00,5.85,26.38,'In-Queue'),(2,'[{\"recipe_id\":14,\"name\":\"Pepsi\",\"ingredients\":[{\"quantity\":1,\"ingredient_id\":34}],\"price\":\"1.99\",\"image\":\"pepsi.png\",\"type\":\"drink\",\"quantity\":10},{\"recipe_id\":3,\"name\":\"Cheese Burger\",\"ingredients\":[{\"quantity\":2,\"ingredient_id\":5},{\"quantity\":1,\"ingredient_id\":6},{\"quantity\":2,\"ingredient_id\":7},{\"quantity\":2,\"ingredient_id\":8},{\"quantity\":1,\"ingredient_id\":20}],\"price\":\"7.99\",\"image\":\"cheese_burger.jpg\",\"type\":\"main\",\"quantity\":5}]',999,678,999,59.85,15,8.98,73.77,74.50,0.73,4.94,'In-Queue');
+INSERT INTO `orders` VALUES (1,'[{\"recipe_id\":1,\"name\":\"Cheese Pizza\",\"ingredients\":[{\"quantity\":1,\"ingredient_id\":2},{\"quantity\":5,\"ingredient_id\":1},{\"quantity\":1,\"ingredient_id\":3}],\"price\":\"15.99\",\"image\":\"cheese_pizza.jpg\",\"type\":\"main\",\"quantity\":20}]',1,1,NULL,319.80,15,47.97,394.15,400.00,5.85,26.38,'In-Queue'),(2,'[{\"recipe_id\":14,\"name\":\"Pepsi\",\"ingredients\":[{\"quantity\":1,\"ingredient_id\":34}],\"price\":\"1.99\",\"image\":\"pepsi.png\",\"type\":\"drink\",\"quantity\":10},{\"recipe_id\":3,\"name\":\"Cheese Burger\",\"ingredients\":[{\"quantity\":2,\"ingredient_id\":5},{\"quantity\":1,\"ingredient_id\":6},{\"quantity\":2,\"ingredient_id\":7},{\"quantity\":2,\"ingredient_id\":8},{\"quantity\":1,\"ingredient_id\":20}],\"price\":\"7.99\",\"image\":\"cheese_burger.jpg\",\"type\":\"main\",\"quantity\":5}]',1,1,NULL,59.85,15,8.98,73.77,74.50,0.73,4.94,'In-Queue');
 /*!40000 ALTER TABLE `orders` ENABLE KEYS */;
 
 --
@@ -135,16 +141,17 @@ DROP TABLE IF EXISTS `request_schedule`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `request_schedule` (
   `request_id` int NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
-  `employee_id` int unsigned DEFAULT NULL,
+  `employee_id` int unsigned NOT NULL,
   `request_type` varchar(50) NOT NULL,
-  `request_start_date` date DEFAULT NULL,
-  `request_end_date` date DEFAULT NULL,
+  `request_start_date` date NOT NULL,
+  `request_end_date` date NOT NULL,
   `status` varchar(50) NOT NULL,
-  `submitted_at` datetime DEFAULT NULL,
-  `is_active` tinyint(1) DEFAULT '1',
+  `submitted_at` datetime NOT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`request_id`),
-  CONSTRAINT `request_schedule_ibfk_1` FOREIGN KEY (`request_id`) REFERENCES `employees` (`employee_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  KEY `fk_request_schedule_employee_id` (`employee_id`),
+  CONSTRAINT `fk_request_schedule_employee_id` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`employee_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='request schedule change';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -155,6 +162,34 @@ CREATE TABLE `request_schedule` (
 /*!40000 ALTER TABLE `request_schedule` ENABLE KEYS */;
 
 --
+-- Table structure for table `restaurant_tables`
+--
+
+DROP TABLE IF EXISTS `restaurant_tables`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `restaurant_tables` (
+  `table_id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
+  `waiter_id` int unsigned DEFAULT NULL,
+  `order_id` int unsigned DEFAULT NULL,
+  `status` varchar(50) NOT NULL DEFAULT 'Free',
+  PRIMARY KEY (`table_id`),
+  KEY `fk_restaurant_tables_waiter_id` (`waiter_id`),
+  KEY `fk_restaurant_tables_order_id` (`order_id`),
+  CONSTRAINT `fk_restaurant_tables_order_id` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_restaurant_tables_waiter_id` FOREIGN KEY (`waiter_id`) REFERENCES `employees` (`employee_id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='every table in the restuarant';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `restaurant_tables`
+--
+
+/*!40000 ALTER TABLE `restaurant_tables` DISABLE KEYS */;
+INSERT INTO `restaurant_tables` VALUES (1,NULL,NULL,'Free');
+/*!40000 ALTER TABLE `restaurant_tables` ENABLE KEYS */;
+
+--
 -- Table structure for table `schedule`
 --
 
@@ -162,14 +197,16 @@ DROP TABLE IF EXISTS `schedule`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `schedule` (
-  `schedule_id` int NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
-  `employee_id` int unsigned DEFAULT NULL,
-  `shift_id` int unsigned DEFAULT NULL,
-  `schedule_date` date DEFAULT NULL,
-  `is_active` tinyint(1) DEFAULT NULL,
+  `schedule_id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
+  `employee_id` int unsigned NOT NULL,
+  `shift_id` int unsigned NOT NULL,
+  `schedule_date` date NOT NULL,
+  `is_active` tinyint(1) NOT NULL,
   PRIMARY KEY (`schedule_id`),
-  CONSTRAINT `schedule_ibfk_1` FOREIGN KEY (`schedule_id`) REFERENCES `employees` (`employee_id`),
-  CONSTRAINT `schedule_ibfk_2` FOREIGN KEY (`schedule_id`) REFERENCES `shifts` (`shift_id`)
+  KEY `fk_schedule_employee_id` (`employee_id`),
+  KEY `fk_schedule_shift_id` (`shift_id`),
+  CONSTRAINT `fk_schedule_employee_id` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`employee_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_schedule_shift_id` FOREIGN KEY (`shift_id`) REFERENCES `shifts` (`shift_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -188,12 +225,12 @@ DROP TABLE IF EXISTS `shifts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `shifts` (
-  `shift_id` int NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
-  `shift_date` date DEFAULT NULL,
-  `shift_start_time` time DEFAULT NULL,
-  `shift_end_time` time DEFAULT NULL,
+  `shift_id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
+  `shift_date` date NOT NULL,
+  `shift_start_time` time NOT NULL,
+  `shift_end_time` time NOT NULL,
   `shift_name` varchar(50) NOT NULL,
-  `is_filled` tinyint(1) DEFAULT '1',
+  `is_filled` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`shift_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -213,15 +250,16 @@ DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
-  `user_id` int NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
+  `user_id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
   `first_name` varchar(50) NOT NULL,
   `last_name` varchar(50) NOT NULL,
   `email` varchar(50) NOT NULL,
   `password` varchar(50) NOT NULL,
   `role` varchar(50) NOT NULL DEFAULT 'user',
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `points` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='customer accounts';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -229,7 +267,7 @@ CREATE TABLE `users` (
 --
 
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'Mike','Ross','mikeross@gmail.com','mike123','user',1),(2,'Tony','Smith','ts@example.com','ts123','user',1);
+INSERT INTO `users` VALUES (1,'Mike','Ross','mikeross@gmail.com','mike123','user',1,0),(2,'Tony','Smith','ts@example.com','ts123','user',1,0);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 
 --
@@ -245,4 +283,4 @@ INSERT INTO `users` VALUES (1,'Mike','Ross','mikeross@gmail.com','mike123','user
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-09-26 18:06:13
+-- Dump completed on 2024-09-29  0:35:20
