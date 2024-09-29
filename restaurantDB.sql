@@ -68,6 +68,34 @@ INSERT INTO `inventory` VALUES (1,'mozzarella',100,20,100),(2,'tomato sauce',100
 /*!40000 ALTER TABLE `inventory` ENABLE KEYS */;
 
 --
+-- Table structure for table `inventory_logs`
+--
+
+DROP TABLE IF EXISTS `inventory_logs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+
+-- Table to log all inventory changes (restocks, manual orders, usage)
+CREATE TABLE `inventory_logs` (
+  `log_id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
+  `ingredient_id` int unsigned NOT NULL,                              -- References the ingredient in inventory
+  `action_type` enum('restock', 'manual_order', 'usage') NOT NULL,    -- Type of inventory change
+  `quantity_change` int NOT NULL,                                     -- Amount of change (positive or negative)
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,           -- When the change occurred
+  PRIMARY KEY (`log_id`),
+  KEY `fk_inventory_logs_ingredient_id` (`ingredient_id`),
+  CONSTRAINT `fk_inventory_logs_ingredient_id` FOREIGN KEY (`ingredient_id`) REFERENCES `inventory` (`ingredient_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='logs for inventory changes';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `inventory_logs`
+--
+
+/*!40000 ALTER TABLE `inventory_logs` DISABLE KEYS */;
+/*!40000 ALTER TABLE `inventory_logs` ENABLE KEYS */;
+
+--
 -- Table structure for table `menu`
 --
 
@@ -81,8 +109,7 @@ CREATE TABLE `menu` (
   `price` decimal(10,2) unsigned NOT NULL,
   `image` varchar(255) NOT NULL COMMENT 'Path to the image',
   `type` varchar(50) NOT NULL COMMENT 'menu type (Ex: main, side, drink)',
-  PRIMARY KEY (`recipe_id`),
-  CONSTRAINT `chk_menu_type` CHECK ((`type` in (_utf8mb4'main',_utf8mb4'side',_utf8mb4'drink')))
+  PRIMARY KEY (`recipe_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='resturant menu items';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -121,8 +148,7 @@ CREATE TABLE `orders` (
   KEY `fk_orders_customer_id` (`customer_id`),
   CONSTRAINT `fk_orders_customer_id` FOREIGN KEY (`customer_id`) REFERENCES `users` (`user_id`) ON UPDATE CASCADE,
   CONSTRAINT `fk_orders_table_id` FOREIGN KEY (`table_id`) REFERENCES `restaurant_tables` (`table_id`) ON UPDATE CASCADE,
-  CONSTRAINT `fk_orders_waiter_id` FOREIGN KEY (`waiter_id`) REFERENCES `employees` (`employee_id`) ON UPDATE CASCADE,
-  CONSTRAINT `chk_orders_status` CHECK ((`status` in (_utf8mb4'In-Queue',_utf8mb4'In-Progress',_utf8mb4'Ready for Pickup',_utf8mb4'Delievered')))
+  CONSTRAINT `fk_orders_waiter_id` FOREIGN KEY (`waiter_id`) REFERENCES `employees` (`employee_id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='receipt and payment info';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -179,8 +205,7 @@ CREATE TABLE `restaurant_tables` (
   KEY `fk_restaurant_tables_waiter_id` (`waiter_id`),
   KEY `fk_restaurant_tables_order_id` (`order_id`),
   CONSTRAINT `fk_restaurant_tables_order_id` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `fk_restaurant_tables_waiter_id` FOREIGN KEY (`waiter_id`) REFERENCES `employees` (`employee_id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `chk_tables_status` CHECK ((`status` in (_utf8mb4'Free',_utf8mb4'In-Use',_utf8mb4'Dirty')))
+  CONSTRAINT `fk_restaurant_tables_waiter_id` FOREIGN KEY (`waiter_id`) REFERENCES `employees` (`employee_id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='every table in the restuarant';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -286,4 +311,66 @@ INSERT INTO `users` VALUES (1,'Mike','Ross','mikeross@gmail.com','mike123','user
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-09-29 11:21:41
+DELIMITER //
+
+-- Procedure to check and restock ingredients below threshold
+CREATE PROCEDURE check_inventory_thresholds()
+BEGIN
+  DECLARE done INT DEFAULT FALSE;
+  DECLARE v_ingredient_id INT UNSIGNED;
+  DECLARE v_name VARCHAR(50);
+  DECLARE v_amount INT UNSIGNED;
+  DECLARE v_restock_threshold INT UNSIGNED;
+  DECLARE v_restock_amount INT UNSIGNED;
+  
+  -- Cursor to select ingredients below threshold
+  DECLARE cur CURSOR FOR 
+    SELECT ingredient_id, name, amount, restock_threshold, restock_amount 
+    FROM inventory 
+    WHERE amount <= restock_threshold;
+  
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+  
+  OPEN cur;
+  
+  read_loop: LOOP
+    FETCH cur INTO v_ingredient_id, v_name, v_amount, v_restock_threshold, v_restock_amount;
+    IF done THEN
+      LEAVE read_loop;
+    END IF;
+    
+    -- Restock the ingredient
+    UPDATE inventory 
+    SET amount = amount + v_restock_amount 
+    WHERE ingredient_id = v_ingredient_id;
+    
+    -- Log the restock action
+    INSERT INTO inventory_logs (ingredient_id, action_type, quantity_change) 
+    VALUES (v_ingredient_id, 'restock', v_restock_amount);
+    
+  END LOOP;
+  
+  CLOSE cur;
+END //
+
+-- Procedure for manually ordering ingredients
+CREATE PROCEDURE manually_order_ingredient(IN p_ingredient_id INT UNSIGNED, IN p_quantity INT UNSIGNED)
+BEGIN
+  -- Update inventory with ordered amount
+  UPDATE inventory 
+  SET amount = amount + p_quantity 
+  WHERE ingredient_id = p_ingredient_id;
+  
+  -- Log the manual order
+  INSERT INTO inventory_logs (ingredient_id, action_type, quantity_change) 
+  VALUES (p_ingredient_id, 'manual_order', p_quantity);
+END //
+
+DELIMITER ;
+
+-- Event to automatically check inventory daily
+CREATE EVENT IF NOT EXISTS check_inventory_event
+ON SCHEDULE EVERY 1 MINUTE
+DO CALL check_inventory_thresholds();
+
+-- Dump completed on 2024-09-29  0:35:20
