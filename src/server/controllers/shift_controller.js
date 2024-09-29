@@ -157,8 +157,8 @@ exports.shift_delete = (req, res) => {
         res.end(JSON.stringify({ success: false, message: "Shift ID is required" }));
         return;
     }
-
-    // Soft delete the employee by setting is_filled to false
+    
+    // Soft delete the shift by setting is_filled to false
     pool.query("DELETE FROM shifts WHERE shift_id = ?", [shiftId], (error, result) => {
         if (error) {
             res.writeHead(500, { "Content-Type": "application/json" });
