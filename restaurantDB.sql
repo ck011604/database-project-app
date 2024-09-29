@@ -81,7 +81,8 @@ CREATE TABLE `menu` (
   `price` decimal(10,2) unsigned NOT NULL,
   `image` varchar(255) NOT NULL COMMENT 'Path to the image',
   `type` varchar(50) NOT NULL COMMENT 'menu type (Ex: main, side, drink)',
-  PRIMARY KEY (`recipe_id`)
+  PRIMARY KEY (`recipe_id`),
+  CONSTRAINT `chk_menu_type` CHECK ((`type` in (_utf8mb4'main',_utf8mb4'side',_utf8mb4'drink')))
 ) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='resturant menu items';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -120,7 +121,8 @@ CREATE TABLE `orders` (
   KEY `fk_orders_customer_id` (`customer_id`),
   CONSTRAINT `fk_orders_customer_id` FOREIGN KEY (`customer_id`) REFERENCES `users` (`user_id`) ON UPDATE CASCADE,
   CONSTRAINT `fk_orders_table_id` FOREIGN KEY (`table_id`) REFERENCES `restaurant_tables` (`table_id`) ON UPDATE CASCADE,
-  CONSTRAINT `fk_orders_waiter_id` FOREIGN KEY (`waiter_id`) REFERENCES `employees` (`employee_id`) ON UPDATE CASCADE
+  CONSTRAINT `fk_orders_waiter_id` FOREIGN KEY (`waiter_id`) REFERENCES `employees` (`employee_id`) ON UPDATE CASCADE,
+  CONSTRAINT `chk_orders_status` CHECK ((`status` in (_utf8mb4'In-Queue',_utf8mb4'In-Progress',_utf8mb4'Ready for Pickup',_utf8mb4'Delievered')))
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='receipt and payment info';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -177,7 +179,8 @@ CREATE TABLE `restaurant_tables` (
   KEY `fk_restaurant_tables_waiter_id` (`waiter_id`),
   KEY `fk_restaurant_tables_order_id` (`order_id`),
   CONSTRAINT `fk_restaurant_tables_order_id` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `fk_restaurant_tables_waiter_id` FOREIGN KEY (`waiter_id`) REFERENCES `employees` (`employee_id`) ON DELETE SET NULL ON UPDATE CASCADE
+  CONSTRAINT `fk_restaurant_tables_waiter_id` FOREIGN KEY (`waiter_id`) REFERENCES `employees` (`employee_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `chk_tables_status` CHECK ((`status` in (_utf8mb4'Free',_utf8mb4'In-Use',_utf8mb4'Dirty')))
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='every table in the restuarant';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -283,4 +286,4 @@ INSERT INTO `users` VALUES (1,'Mike','Ross','mikeross@gmail.com','mike123','user
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-09-29  0:35:20
+-- Dump completed on 2024-09-29 11:21:41
