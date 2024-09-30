@@ -12,7 +12,7 @@ exports.valid_table = (req, res) => {
     );
     return;
   }
-  pool.query("SELECT * FROM restaurant_tables WHERE table_id = ?", [tableNumber],
+  pool.query("SELECT table_id FROM restaurant_tables WHERE table_id = ?", [tableNumber],
     (error, results) => {
       if (error) {
         res.writeHead(500, { "Content-Type": "application/json" });

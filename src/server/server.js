@@ -53,6 +53,9 @@ const server = http.createServer((req, res) => {
         if (req.url.startsWith("/valid-table")) {
           tableController.valid_table(req, res);
         }
+        if (req.url.startsWith("/valid-customer-email")) {
+          accountController.validCustomerEmail(req, res);
+        }
         if (req.url === "/api/employees") {
             employee_controller.index(req, res);
         }
