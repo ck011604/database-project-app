@@ -89,8 +89,15 @@
     border-radius: 5px;
     border: none;
     padding: 10px 20px;
+    cursor: pointer;
 }
 .confirm-order-error, .affected-items {
     color: red;
     margin: 0;
+}
+.special-request-container textarea {
+    width: 70%;
+    height: 50px;
+    resize: none;
+    font-family: inherit;
 }

@@ -3,13 +3,13 @@ import { useEffect, useState } from "react";
 import "../css/CheckoutPopup.css";
 
 const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInventory, setSelectedItemsVR }) => {
-  const [tax, setTax] = useState(0.0);
-  const [total, setTotal] = useState(0.0);
+  const [tax, setTax] = useState(0.0); // Based off subtotal
+  const [total, setTotal] = useState(0.0); // Subtotal + tax + tip
   const [tableNumber, setTableNumber] = useState(0);
   const [receivedAmount, setReceivedAmount] = useState(0.00);
   const [tipPercent, setTipPercent] = useState(0);
   const [tipAmount, setTipAmount] = useState(0.00);
-  const [changeAmount, setChangeAmount] = useState(0.00);
+  const [changeAmount, setChangeAmount] = useState(0.00); // total - received amount
   const [error, setError] = useState("");
   const [confirmOrderButton, setConfrimOrderButton] = useState("Confrim Order");
   const [waiterID, setWaiterID,] = useState(1); //For testing, needs to be passed along from login
@@ -20,6 +20,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
   const [updatedSelectedItems, setUpdatedSelectiveItems] = useState([]); // New list after removing items with conIng
   const [itemsWithConIng, setItemsWithConIng] = useState([]); // List of items containing a conIng
   const [ingredientsNeeded, setIngredientsNeeded] = useState([]); // List of ingredients and quantity for the order
+  const [specialRequest, setSpecialRequest] = useState("");
 
   useEffect(() => { // Handle all of the calculations
     const numericSubtotal = parseFloat(subtotal); // Treat as number, not string
@@ -60,11 +61,22 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
       setError(`Insufficient Funds. Need $${neededMoney} more`);
       return;
     }
-    else if (tableNumber <= 0) {
-      setError("Invalid table number")
-      return;
-    }
     else {
+      // Check if the table number is valid
+      try {
+        const tableResponse = await axios.get(`http://localhost:3001/valid-table?tableNumber=${tableNumber}`);
+        if (tableResponse.data.success === false) {
+          setError("Invalid table number");
+          return;
+        }
+      } catch(err) {
+        if (err.response && err.response.data && err.response.data.message)
+          setError(err.response.data.message);
+        else
+          setError(`An error has occured checking the validity of table ${tableNumber}`);
+        return;
+      }
+
       let requiredIngredients=[]; // List of all the ingredients and the amount required for the order
       selectedItems.forEach(item => {
         item.ingredients.forEach(ingredient => {
@@ -82,12 +94,12 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
         const inventoryResponse = await axios.get('http://localhost:3001/inventory-stock');
         inventoryStock = inventoryResponse.data.inventory;
       } catch(err) {
-        if (err.response && err.inventoryResponse.data && err.inventoryResponse.data.message)
-          setError(err.inventoryResponse.data.message);
+        if (err.response && err.response.data && err.response.data.message)
+          setError(err.response.data.message);
         else
           setError('An error has occured fetching the inventory');
       }
-      //let conflictingIngredients =[]; // Name and ID of out of stock ingredients
+      
       requiredIngredients.forEach(reqIng => {
         const ingredient = inventoryStock.find(ing => ing.ingredient_id === reqIng.ingredient_id);
         if (!ingredient) {
@@ -125,13 +137,13 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
       setError("");
       setConfrimOrderButton("Loading...");
       try {
-          const response = await axios.post('http://localhost:3001/confirm-order', {selectedItems: itemsJSON, waiterID, tableNumber, customerID, subtotal, tax, tipPercent, tipAmount, total, receivedAmount, changeAmount});
+          const response = await axios.post('http://localhost:3001/confirm-order', {
+            selectedItems: itemsJSON, waiterID, tableNumber, customerID, subtotal, tax, tipPercent, tipAmount, total, receivedAmount, changeAmount, specialRequest});
           if (response.data.success)
             setFormLock(true);
             setSuccessfulOrder(true);
             setConfrimOrderButton("Success!");
             try { // Subtract from inventory
-              console.log("Client sending patch request to subtract inventory", requiredIngredients)
               await axios.patch('http://localhost:3001/subtract-inventory', { ingredientsNeeded: requiredIngredients });
             }
             catch (err) {
@@ -218,6 +230,15 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
           {itemsWithConIng.length > 0 && <p className="affected-items">Affected items: {
             itemsWithConIng.map(item => item.name).join(', ')
           }</p>}
+          <div className="special-request-container">
+            <textarea
+              value={specialRequest}
+              onChange={(e) => setSpecialRequest(e.target.value)}
+              placeholder="Type special requests here"
+              rows={3}
+              disabled={formLock}
+            />
+          </div>
           <button className="confirm-order-button" disabled={formLock}>{confirmOrderButton}</button>
         </form>
       </div>

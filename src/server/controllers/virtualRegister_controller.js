@@ -45,33 +45,33 @@ exports.inventory_stock = (req, res) => { // Get inventory stock
 
 exports.confirm_order = (req, res) => {
     console.log("Received request to add order");
-          let body = "";
-          req.on("data", (chunk) => {
-            body += chunk.toString();
-          });
-          req.on("end", () => {
-            const { selectedItems, waiterID, tableNumber, customerID, subtotal, tax, tipPercent, tipAmount, total, receivedAmount, changeAmount } = JSON.parse(body);
-            pool.query(
-              "INSERT INTO orders (items, waiter_id, table_id, customer_id, subtotal, tip_percent, tip_amount, total, received_amount, change_amount, tax_amount) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
-              [selectedItems, waiterID, tableNumber, customerID, subtotal, tipPercent, tipAmount, total, receivedAmount, changeAmount, tax],
-              (error, result) => {
-                if (error) {
-                  res.writeHead(500, { "Content-Type": "application/json" });
-                  res.end(
-                    JSON.stringify({
-                      success: false,
-                      message: "Server Error inserting into orders",
-                    })
-                  );
-                  console.log(error)
-                  return;
-                } // Else
-                res.writeHead(200, { "Content-Type": "application/json" });
-                res.end(JSON.stringify({ success: true }));
-                console.log("Successfully added order");
-              }
+    let body = "";
+    req.on("data", (chunk) => {
+      body += chunk.toString();
+    });
+    req.on("end", () => {
+      const { selectedItems, waiterID, tableNumber, customerID, subtotal, tax, tipPercent, tipAmount, total, receivedAmount, changeAmount, specialRequest } = JSON.parse(body);
+      pool.query(
+        "INSERT INTO orders (items, waiter_id, table_id, customer_id, subtotal, tip_percent, tip_amount, total, received_amount, change_amount, tax_amount, special_requests) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+        [selectedItems, waiterID, tableNumber, customerID, subtotal, tipPercent, tipAmount, total, receivedAmount, changeAmount, tax, specialRequest],
+        (error, result) => {
+          if (error) {
+            res.writeHead(500, { "Content-Type": "application/json" });
+            res.end(
+              JSON.stringify({
+                success: false,
+                message: "Server Error inserting into orders",
+              })
             );
-          });
+            console.log(error)
+            return;
+          } // Else
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ success: true }));
+          console.log("Successfully added order");
+        }
+      );
+    });
 };
 exports.subtract_inventory = (req, res) => { // Given a list and quantity, subtract from INVENTORY
   console.log("Received request to subtract from inventory");
