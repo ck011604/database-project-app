@@ -10,7 +10,7 @@ const Navbar = () => {
                 <a href="">Tab2</a>
                 <a href="">Tab3</a>
                 <a href="">Tab4</a>
-                <a href="/schedule">here</a>
+                <a href="/schedule">schedule</a>
             </nav>
         </header>
      );

@@ -56,7 +56,7 @@ exports.shift_detail = (req, res) => { // Get info of a shift
         }
         // If the employee is found, return details
         res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ success: true, employee: results[0]}));
+        res.end(JSON.stringify({ success: true, shift: results[0]}));
     });
 }
 

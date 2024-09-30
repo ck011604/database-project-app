@@ -31,7 +31,7 @@ exports.schedule_detail = (req, res) => {
         return;
     }
     // Query database for schedule with specified ID
-    pool.query("SELECT * FROM schedule WHERE shift_ID = ?", [scheduleID], (error, results) => {
+    pool.query("SELECT * FROM schedule WHERE schedule_id = ?", [scheduleID], (error, results) => {
         if (error) {
             res.writeHead(500, { "Content-Type": "application/json" });
             res.end(
@@ -69,8 +69,8 @@ exports.schedule_create_post = (req, res) => {
     req.on('end', () => {
         // Ensure required fields
         console.log("Body received:", body);
-        const{employee_id, shift_id, schedule_date} = JSON.parse(body);
-        if (!employee_id || !shift_id || !schedule_date) {
+        const{employee_id, shift_id} = JSON.parse(body);
+        if (!employee_id || !shift_id) {
             res.writeHead(400, {'Content-Type': 'application/json'});
             res.end(
                 JSON.stringify({
@@ -82,8 +82,8 @@ exports.schedule_create_post = (req, res) => {
         }
         pool.query(
             // Insert schedule into database
-            "INSERT INTO schedule (employee_id, shift_id, schedule_date) VALUES(?, ?, ?)",
-            [employee_id, shift_id, schedule_date],
+            "INSERT INTO schedule (employee_id, shift_id) VALUES(?, ?)",
+            [employee_id, shift_id],
             (error, result) => {
                 if (error) {
                     res.writeHead(500, {'Content-Type': 'application/json'});
