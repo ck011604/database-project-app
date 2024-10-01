@@ -157,6 +157,7 @@ const VirtualRegister = () => {
                         <MenuItem key={item.recipe_id} className={isItemOutOfStock(item) ? 'out-of-stock' : ''} item={item} onSelect={handleSelect} />
                     ))}
                 </div>
+                {error && <p>{error}</p>}
             </div>
             <div className="order-container">
                 <div className="selection-list">

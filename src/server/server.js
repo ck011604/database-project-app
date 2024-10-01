@@ -85,9 +85,9 @@ const server = http.createServer((req, res) => {
         if (req.url.startsWith("/api/employees/")) {
             employee_controller.employee_update_patch(req, res);
         }
-        if (req.url === "/subtract-inventory") {
-            virtualRegisterController.subtract_inventory(req, res);
-        }
+        // if (req.url === "/subtract-inventory") {
+        //     virtualRegisterController.subtract_inventory(req, res);
+        // }
         if (req.url.startsWith("/api/shifts/")) {
             shift_controller.shift_update_patch(req, res);
         }

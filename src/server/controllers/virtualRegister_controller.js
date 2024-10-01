@@ -73,70 +73,70 @@ exports.confirm_order = (req, res) => {
       );
     });
 };
-exports.subtract_inventory = (req, res) => { // Given a list and quantity, subtract from INVENTORY
-  console.log("Received request to subtract from inventory");
-  let body = "";
+// exports.subtract_inventory = (req, res) => { // Given a list and quantity, subtract from INVENTORY
+//   console.log("Received request to subtract from inventory");
+//   let body = "";
 
-  req.on("data", (chunk) => {
-    body += chunk.toString();
-  });
+//   req.on("data", (chunk) => {
+//     body += chunk.toString();
+//   });
 
-  req.on("end", () => {
-    const { ingredientsNeeded } = JSON.parse(body);
-    pool.getConnection((err, connection) => {
-      if (err) {
-        res.writeHead(500, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ success: false, message: "Could not connect to the database" }));
-        console.log(err);
-        return; // Exit if it can't connect
-      }
+//   req.on("end", () => {
+//     const { ingredientsNeeded } = JSON.parse(body);
+//     pool.getConnection((err, connection) => {
+//       if (err) {
+//         res.writeHead(500, { "Content-Type": "application/json" });
+//         res.end(JSON.stringify({ success: false, message: "Could not connect to the database" }));
+//         console.log(err);
+//         return; // Exit if it can't connect
+//       }
 
-      connection.beginTransaction((err) => {
-        if (err) {
-          connection.release();
-          res.writeHead(500, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ success: false, message: "Could not start transaction" }));
-          console.log(err);
-          return;
-        }
+//       connection.beginTransaction((err) => {
+//         if (err) {
+//           connection.release();
+//           res.writeHead(500, { "Content-Type": "application/json" });
+//           res.end(JSON.stringify({ success: false, message: "Could not start transaction" }));
+//           console.log(err);
+//           return;
+//         }
 
-        let promises = ingredientsNeeded.map((ingredient) => {
-          const query = "UPDATE inventory SET amount = amount - ? WHERE ingredient_id = ?";
-          return new Promise((resolve, reject) => {
-            connection.query(query, [ingredient.quantity, ingredient.ingredient_id], (error) => {
-              if (error) {
-                return reject(error);
-              }
-              resolve();
-            });
-          });
-        });
+//         let promises = ingredientsNeeded.map((ingredient) => {
+//           const query = "UPDATE inventory SET amount = amount - ? WHERE ingredient_id = ?";
+//           return new Promise((resolve, reject) => {
+//             connection.query(query, [ingredient.quantity, ingredient.ingredient_id], (error) => {
+//               if (error) {
+//                 return reject(error);
+//               }
+//               resolve();
+//             });
+//           });
+//         });
 
-        Promise.all(promises)
-          .then(() => {
-            connection.commit((err) => {
-              if (err) {
-                return connection.rollback(() => {
-                  connection.release();
-                  res.writeHead(500, { "Content-Type": "application/json" });
-                  res.end(JSON.stringify({ success: false, message: "Server Error committing transaction" }));
-                });
-              }
-              connection.release();
-              res.writeHead(200, { "Content-Type": "application/json" });
-              res.end(JSON.stringify({ success: true })); // Success response
-              console.log("Successfully modified INVENTORY");
-            });
-          })
-          .catch((error) => {
-            connection.rollback(() => {
-              connection.release();
-              res.writeHead(500, { "Content-Type": "application/json" });
-              res.end(JSON.stringify({ success: false, message: "Server Error modifying ingredients in INVENTORY" }));
-              console.log(error);
-            });
-          });
-      });
-    });
-  });
-};
+//         Promise.all(promises)
+//           .then(() => {
+//             connection.commit((err) => {
+//               if (err) {
+//                 return connection.rollback(() => {
+//                   connection.release();
+//                   res.writeHead(500, { "Content-Type": "application/json" });
+//                   res.end(JSON.stringify({ success: false, message: "Server Error committing transaction" }));
+//                 });
+//               }
+//               connection.release();
+//               res.writeHead(200, { "Content-Type": "application/json" });
+//               res.end(JSON.stringify({ success: true })); // Success response
+//               console.log("Successfully modified INVENTORY");
+//             });
+//           })
+//           .catch((error) => {
+//             connection.rollback(() => {
+//               connection.release();
+//               res.writeHead(500, { "Content-Type": "application/json" });
+//               res.end(JSON.stringify({ success: false, message: "Server Error modifying ingredients in INVENTORY" }));
+//               console.log(error);
+//             });
+//           });
+//       });
+//     });
+//   });
+// };

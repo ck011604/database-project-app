@@ -210,16 +210,16 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
         if (response.data.success) setFormLock(true);
         setSuccessfulOrder(true);
         setConfrimOrderButton("Success!");
-        try {
-          // Subtract from inventory
-          await axios.patch("http://localhost:3001/subtract-inventory", {
-            ingredientsNeeded: requiredIngredients,
-          });
-        } catch (err) {
-          if (err.response && err.response.data && err.response.data.message)
-            setError(err.response.data.message);
-          else setError("An error has occured");
-        }
+        // try {
+        //   // Subtract from inventory
+        //   await axios.patch("http://localhost:3001/subtract-inventory", {
+        //     ingredientsNeeded: requiredIngredients,
+        //   });
+        // } catch (err) {
+        //   if (err.response && err.response.data && err.response.data.message)
+        //     setError(err.response.data.message);
+        //   else setError("An error has occured");
+        // }
       } catch (err) {
         if (err.response && err.response.data && err.response.data.message)
           setError(err.response.data.message);
