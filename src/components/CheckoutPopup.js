@@ -22,6 +22,8 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
   const [itemsWithConIng, setItemsWithConIng] = useState([]); // List of items containing a conIng
   const [ingredientsNeeded, setIngredientsNeeded] = useState([]); // List of ingredients and quantity for the order
   const [specialRequest, setSpecialRequest] = useState("");
+  const [promoCode, setPromoCode] = useState("");
+  const [discountAmount, setDiscountAmount] = useState(0);
 
   useEffect(() => { // Handle all of the calculations
     const numericSubtotal = parseFloat(subtotal); // Treat as number, not string
@@ -54,6 +56,9 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
     setSuccessfulOrder(false);
     fetchInventory();
     onClose();
+  }
+  const handleCheckPromoCode = () => {
+
   }
   const handleConfirmOrder = async (e) => {
     e.preventDefault();
@@ -270,6 +275,16 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
               required
               disabled={formLock}
             />
+          </div>
+          <div className="checkout-label">
+            <label>Promotional Code: </label>
+            <input className="promo-code-input"
+              type="text" 
+              value={promoCode}
+              onChange={(e) => setPromoCode(e.target.value)}
+              disabled={formLock}
+            />
+            <button type="button" disabled={formLock}>Apply</button>
           </div>
           <div className="checkout-label">
             <label>Total: </label>
