@@ -2,7 +2,7 @@ const pool = require("../pool");
 
 exports.menu = (req, res) => { // Get menu
     console.log("Received request to get menu");
-    pool.query("SELECT * FROM menu ORDER BY price DESC", (error, results) => {
+    pool.query("SELECT * FROM menu WHERE is_active = true ORDER BY price DESC", (error, results) => {
       if (error) {
         res.writeHead(500, { "Content-Type": "application/json" });
         res.end(
