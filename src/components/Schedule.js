@@ -8,42 +8,31 @@ import axios from 'axios'
 const localizer = momentLocalizer(moment)
 
 const Schedule = () => {
-    const [schedules, setSchedules] = useState([]);
+    const [shifts, setShifts] = useState([]);
     useEffect(() => {
-        const fetchAllSchedules = async ()=>{
+        const fetchAllShifts = async ()=>{
             try {
-                let res = await axios.get("http://localhost:3001/api/schedule")
-                let schedules = res.data.schedule;
-                let new_schedules = []
-                for(let schedule of schedules){
-                    res = await axios.get(`http://localhost:3001/api/employees/${schedule.employee_id}`)
+                let res = await axios.get("http://localhost:3001/api/shifts")
+                let shifts = res.data.shifts;
+                let new_shifts = []
+                for(let shift of shifts){
+                    res = await axios.get(`http://localhost:3001/api/employees/${shift.employee_id}`)
                     let name = `${res.data.employee.first_name} ${res.data.employee.last_name}`
-                    res = await axios.get(`http://localhost:3001/api/shifts/${schedule.shift_id}`)
-                    let shift = res.data.shift;
 
-                    let start_time = new Date(shift.shift_date)
-                    let start = shift.shift_start_time.split(":")
-                    start_time.setHours(parseInt(start[0]))
-                    start_time.setMinutes(parseInt(start[1]))
-
-                    let end_time = new Date(shift.shift_date)
-                    let end = shift.shift_end_time.split(":")
-                    end_time.setHours(parseInt(end[0]))
-                    end_time.setMinutes(parseInt(end[1]))
-                    new_schedules.push({
-                        id: schedule.schedule_id,
-                        title: `${name} - ${shift.shift_name}`,
-                        start: start_time,
-                        end: end_time
+                    new_shifts.push({
+                        id: shift.shift_id,
+                        title: `${name}`,
+                        start: new Date(shift.shift_start_time),
+                        end: new Date(shift.shift_end_time)
                     })
                 }
-                console.log(new_schedules)
-                setSchedules(new_schedules);
+                console.log(new_shifts)
+                setShifts(new_shifts);
             } catch (err) {
-                console.log("Error fetching schedules")
+                console.log("Error fetching shifts")
             }
         }
-        fetchAllSchedules()
+        fetchAllShifts()
     }, [])
     const { defaultDate, views } = useMemo(
         () => ({
@@ -57,7 +46,7 @@ const Schedule = () => {
         <div>
         <Calendar
           localizer={localizer}
-          events={schedules}
+          events={shifts}
           startAccessor="start"
           endAccessor="end"
           style={{ height: 600 }}
@@ -66,7 +55,7 @@ const Schedule = () => {
           defaultView={Views.WEEK}
         />
       </div>
-     );
+    );
 }
 
 export default Schedule;

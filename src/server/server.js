@@ -5,7 +5,7 @@ const virtualRegisterController = require('./controllers/virtualRegister_control
 const tableController = require("./controllers/table_controller");
 const employee_controller = require("./controllers/employee_controller")
 const shift_controller = require("./controllers/shift_controller")
-const schedule_controller = require("./controllers/schedule_controller")
+const menu_management_controller = require("./controllers/menu_management_controller")
 const request_schedule_controller = require("./controllers/request_schedule_controller")
 const pool = require("./pool") // put const pool = require("../pool") into controller files
 
@@ -36,8 +36,8 @@ const server = http.createServer((req, res) => {
         if (req.url === "/api/shifts") {
             shift_controller.shift_create_post(req, res);
         }
-        if (req.url === "/api/schedule") {
-            schedule_controller.schedule_create_post(req, res);
+        if (req.url === "/api/menu_management") {
+            menu_management_controller.menu_create_post(req, res);
         }
         if (req.url === "/api/request_schedule") {
             request_schedule_controller.request_schedule_create_post(req, res);
@@ -68,15 +68,6 @@ const server = http.createServer((req, res) => {
         if (req.url.startsWith ("/api/shifts/")) {
             shift_controller.shift_detail(req, res);
         }
-        if (req.url === ("/api/schedule")) {
-            schedule_controller.index(req, res)
-        }
-        if (req.url.startsWith ("/api/schedule/")) {
-            schedule_controller.schedule_detail(req, res);
-        }
-        if (req.url === ("/api/request_schedule")) {
-            request_schedule_controller.index(req, res)
-        }
         if (req.url.startsWith ("/api/request_schedule/")) {
             request_schedule_controller.request_schedule_detail(req, res);
         }
@@ -91,8 +82,8 @@ const server = http.createServer((req, res) => {
         if (req.url.startsWith("/api/shifts/")) {
             shift_controller.shift_update_patch(req, res);
         }
-        if (req.url.startsWith("/api/schedule/")) {
-            schedule_controller.schedule_update_patch(req, res);
+        if (req.url.startsWith("/api/menu_management/")) {
+            menu_management_controller.menu_update_patch(req, res);
         }
         if (req.url.startsWith("/api/request_schedule/")) {
             request_schedule_controller.request_schedule_update_patch(req, res);
@@ -105,8 +96,8 @@ const server = http.createServer((req, res) => {
         if (req.url.startsWith("/api/shifts/")) {
             shift_controller.shift_delete(req, res);
         }
-        if (req.url.startsWith("/api/schedule/")) {
-            schedule_controller.schedule_delete(req, res);
+        if (req.url.startsWith("/api/menu_management/")) {
+            menu_management_controller.menu_delete(req, res);
         }
         if (req.url.startsWith("/api/request_schedule/")) {
             request_schedule_controller.request_schedule_delete(req, res);
