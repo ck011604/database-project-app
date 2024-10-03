@@ -22,8 +22,8 @@ const VirtualRegister = () => {
             setInventoryStock(inventoryResponse.data.inventory);
             setOriginalInventoryStock(inventoryResponse.data.inventory);
         } catch (err) {
-            if (err.response && err.inventoryResponse.data && err.inventoryResponse.data.message)
-                setError(err.inventoryResponse.data.message);
+            if (err.response && err.response.data && err.response.data.message)
+                setError(err.response.data.message);
             else
                 setError('An error has occured fetching the inventory');
         }
@@ -35,8 +35,8 @@ const VirtualRegister = () => {
                 setItems(menuResponse.data.menu);
                 setOriginalItems(menuResponse.data.menu);
             } catch(err) {
-                if (err.response && err.menuResponse.data && err.menuResponse.data.message)
-                    setError(err.menuResponse.data.message);
+                if (err.response && err.response.data && err.response.data.message)
+                    setError(err.response.data.message);
                 else
                     setError('An error has occured fetching the menu');
             }
@@ -157,6 +157,7 @@ const VirtualRegister = () => {
                         <MenuItem key={item.recipe_id} className={isItemOutOfStock(item) ? 'out-of-stock' : ''} item={item} onSelect={handleSelect} />
                     ))}
                 </div>
+                {error && <p>{error}</p>}
             </div>
             <div className="order-container">
                 <div className="selection-list">

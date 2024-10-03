@@ -21,10 +21,6 @@
     text-align: center;
     z-index: 1000;
 }
-
-.checkout-popup-content button {
-    margin-top: 10px;
-}
 .checkout-popup-content form {
     display: flex;
     flex-direction: column;
@@ -89,8 +85,30 @@
     border-radius: 5px;
     border: none;
     padding: 10px 20px;
+    cursor: pointer;
 }
 .confirm-order-error, .affected-items {
     color: red;
     margin: 0;
+}
+.special-request-container textarea {
+    width: 70%;
+    height: 50px;
+    resize: none;
+    font-family: inherit;
+}
+.checkout-label button {
+    margin-left: 10px;
+    padding: 5px 10px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.checkout-label button:hover {
+    background-color: #0363ca;
+}
+.promo-code-input {
+    width: 20%;
 }

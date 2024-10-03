@@ -1,4 +1,5 @@
 const pool = require("../pool");
+const url = require("url");
 
 exports.login = (req, res) => {
     console.log("Received Post and /login");
@@ -69,4 +70,34 @@ exports.createUserAccount = (req, res) => {
             }
         )
     });
+};
+
+exports.validCustomerEmail = (req, res) => {
+  console.log("Received request to check the customer email validity");
+  const { query } = url.parse(req.url, true); // Parse the URL
+  const email = query.email; // Extract email from query
+  if (!email) {
+    res.writeHead(400, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ success: false, message: "Email is required to check validity" }));
+    return;
+  }
+  pool.query("SELECT user_id, email FROM users WHERE email = ?", [email],
+    (error, results) => {
+      if (error) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({success: false, message: "Server Error fetching USERS",}));
+        console.log("Server Error", error);
+        return;
+      }
+      if (results.length > 0) {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: true, user_id: results[0].user_id }));
+        console.log("Valid customer email");
+        return;
+      }
+      res.writeHead(401, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: false, message: "Invalid customer email" }));
+      console.log("Invalid customer email");
+    }
+  );
 };
