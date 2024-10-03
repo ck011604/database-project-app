@@ -319,7 +319,7 @@ DROP TABLE IF EXISTS `shifts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `shifts` (
-  `shift_id` int NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
+  `shift_id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
   `employee_id` int unsigned DEFAULT NULL,
   `shift_start_time` datetime DEFAULT NULL,
   `shift_end_time` datetime DEFAULT NULL,
@@ -368,6 +368,74 @@ INSERT INTO `users` VALUES (1,'Mike','Ross','mikeross@gmail.com','mike123','user
 --
 -- Dumping routines for database 'restaurantdb'
 --
+DELIMITER ;;
+
+-- This procedure checks if any ingredients are low and restocks them automatically
+CREATE DEFINER=`root`@`localhost` PROCEDURE `check_inventory_thresholds`()
+BEGIN
+  -- Declare variables to store ingredient information
+  DECLARE done INT DEFAULT FALSE;
+  DECLARE v_ingredient_id INT UNSIGNED;
+  DECLARE v_name VARCHAR(50);
+  DECLARE v_amount INT UNSIGNED;
+  DECLARE v_restock_threshold INT UNSIGNED;
+  DECLARE v_restock_amount INT UNSIGNED;
+  
+  -- Create a cursor (kinda like  a pointer) to loop through low inventory items
+  DECLARE cur CURSOR FOR 
+    SELECT ingredient_id, name, amount, restock_threshold, restock_amount 
+    FROM inventory 
+    WHERE amount <= restock_threshold;
+  
+  -- This tells MySQL what to do when there are no more rows to process
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+  
+  -- Open the cursor to start using it
+  OPEN cur;
+  
+  -- Start a loop to process each low inventory item
+  read_loop: LOOP
+    -- Get the next low inventory item
+    FETCH cur INTO v_ingredient_id, v_name, v_amount, v_restock_threshold, v_restock_amount;
+    
+    -- If there are no more items, exit the loop
+    IF done THEN
+      LEAVE read_loop;
+    END IF;
+    
+    -- Restock the ingredient by adding the restock amount
+    UPDATE inventory 
+    SET amount = amount + v_restock_amount 
+    WHERE ingredient_id = v_ingredient_id;
+    
+    -- Log this restock action
+    INSERT INTO inventory_logs (ingredient_id, action_type, quantity_change) 
+    VALUES (v_ingredient_id, 'restock', v_restock_amount);
+    
+  END LOOP;
+  
+  -- Close the cursor when we're done using it
+  CLOSE cur;
+END ;;
+
+-- This procedure allows manual ordering of ingredients
+CREATE DEFINER=`root`@`localhost` PROCEDURE `manually_order_ingredient`(
+  IN p_ingredient_id INT UNSIGNED,  -- The ID of the ingredient to order
+  IN p_quantity INT UNSIGNED        -- How much to order
+)
+BEGIN
+  -- Increase the amount of the specified ingredient
+  UPDATE inventory 
+  SET amount = amount + p_quantity 
+  WHERE ingredient_id = p_ingredient_id;
+  
+  -- Log this manual order action
+  INSERT INTO inventory_logs (ingredient_id, action_type, quantity_change) 
+  VALUES (p_ingredient_id, 'manual_order', p_quantity);
+END ;;
+
+DELIMITER ;
+
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
