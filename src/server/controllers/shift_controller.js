@@ -44,17 +44,17 @@ exports.shift_detail = (req, res) => { // Get info of a shift
             return;
         }
         if (results.length === 0) {
-            // No employee is found with the given ID
+            // No shift is found with the given ID
             res.writeHead(404, {"Content-Type": "application/json"});
             res.end(
                 JSON.stringify({
                 success: false,
-                message: "Employee not found",
+                message: "Shift not found",
                 })
             );
             return;
         }
-        // If the employee is found, return details
+        // If the shift is found, return details
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ success: true, shift: results[0]}));
     });
@@ -69,8 +69,8 @@ exports.shift_create_post = (req, res) => { // Add a shift, make is_filled = TRU
     req.on('end', () => {
         // Ensure required fields
         console.log("Body received:", body);
-        const{shift_date, shift_start_time, shift_end_time, shift_name} = JSON.parse(body);
-        if (!shift_date || !shift_start_time || !shift_end_time || !shift_name) {
+        const{employee_id, shift_start_time, shift_end_time} = JSON.parse(body);
+        if (!employee_id || !shift_start_time || !shift_end_time) {
             res.writeHead(400, {'Content-Type': 'application/json'});
             res.end(
                 JSON.stringify({
@@ -81,9 +81,9 @@ exports.shift_create_post = (req, res) => { // Add a shift, make is_filled = TRU
             return;
         }
         pool.query(
-            // Insert employee into database
-            "INSERT INTO shifts (shift_date, shift_start_time, shift_end_time, shift_name) VALUES(?, ?, ?, ?)",
-            [shift_date, shift_start_time, shift_end_time, shift_name],
+            // Insert shift into database
+            "INSERT INTO shifts (employee_id, shift_start_time, shift_end_time) VALUES(?, ?, ?)",
+            [employee_id, shift_start_time, shift_end_time],
             (error, result) => {
                 if (error) {
                     res.writeHead(500, {'Content-Type': 'application/json'});
@@ -114,9 +114,9 @@ exports.shift_update_patch = (req, res) => { // Update shift details
         body += chunk.toString();
     });
     req.on('end', () => {
-        const {shift_date, shift_start_time, shift_end_time, shift_name, is_filled } = JSON.parse(body);
+        const {employee_id, shift_start_time, shift_end_time, is_filled} = JSON.parse(body);
         // Check if there are fields to update
-        if (!shift_date && !shift_start_time && !shift_end_time && !shift_name && is_filled === undefined) {
+        if (!employee_id && !shift_start_time && !shift_end_time && is_filled === undefined) {
             res.writeHead(400, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ success: false, message: "No fields to update" }));
             return;
@@ -125,10 +125,9 @@ exports.shift_update_patch = (req, res) => { // Update shift details
         let query_string = "UPDATE shifts SET ";
         const params = [];
         // Query provided fields and add to params array (allows for single changes)
-        if (shift_date) { query_string += "shift_date = ?, "; params.push(shift_date); }
+        if (employee_id) { query_string += "employee_id = ?, "; params.push(employee_id); }
         if (shift_start_time) { query_string += "shift_start_time = ?, "; params.push(shift_start_time); }
         if (shift_end_time) { query_string += "shift_end_time = ?, "; params.push(shift_end_time); }
-        if (shift_name) { query_string += "shift_name = ?, "; params.push(shift_name); }
         if (is_filled !== undefined) { query_string += "is_filled = ? "; params.push(is_filled); }
         // Remove trailing comma and spaces in array
         // Specify which shift
