@@ -1,0 +1,45 @@
+.table {
+    width: 90%;
+    border-collapse: collapse;
+    border: centered;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 1em;
+    min-width: 400px;
+    border-radius: 5px 5px 0 0;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+.table thead tr {
+    background-color: #808080;
+    color: #ffffff;
+    text-align: left;
+    font-weight: bold;
+    min-width: 400px;
+}
+.table th,
+.table td {
+    padding: 12px 15px;
+}
+.table tbody tr {
+    border-bottom: 1px solid #ffffff
+}
+.table tbody tr:last-of-type {
+    border-bottom: 2x solid #808080
+}
+.status {
+    padding: .4rem 0;
+    border-radius: 2rem;
+}
+.status {
+    padding: .4rem 0;
+    border-radius: 2rem;
+}
+.status.isActive {
+    background-color: #86e49d;
+    color: #006b21;
+}
+.status.notActive {
+    background-color: #d893a3;
+    color: #b30021;
+}
