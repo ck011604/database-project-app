@@ -39,7 +39,7 @@ CREATE TABLE `employees` (
 --
 
 /*!40000 ALTER TABLE `employees` DISABLE KEYS */;
-INSERT INTO `employees` VALUES (1,'Amy','Lee','amy@example.com','Manager',1,'123'),(2,'Bob','Ross','bob@example.com','Waiter',0,'123'),(3,'Sam','Do','sam@example.com','Chef',0,'123'),(4,'Taylor','Swift','taylor@example.com','Manager',1,'123'),(5,'Dan','Pie','dan@example.com','Chef',0,'123'),(6,'Daz','Pir','daz@example.com','Chef',0,'123'),(7,'Daz','Pir','daz@example.com','Chef',0,'123');
+INSERT INTO `employees` VALUES (1,'Amy','Lee','amy@example.com','Manager',1,'123'),(2,'Bob','Ross','bob@example.com','Waiter',0,'123'),(4,'Taylor','Swift','taylor@example.com','Manager',1,'123');
 /*!40000 ALTER TABLE `employees` ENABLE KEYS */;
 
 --
@@ -66,6 +66,35 @@ CREATE TABLE `inventory` (
 /*!40000 ALTER TABLE `inventory` DISABLE KEYS */;
 INSERT INTO `inventory` VALUES (1,'mozzarella',75,20,100),(2,'tomato sauce',95,10,100),(3,'dough',95,10,50),(4,'pepperoni',100,50,100),(5,'cheddar cheese',100,20,100),(6,'beef patty',100,20,50),(7,'lettuce',100,20,50),(8,'tomato',100,20,50),(9,'pasta',100,20,50),(10,'chicken',100,20,70),(11,'garlic',100,20,50),(12,'fish fillets',70,10,30),(13,'tortillas',100,20,50),(14,'cabbage',100,20,50),(15,'lime',100,40,50),(16,'sour cream',50,20,50),(17,'milk',100,20,50),(18,'butter',100,30,100),(19,'flour',100,40,200),(20,'hamburger bun',100,20,75),(21,'hot dog sausage',100,20,50),(22,'hot dog bun',100,30,100),(23,'mustard',100,40,100),(24,'ketchup',100,30,100),(25,'relish',50,20,45),(26,'potatoes',100,30,100),(27,'carrots',100,20,60),(28,'mayonnaise',70,10,40),(29,'bread',100,10,40),(30,'corn',100,10,50),(31,'salt',100,40,100),(32,'Sprite',94,20,100),(33,'Coca-Cola',96,20,100),(34,'Pepsi',96,20,100),(35,'Dr. Pepper',96,20,100),(36,'Fanta Orange',0,20,100),(37,'Diet Coke',90,20,100),(38,'Black Tea',100,20,70),(39,'Sugar',100,20,100);
 /*!40000 ALTER TABLE `inventory` ENABLE KEYS */;
+
+--
+-- Table structure for table `inventory_daily_summary`
+--
+
+DROP TABLE IF EXISTS `inventory_daily_summary`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `inventory_daily_summary` (
+  `summary_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `date` date NOT NULL,
+  `ingredient_id` int unsigned NOT NULL,
+  `starting_amount` int unsigned NOT NULL,
+  `ending_amount` int unsigned NOT NULL,
+  `restocked_amount` int unsigned NOT NULL DEFAULT '0',
+  `used_amount` int unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`summary_id`),
+  UNIQUE KEY `date_ingredient` (`date`,`ingredient_id`),
+  KEY `ingredient_id` (`ingredient_id`),
+  CONSTRAINT `inventory_daily_summary_ibfk_1` FOREIGN KEY (`ingredient_id`) REFERENCES `inventory` (`ingredient_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `inventory_daily_summary`
+--
+
+/*!40000 ALTER TABLE `inventory_daily_summary` DISABLE KEYS */;
+/*!40000 ALTER TABLE `inventory_daily_summary` ENABLE KEYS */;
 
 --
 -- Table structure for table `inventory_logs`
@@ -259,6 +288,32 @@ CREATE TABLE `redemptions` (
 /*!40000 ALTER TABLE `redemptions` ENABLE KEYS */;
 
 --
+-- Table structure for table `restaurant_sales`
+--
+
+DROP TABLE IF EXISTS `restaurant_sales`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `restaurant_sales` (
+  `sales_date` date NOT NULL,
+  `total_sales` decimal(10,2) unsigned DEFAULT '0.00',
+  `total_discounts` decimal(10,2) unsigned DEFAULT '0.00',
+  `location` int DEFAULT NULL,
+  `total_taxes` decimal(10,2) unsigned DEFAULT '0.00',
+  `total_cash` decimal(10,2) unsigned DEFAULT '0.00',
+  PRIMARY KEY (`sales_date`),
+  UNIQUE KEY `location_UNIQUE` (`location`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `restaurant_sales`
+--
+
+/*!40000 ALTER TABLE `restaurant_sales` DISABLE KEYS */;
+/*!40000 ALTER TABLE `restaurant_sales` ENABLE KEYS */;
+
+--
 -- Table structure for table `restaurant_tables`
 --
 
@@ -368,9 +423,16 @@ INSERT INTO `users` VALUES (1,'Mike','Ross','mikeross@gmail.com','mike123','user
 --
 -- Dumping routines for database 'restaurantdb'
 --
+/*!50003 DROP PROCEDURE IF EXISTS `check_inventory_thresholds` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
 DELIMITER ;;
-
--- This procedure checks if any ingredients are low and restocks them automatically
 CREATE DEFINER=`root`@`localhost` PROCEDURE `check_inventory_thresholds`()
 BEGIN
   -- Declare variables to store ingredient information
@@ -417,8 +479,21 @@ BEGIN
   -- Close the cursor when we're done using it
   CLOSE cur;
 END ;;
-
--- This procedure allows manual ordering of ingredients
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `manually_order_ingredient` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
+DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `manually_order_ingredient`(
   IN p_ingredient_id INT UNSIGNED,  -- The ID of the ingredient to order
   IN p_quantity INT UNSIGNED        -- How much to order
@@ -433,9 +508,11 @@ BEGIN
   INSERT INTO inventory_logs (ingredient_id, action_type, quantity_change) 
   VALUES (p_ingredient_id, 'manual_order', p_quantity);
 END ;;
-
 DELIMITER ;
-
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -446,4 +523,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-10-01 16:22:20
+-- Dump completed on 2024-10-02 22:08:52
