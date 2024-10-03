@@ -8,6 +8,7 @@ import Navbar from "./components/Navbar";
 import VirtualRegister from "./components/VirtualRegister";
 import Footer from "./components/Footer";
 import Schedule from "./components/Schedule";
+import Products from "./components/Products";
 
 function App() {
 
@@ -26,6 +27,7 @@ function App() {
           <Route path="/create-account" element={<CreateAccount />} />
           <Route path="/virtual-register" element={<VirtualRegister />} />
           <Route path="/schedule" element={<Schedule />} />
+          <Route path="/products" element={<Products />} />
         </Routes>
       </div>
       {!hideFooterRoutes.includes(location.pathname) && <Footer />}
