@@ -2,7 +2,7 @@ const pool = require("../pool");
 
 exports.menu = (req, res) => { // Get menu
     console.log("Received request to get menu");
-    pool.query("SELECT * FROM menu WHERE is_active = true ORDER BY price DESC", (error, results) => {
+    pool.query("SELECT * FROM menu WHERE is_active = 1 ORDER BY price DESC", (error, results) => {
       if (error) {
         res.writeHead(500, { "Content-Type": "application/json" });
         res.end(
@@ -52,7 +52,7 @@ exports.confirm_order = (req, res) => {
     req.on("end", () => {
       const { selectedItems, waiterID, tableNumber, customerID, subtotal, tax, tipPercent, tipAmount, total, receivedAmount, changeAmount, specialRequest } = JSON.parse(body);
       pool.query(
-        "INSERT INTO orders (items, waiter_id, table_id, customer_id, subtotal, tip_percent, tip_amount, total, received_amount, change_amount, tax_amount, special_requests) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+        "INSERT INTO orders (items, waiter_id, table_number, customer_id, subtotal, tip_percent, tip_amount, total, received_amount, change_amount, tax_amount, special_requests) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
         [selectedItems, waiterID, tableNumber, customerID, subtotal, tipPercent, tipAmount, total, receivedAmount, changeAmount, tax, specialRequest],
         (error, result) => {
           if (error) {
