@@ -51,9 +51,10 @@ exports.confirm_order = (req, res) => {
     });
     req.on("end", () => {
       const { selectedItems, waiterID, tableNumber, customerID, subtotal, tax, tipPercent, tipAmount, total, receivedAmount, changeAmount, specialRequest } = JSON.parse(body);
+      const addedPoints = Math.floor(subtotal)
       pool.query(
-        "INSERT INTO orders (items, waiter_id, table_number, customer_id, subtotal, tip_percent, tip_amount, total, received_amount, change_amount, tax_amount, special_requests) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
-        [selectedItems, waiterID, tableNumber, customerID, subtotal, tipPercent, tipAmount, total, receivedAmount, changeAmount, tax, specialRequest],
+        "INSERT INTO orders (items, waiter_id, table_number, customer_id, subtotal, tip_percent, tip_amount, total, received_amount, change_amount, tax_amount, special_requests, pointsEarned) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        [selectedItems, waiterID, tableNumber, customerID, subtotal, tipPercent, tipAmount, total, receivedAmount, changeAmount, tax, specialRequest, addedPoints],
         (error, result) => {
           if (error) {
             res.writeHead(500, { "Content-Type": "application/json" });
