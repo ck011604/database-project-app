@@ -7,14 +7,13 @@ import CreateAccount from "./components/CreateAccount";
 import Navbar from "./components/Navbar";
 import VirtualRegister from "./components/VirtualRegister";
 import Footer from "./components/Footer";
-import Schedule from "./components/Schedule";
 import Products from "./components/Products";
+import InventoryReport from "./components/InventoryReport";
 
 function App() {
-
   const location = useLocation(); // Get current location
-  const hideNavbarRoutes = ["/login", "/create-account"]
-  const hideFooterRoutes = ["/login", "/create-account"]
+  const hideNavbarRoutes = ["/login", "/create-account"];
+  const hideFooterRoutes = ["/login", "/create-account"];
 
   return (
     <div className="App">
@@ -26,8 +25,8 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/create-account" element={<CreateAccount />} />
           <Route path="/virtual-register" element={<VirtualRegister />} />
-          <Route path="/schedule" element={<Schedule />} />
           <Route path="/products" element={<Products />} />
+          <Route path="/inventory-report" element={<InventoryReport />} />
         </Routes>
       </div>
       {!hideFooterRoutes.includes(location.pathname) && <Footer />}
