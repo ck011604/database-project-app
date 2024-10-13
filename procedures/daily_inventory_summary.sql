@@ -1,9 +1,9 @@
--- Active: 1727921417886@@localhost@3306@restaurant_db
+-- Active: 1728838035833@@localhost@3306@restaurantdb
 DROP PROCEDURE generate_daily_inventory_summary;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `generate_daily_inventory_summary`()
 BEGIN
     DECLARE report_date DATE;
-    SET report_date = CURDATE() - INTERVAL 1 DAY;
+    SET report_date = CURDATE();
     -- Insert or update the inventory_daily_summary table
     INSERT INTO inventory_daily_summary (
         date, 
@@ -42,3 +42,5 @@ BEGIN
         restocked_amount = VALUES(restocked_amount),
         used_amount = VALUES(used_amount);
 END
+
+CALL generate_daily_inventory_summary();
