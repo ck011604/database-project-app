@@ -110,7 +110,7 @@ CREATE TABLE `inventory_daily_summary` (
   UNIQUE KEY `date_ingredient` (`date`,`ingredient_id`),
   KEY `ingredient_id` (`ingredient_id`),
   CONSTRAINT `inventory_daily_summary_ibfk_1` FOREIGN KEY (`ingredient_id`) REFERENCES `inventory` (`ingredient_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -118,6 +118,7 @@ CREATE TABLE `inventory_daily_summary` (
 --
 
 /*!40000 ALTER TABLE `inventory_daily_summary` DISABLE KEYS */;
+INSERT INTO `inventory_daily_summary` VALUES (1,'2024-10-12',1,50,50,0,0),(2,'2024-10-12',2,90,90,0,0),(3,'2024-10-12',3,90,90,0,0),(4,'2024-10-12',4,100,100,0,0),(5,'2024-10-12',5,100,100,0,0),(6,'2024-10-12',6,100,100,0,0),(7,'2024-10-12',7,100,100,0,0),(8,'2024-10-12',8,100,100,0,0),(9,'2024-10-12',9,100,100,0,0),(10,'2024-10-12',10,100,100,0,0),(11,'2024-10-12',11,100,100,0,0),(12,'2024-10-12',12,70,70,0,0),(13,'2024-10-12',13,100,100,0,0),(14,'2024-10-12',14,100,100,0,0),(15,'2024-10-12',15,100,100,0,0),(16,'2024-10-12',16,50,50,0,0),(17,'2024-10-12',17,100,100,0,0),(18,'2024-10-12',18,100,100,0,0),(19,'2024-10-12',19,100,100,0,0),(20,'2024-10-12',20,100,100,0,0),(21,'2024-10-12',21,100,100,0,0),(22,'2024-10-12',22,100,100,0,0),(23,'2024-10-12',23,100,100,0,0),(24,'2024-10-12',24,100,100,0,0),(25,'2024-10-12',25,50,50,0,0),(26,'2024-10-12',26,100,100,0,0),(27,'2024-10-12',27,100,100,0,0),(28,'2024-10-12',28,70,70,0,0),(29,'2024-10-12',29,100,100,0,0),(30,'2024-10-12',30,100,100,0,0),(31,'2024-10-12',31,100,100,0,0),(32,'2024-10-12',32,89,89,0,0),(33,'2024-10-12',33,96,96,0,0),(34,'2024-10-12',34,96,96,0,0),(35,'2024-10-12',35,96,96,0,0),(36,'2024-10-12',36,0,0,0,0),(37,'2024-10-12',37,90,90,0,0),(38,'2024-10-12',38,100,100,0,0),(39,'2024-10-12',39,100,100,0,0);
 /*!40000 ALTER TABLE `inventory_daily_summary` ENABLE KEYS */;
 
 --
@@ -410,6 +411,63 @@ INSERT INTO `users` VALUES (1,'Mike','Ross','mikeross@gmail.com','mike123','user
 --
 -- Dumping routines for database 'restaurantdb'
 --
+/*!50003 DROP PROCEDURE IF EXISTS `generate_daily_inventory_summary` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'IGNORE_SPACE,ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `generate_daily_inventory_summary`()
+BEGIN
+    DECLARE report_date DATE;
+    SET report_date = CURDATE() - INTERVAL 1 DAY;
+    -- Insert or update the inventory_daily_summary table
+    INSERT INTO inventory_daily_summary (
+        date, 
+        ingredient_id, 
+        starting_amount, 
+        ending_amount, 
+        restocked_amount, 
+        used_amount
+    )
+    SELECT 
+        report_date,
+        i.ingredient_id,
+        COALESCE(prev_summary.ending_amount, i.amount) AS starting_amount,
+        i.amount AS ending_amount,
+        COALESCE(restocked.amount, 0) AS restocked_amount,
+        COALESCE(used.amount, 0) AS used_amount
+    FROM 
+        inventory i
+        LEFT JOIN inventory_daily_summary prev_summary ON i.ingredient_id = prev_summary.ingredient_id
+            AND prev_summary.date = report_date - INTERVAL 1 DAY
+        LEFT JOIN (
+            SELECT ingredient_id, SUM(quantity_change) AS amount
+            FROM inventory_logs
+            WHERE DATE(timestamp) = report_date AND action_type IN ('restock', 'manual_order')
+            GROUP BY ingredient_id
+        ) restocked ON i.ingredient_id = restocked.ingredient_id
+        LEFT JOIN (
+            SELECT ingredient_id, SUM(ABS(quantity_change)) AS amount
+            FROM inventory_logs
+            WHERE DATE(timestamp) = report_date AND action_type = 'usage'
+            GROUP BY ingredient_id
+        ) used ON i.ingredient_id = used.ingredient_id
+    ON DUPLICATE KEY UPDATE
+        starting_amount = VALUES(starting_amount),
+        ending_amount = VALUES(ending_amount),
+        restocked_amount = VALUES(restocked_amount),
+        used_amount = VALUES(used_amount);
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -420,4 +478,4 @@ INSERT INTO `users` VALUES (1,'Mike','Ross','mikeross@gmail.com','mike123','user
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-10-11 21:32:38
+-- Dump completed on 2024-10-13 13:56:49
