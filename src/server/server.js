@@ -4,6 +4,7 @@ const accountController = require('./controllers/account_controller');
 const virtualRegisterController = require('./controllers/virtualRegister_controller');
 const employee_controller = require("./controllers/employee_controller")
 const shift_controller = require("./controllers/shift_controller")
+const inventory_controller = require("./controllers/inventory_controller")
 const menu_management_controller = require("./controllers/menu_management_controller")
 const request_schedule_controller = require("./controllers/request_schedule_controller")
 const inventory_report_controller = require("./controllers/inventory_report_controller"); 
@@ -70,6 +71,9 @@ const server = http.createServer((req, res) => {
         }
         if (req.url.startsWith("/api/inventory-report")) {
             inventory_report_controller.getInventoryReport(req, res);
+        }
+        if (req.url.startsWith("/api/inventory/")) {
+            inventory_controller.inventory_detail(req, res);
         }
     }
     if (req.method === "PATCH") {

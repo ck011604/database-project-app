@@ -1,5 +1,10 @@
-.table {
-    width: 90%;
+.products {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+.menu_items_table {
+    width: 100%;
     border-collapse: collapse;
     border: centered;
     margin-left: auto;
@@ -10,21 +15,24 @@
     overflow: hidden;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
 }
-.table thead tr {
+.menu_items_table thead tr {
     background-color: #808080;
     color: #ffffff;
     text-align: left;
     font-weight: bold;
     min-width: 400px;
 }
-.table th,
-.table td {
+.item_info th {
+    height: 50px;
+    background-color: #808080;
+}
+.items_table td {
     padding: 12px 15px;
 }
-.table tbody tr {
+.item_info tbody tr {
     border-bottom: 1px solid #ffffff
 }
-.table tbody tr:last-of-type {
+.item_info tbody tr:last-of-type {
     border-bottom: 2x solid #808080
 }
 .status {
