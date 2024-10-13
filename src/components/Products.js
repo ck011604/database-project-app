@@ -1,10 +1,35 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
-import "../css/Products.css"
+import Ingredient from "./Ingredient";
+import '../css/Products.css';
 
 const Products = () => {
     const [items, setItems] = useState([]);
     const [productFilter, setProductFilter] = useState("Menu Items");
+    useEffect(() => {
+        const fetchAllItems = async ()=>{
+            try{
+                let res = await axios.get("http://localhost:3001/menu")
+                let items = res.data.menu;
+                let new_items = []
+                for(let item of items){
+                    new_items.push({
+                        id: item.ingredient_id,
+                        name: item.name,
+                        ingredients: item.ingredients,
+                        type: item.type,
+                        price: item.price,
+                        isActive: item.is_active
+                    })
+                }
+                console.log(new_items)
+                setItems(new_items);
+            } catch (err) {
+                console.log(`Error fetching Menu Items: ${err}`)
+            }
+        }
+        fetchAllItems()
+    }, [])
     useEffect(() => {
         if (productFilter === "MENU_ITEMS") {
             
@@ -19,7 +44,6 @@ const Products = () => {
             
         }
     }, [productFilter])
-
     return (
         <div className="products">
             <style>
@@ -31,10 +55,11 @@ const Products = () => {
                 <button onClick={() => setProductFilter("REWARDS")}>Rewards</button>
                 <button onClick={() => setProductFilter("EVENTS")}>Events</button>
             </div>
-            <h3>List of Menu Items</h3>
-            <table class="table">
+            <h2>List of Menu Items</h2>
+            
+            <table class = "menu_items_table">
                 <thead> 
-                    <tr>
+                    <tr class = "item_info">
                         <th>Item Number</th>
                         <th>Name</th>
                         <th>Ingredients</th>
@@ -43,6 +68,22 @@ const Products = () => {
                         <th>IsActive</th>
                     </tr>
                 </thead>
+                <tbody id = "items_table">
+                    {items.map((item, key) => {
+                        return (   
+                            <tr>
+                                <td>{key}</td>
+                                <td>{item.name}</td>
+                                <td>{item.ingredients.map((ingredient, _) => {
+                                    return ( <Ingredient ingredient_id={ingredient.ingredient_id} />)
+                                })}</td>
+                                <td>{item.type}</td>
+                                <td>{item.price}</td>
+                                <td>{item.isActive}</td>
+                            </tr>
+                        )
+                    })}
+                </tbody>
             </table>
         </div>
     );
