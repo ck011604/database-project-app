@@ -11,7 +11,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
   const [tipAmount, setTipAmount] = useState(0.00);
   const [changeAmount, setChangeAmount] = useState(0.00); // total - received amount
   const [error, setError] = useState("");
-  const [confirmOrderButton, setConfrimOrderButton] = useState("Confrim Order");
+  const [confirmOrderButton, setConfirmOrderButton] = useState("Confrim Order");
   const [waiterID, setWaiterID,] = useState(1); //For testing, needs to be passed along from login
   const [customerID, setCustomerID] = useState(null);
   const [customerEmail, setCustomerEmail] = useState(""); // From the form
@@ -52,7 +52,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
       setItemsWithConIng([]);
     }
     setFormLock(false);
-    setConfrimOrderButton("Confirm Order");
+    setConfirmOrderButton("Confirm Order");
     setSuccessfulOrder(false);
     fetchInventory();
     onClose();
@@ -68,22 +68,8 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
       return;
     }
     else {
-      // Check if the table number is valid
-      try {
-        const tableResponse = await axios.get(
-          `http://localhost:3001/valid-table?tableNumber=${tableNumber}`
-        );
-        if (tableResponse.data.success === false) {
-          setError("Invalid table number");
-          return;
-        }
-      } catch (err) {
-        if (err.response && err.response.data && err.response.data.message)
-          setError(err.response.data.message);
-        else
-          setError(
-            `An error has occured checking the validity of table ${tableNumber}`
-          );
+      if (tableNumber < 0 || tableNumber > 30) { // Check if its a valid table (1-30)
+        setError("Invalid table nummber")
         return;
       }
       // Check if the customer email is valid
@@ -149,7 +135,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
         );
         if (!ingredient) {
           setError("Invalid Ingredient");
-          setConfrimOrderButton("Error");
+          setConfirmOrderButton("Error");
           setFormLock(true);
           return;
         } else if (reqIng.quantity > ingredient.amount) {
@@ -166,7 +152,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
             .map((conIng) => conIng.name)
             .join(", ")}`
         );
-        setConfrimOrderButton("Error");
+        setConfirmOrderButton("Error");
         setFormLock(true);
         // filters out items without a conflicting ingredient
         setUpdatedSelectiveItems(
@@ -193,7 +179,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
       // Passed checks, order can continue...
       const itemsJSON = JSON.stringify(selectedItems);
       setError("");
-      setConfrimOrderButton("Loading...");
+      setConfirmOrderButton("Loading...");
       try {
         const response = await axios.post(
           "http://localhost:3001/confirm-order",
@@ -214,7 +200,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
         );
         if (response.data.success) setFormLock(true);
         setSuccessfulOrder(true);
-        setConfrimOrderButton("Success!");
+        setConfirmOrderButton("Success!");
         // try {
         //   // Subtract from inventory
         //   await axios.patch("http://localhost:3001/subtract-inventory", {

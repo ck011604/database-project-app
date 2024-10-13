@@ -7,10 +7,10 @@ const Navbar = () => {
             <a href="/home" className="logo">POS System</a>
             <nav className="navbar">
                 <a href="/virtual-register">Virtual Register</a>
-                <a href="/management">Management</a>
+                <a href="/products">Products</a>
                 <a href="">Tab3</a>
                 <a href="">Tab4</a>
-                <a href="/schedule">Your schedule</a>
+                <a href="/schedule">Events</a>
             </nav>
         </header>
      );
