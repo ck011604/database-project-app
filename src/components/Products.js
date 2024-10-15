@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 import Ingredient from "./Ingredient";
+import AddMenuItemForm from "./EditForms/AddMenuItemForm"
 import '../css/Products.css';
 
 const Products = () => {
@@ -69,7 +70,7 @@ const Products = () => {
                         <div className="modal">
                             <div onClick={() => toggleModal()} className="overlay"></div>
                             <div className="modal-content">
-                                <h2>Add Item Form</h2>
+                                <AddMenuItemForm />
                                 <button className="close-modal" onClick={() => toggleModal()}>Close</button>
                             </div>
                         </div>
