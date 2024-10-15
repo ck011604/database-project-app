@@ -2,6 +2,7 @@ const http = require('http');
 const url = require('url');
 const accountController = require('./controllers/account_controller');
 const virtualRegisterController = require('./controllers/virtualRegister_controller');
+const promotionalCodeController = require('./controllers/promotional_code_controller');
 const employee_controller = require("./controllers/employee_controller")
 const shift_controller = require("./controllers/shift_controller")
 const inventory_controller = require("./controllers/inventory_controller")
@@ -51,6 +52,9 @@ const server = http.createServer((req, res) => {
         if (req.url === "/inventory-stock") {
             virtualRegisterController.inventory_stock(req, res);
         }
+        if (req.url.startsWith("/apply-promo-code")) {
+            promotionalCodeController.apply_promo_code(req, res);
+        }
         if (req.url.startsWith("/valid-customer-email")) {
           accountController.validCustomerEmail(req, res);
         }
@@ -80,9 +84,6 @@ const server = http.createServer((req, res) => {
         if (req.url.startsWith("/api/employees/")) {
             employee_controller.employee_update_patch(req, res);
         }
-        // if (req.url === "/subtract-inventory") {
-        //     virtualRegisterController.subtract_inventory(req, res);
-        // }
         if (req.url.startsWith("/api/shifts/")) {
             shift_controller.shift_update_patch(req, res);
         }

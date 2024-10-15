@@ -97,7 +97,7 @@
     resize: none;
     font-family: inherit;
 }
-.checkout-label button {
+.promo-code-apply-button {
     margin-left: 10px;
     padding: 5px 10px;
     background-color: #007BFF;
@@ -106,8 +106,12 @@
     border-radius: 5px;
     cursor: pointer;
 }
-.checkout-label button:hover {
+.promo-code-apply-button:hover {
     background-color: #0363ca;
+}
+.promo-code-apply-button:disabled {
+    cursor: not-allowed;
+    background-color: gray;
 }
 .promo-code-input {
     width: 20%;
