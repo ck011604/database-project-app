@@ -5,22 +5,22 @@
     padding: 20px;
   }
   
-  form {
+.inventory-report  form {
     margin-bottom: 20px;
   }
   
-  label {
+.inventory-report  label {
     display: block;
     margin-bottom: 10px;
   }
   
-  select, input[type="date"] {
+.inventory-report  select, input[type="date"] {
     width: 100%;
     padding: 8px;
     margin-top: 5px;
   }
   
-  button {
+.inventory-report  button {
     background-color: #4CAF50;
     color: white;
     padding: 10px 15px;
@@ -28,7 +28,7 @@
     cursor: pointer;
   }
   
-  button:hover {
+.inventory-report  button:hover {
     background-color: #45a049;
   }
   
@@ -37,18 +37,18 @@
     margin-bottom: 10px;
   }
   
-  table {
+.inventory-report  table {
     width: 100%;
     border-collapse: collapse;
   }
   
-  th, td {
+.inventory-report  th, td {
     border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
   }
   
-  th {
+.inventory-report  th {
     background-color: #4CAF50;
     color: white;
   }

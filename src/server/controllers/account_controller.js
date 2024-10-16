@@ -86,7 +86,7 @@ exports.validCustomerEmail = (req, res) => {
       if (error) {
         res.writeHead(500, { "Content-Type": "application/json" });
         res.end(JSON.stringify({success: false, message: "Server Error fetching USERS",}));
-        console.log("Server Error", error);
+        console.log("Server Error fetching USERS", error);
         return;
       }
       if (results.length > 0) {
