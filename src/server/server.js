@@ -76,9 +76,9 @@ const server = http.createServer((req, res) => {
         if (req.url.startsWith("/api/inventory-report")) {
             inventory_report_controller.getInventoryReport(req, res);
         }
-        // if (req.url.startsWith("/api/inventory")) {
-        //     inventory_controller.index(req, res);
-        // }
+        if (req.url === ("/api/inventory")) {
+            inventory_controller.index(req, res);
+        }
         if (req.url.startsWith("/api/inventory/")) {
             inventory_controller.inventory_detail(req, res);
         }

@@ -32,7 +32,7 @@ function Form({ template, onSubmit, watchFields, validate }) {
                 case 'text':
                     return(
                         <div key={name}>
-                            <label htmlFor={name}>{title}</label>
+                            <label htmlFor={name} style={{ marginTop: '10px' }}>{title}</label>
                             <input type='text' name={name} id={name} {...register(name, validationProps)}></input>
                             { errors[name] && <span className='red-text'>{errors[name]['message']}</span>}
                         </div>
@@ -40,14 +40,14 @@ function Form({ template, onSubmit, watchFields, validate }) {
                 case 'number':
                     return(
                         <div key={name}>
-                            <label htmlFor={name}>{title}</label>
+                            <label htmlFor={name} style={{ marginTop: '10px' }}>{title}</label>
                             <input type='number' name={name} id={name} {...register(name, validationProps)}></input>
                             { errors[name] && <span className='red-text'>{errors[name]['message']}</span>}
                         </div>
                     )
                 case 'select':
                     return (
-                        <div key={name}>
+                        <div key={name} style={{ marginTop: '10px' }}>
                             <label htmlFor={name}>{title}</label>
                             <Controller
                                 name={name}
@@ -60,7 +60,7 @@ function Form({ template, onSubmit, watchFields, validate }) {
                     );
                 default:
                     return(
-                        <div key={name}>
+                        <div key={name} style={{ marginTop: '10px' }}>
                             <span className='red-text'>Invalid Field</span>
                         </div>
                     )
@@ -69,7 +69,7 @@ function Form({ template, onSubmit, watchFields, validate }) {
     }
 
     return (
-        <div>
+        <div className = 'form-details'>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <h2>{title}</h2>
                 {renderFields(fields)}

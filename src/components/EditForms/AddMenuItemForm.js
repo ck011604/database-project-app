@@ -11,26 +11,26 @@ const AddMenuItemForm = (props) => {
     const [ingredientsOptions, setIngredientsOptions] = useState([]);
     const [typeOptions, setTypeOptions] = useState([]);
 
-    // useEffect(() => {
-    //     const fetchIngredients = async () => {
-    //         try {
-    //             let res = await axios.get("http://localhost:3001/api/inventory")
-    //             let ingredientsOptions = res.data.inventory;
-    //             let new_ingredients = []
-    //             for (let ingredient of ingredientsOptions) {
-    //                 new_ingredients.push({
-    //                     value: ingredient.ingredient_id,
-    //                     label: ingredient.name,
-    //                 })
-    //             }
-    //             console.log(new_ingredients)
-    //             setIngredientsOptions(new_ingredients);
-    //         } catch (err) {
-    //             console.log(`Error fetching ingredients: ${err}`);
-    //         }
-    //     };
-    //     fetchIngredients();
-    // }, []);
+    useEffect(() => {
+        const fetchIngredients = async () => {
+            try {
+                let res = await axios.get("http://localhost:3001/api/inventory")
+                let ingredientsOptions = res.data.inventory;
+                let new_ingredients = []
+                for (let ingredient of ingredientsOptions) {
+                    new_ingredients.push({
+                        value: ingredient.ingredient_id,
+                        label: ingredient.name,
+                    })
+                }
+                console.log(new_ingredients)
+                setIngredientsOptions(new_ingredients);
+            } catch (err) {
+                console.log(`Error fetching ingredients: ${err}`);
+            }
+        };
+        fetchIngredients();
+    }, []);
 
     useEffect(() => {
         const fetchAllItems = async ()=>{
