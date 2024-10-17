@@ -23,6 +23,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
   const [ingredientsNeeded, setIngredientsNeeded] = useState([]); // List of ingredients and quantity for the order
   const [specialRequest, setSpecialRequest] = useState("");
   const [promoCode, setPromoCode] = useState("");
+  const [promoCodeID, setPromoCodeID] = useState("");
   const [promoCodePercent, setPromoCodePercent] = useState(0);
   const [promoCodeLock, setPromoCodeLock] = useState(false); // Once the submit promo button is pressed, don't allow more
   const [discountAmount, setDiscountAmount] = useState(0.00);
@@ -80,13 +81,14 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
   const handlePromoCode = async (e) => {
     if (promoCode.length > 0) {
       try {
-        const promoCodeResponse = await axios.get(`http://localhost:3001/apply-promo-code?promoCode=${promoCode}`);
+        const promoCodeResponse = await axios.get(`http://localhost:3001/check-promo-code?promoCode=${promoCode}`);
         if (promoCodeResponse.data.success === false) {
           setError('Not a valid promotional code');
           return;
         }
         else {
           setPromoCodePercent(promoCodeResponse.data.discountPercent);
+          setPromoCodeID(promoCodeResponse.data.promoCode_ID);
           setPromoCodeLock(true);
         }
       } catch(err) {
@@ -109,7 +111,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
     }
     else {
       if (tableNumber < 0 || tableNumber > 30) { // Check if its a valid table (1-30)
-        setError("Invalid table nummber")
+        setError("Invalid table number")
         return;
       }
       // Check if the customer email is valid
@@ -236,6 +238,9 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
             receivedAmount,
             changeAmount,
             specialRequest,
+            promoCode_id: promoCodeID,
+            isMilitary,
+            discount_percentage: highestDiscountPercent
           }
         );
         if (response.data.success) setFormLock(true);
@@ -305,12 +310,14 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
               value="yes"
               checked={isMilitary === "yes"}
               onChange={() => setIsMilitary("yes")}
+              disabled={formLock}
             /> Yes
             <input
               type="radio"
               value="no"
               checked={isMilitary === "no"}
               onChange={() => setIsMilitary("no")}
+              disabled={formLock}
             /> No
           </div>
           <div className="checkout-label">

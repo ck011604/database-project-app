@@ -52,8 +52,8 @@ const server = http.createServer((req, res) => {
         if (req.url === "/inventory-stock") {
             virtualRegisterController.inventory_stock(req, res);
         }
-        if (req.url.startsWith("/apply-promo-code")) {
-            promotionalCodeController.apply_promo_code(req, res);
+        if (req.url.startsWith("/check-promo-code")) {
+            promotionalCodeController.check_promo_code(req, res);
         }
         if (req.url.startsWith("/valid-customer-email")) {
           accountController.validCustomerEmail(req, res);
