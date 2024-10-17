@@ -35,8 +35,8 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
     let calculatedDiscount = 0
     if (isMilitary === "yes" && promoCodePercent < 10) {
       setHighestDiscountPercent(10);
-      // calculatedDiscount = numericSubtotal * 0.10;
-      // setDiscountAmount(calculatedDiscount.toFixed(2));
+      calculatedDiscount = numericSubtotal * 0.10;
+      setDiscountAmount(calculatedDiscount.toFixed(2));
     }
     else if (promoCodePercent > 0) {
       setHighestDiscountPercent(promoCodePercent);
@@ -274,7 +274,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
           </div>
           {discountAmount > 0 &&
             <div className="checkout-label">
-              <label>Discount {promoCodePercent}%: </label>
+              <label>Discount {highestDiscountPercent}%: </label>
               <p>-${discountAmount}</p>
             </div>
           }
