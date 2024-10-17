@@ -26,16 +26,26 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
   const [promoCodePercent, setPromoCodePercent] = useState(0);
   const [promoCodeLock, setPromoCodeLock] = useState(false); // Once the submit promo button is pressed, don't allow more
   const [discountAmount, setDiscountAmount] = useState(0.00);
+  const [highestDiscountPercent, setHighestDiscountPercent] = useState(0);
+  const [isMilitary, setIsMilitary] = useState('no');
 
   useEffect(() => { // Handle all of the calculations
     const numericSubtotal = parseFloat(subtotal); // Treat as number, not string
 
     let calculatedDiscount = 0
-    if (promoCodePercent > 0) {
-      calculatedDiscount = numericSubtotal * (promoCodePercent/100)
-      setDiscountAmount(calculatedDiscount.toFixed(2))
+    if (isMilitary === "yes" && promoCodePercent < 10) {
+      setHighestDiscountPercent(10);
+      // calculatedDiscount = numericSubtotal * 0.10;
+      // setDiscountAmount(calculatedDiscount.toFixed(2));
     }
-    const afterDiscount = numericSubtotal - calculatedDiscount
+    else if (promoCodePercent > 0) {
+      setHighestDiscountPercent(promoCodePercent);
+      calculatedDiscount = numericSubtotal * (promoCodePercent/100);
+      setDiscountAmount(calculatedDiscount.toFixed(2));
+    }
+    else
+      setDiscountAmount(0.00);
+    const afterDiscount = numericSubtotal - calculatedDiscount;
 
     const taxRate = 0.0825; // 8.25% tax rate
     const calculatedTax = afterDiscount * taxRate;
@@ -49,7 +59,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
 
     const calculateChange = receivedAmount - total;
     setChangeAmount(calculateChange.toFixed(2))
-  }, [subtotal, tipPercent, receivedAmount, promoCodePercent]);
+  }, [subtotal, tipPercent, receivedAmount, promoCodePercent, isMilitary]);
 
   const handleOnClose = () => {
     if (successfulOrder)
@@ -289,6 +299,21 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
             />
           </div>
           <div className="checkout-label">
+            <label>Member of Military: </label>
+            <input
+              type="radio"
+              value="yes"
+              checked={isMilitary === "yes"}
+              onChange={() => setIsMilitary("yes")}
+            /> Yes
+            <input
+              type="radio"
+              value="no"
+              checked={isMilitary === "no"}
+              onChange={() => setIsMilitary("no")}
+            /> No
+          </div>
+          <div className="checkout-label">
             <label>Promotional Code: </label>
             <input className="promo-code-input"
               type="text" 
@@ -300,6 +325,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
               {promoCodeLock == true ? "Applied" : "Apply"}
             </button>
           </div>
+          <small>Only the highest discount will be applied to your order.</small>
           <div className="checkout-label">
             <label>Total: </label>
             <p>${total}</p>
