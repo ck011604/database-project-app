@@ -98,84 +98,29 @@ INSERT INTO `inventory` VALUES (1,'mozzarella',75,20,100),(2,'tomato sauce',95,1
 /*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'IGNORE_SPACE,ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `check_inventory_thresholds` AFTER UPDATE ON `inventory` FOR EACH ROW BEGIN
-    DECLARE v_restock_amount INT UNSIGNED;
-    IF NEW.amount <= NEW.restock_threshold THEN
-        SET v_restock_amount = NEW.restock_amount;
-        UPDATE inventory 
-        SET amount = amount + v_restock_amount 
-        WHERE ingredient_id = NEW.ingredient_id;
-        INSERT INTO inventory_logs (ingredient_id, action_type, quantity_change) 
-        VALUES (NEW.ingredient_id, 'restock', v_restock_amount);
-    END IF;
-END */;;
-DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
 
---
--- Table structure for table `inventory_daily_summary`
---
+DROP TABLE IF EXISTS inventory_summary_logs
 
-DROP TABLE IF EXISTS `inventory_daily_summary`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `inventory_daily_summary` (
-  `summary_id` int unsigned NOT NULL AUTO_INCREMENT,
-  `date` date NOT NULL,
-  `ingredient_id` int unsigned NOT NULL,
-  `starting_amount` int unsigned NOT NULL,
-  `ending_amount` int unsigned NOT NULL,
-  `restocked_amount` int unsigned NOT NULL DEFAULT '0',
-  `used_amount` int unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`summary_id`),
-  UNIQUE KEY `date_ingredient` (`date`,`ingredient_id`),
-  KEY `ingredient_id` (`ingredient_id`),
-  CONSTRAINT `inventory_daily_summary_ibfk_1` FOREIGN KEY (`ingredient_id`) REFERENCES `inventory` (`ingredient_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `inventory_daily_summary`
---
-
-/*!40000 ALTER TABLE `inventory_daily_summary` DISABLE KEYS */;
-INSERT INTO `inventory_daily_summary` VALUES (1,'2024-10-12',1,50,50,0,0),(2,'2024-10-12',2,90,90,0,0),(3,'2024-10-12',3,90,90,0,0),(4,'2024-10-12',4,100,100,0,0),(5,'2024-10-12',5,100,100,0,0),(6,'2024-10-12',6,100,100,0,0),(7,'2024-10-12',7,100,100,0,0),(8,'2024-10-12',8,100,100,0,0),(9,'2024-10-12',9,100,100,0,0),(10,'2024-10-12',10,100,100,0,0),(11,'2024-10-12',11,100,100,0,0),(12,'2024-10-12',12,70,70,0,0),(13,'2024-10-12',13,100,100,0,0),(14,'2024-10-12',14,100,100,0,0),(15,'2024-10-12',15,100,100,0,0),(16,'2024-10-12',16,50,50,0,0),(17,'2024-10-12',17,100,100,0,0),(18,'2024-10-12',18,100,100,0,0),(19,'2024-10-12',19,100,100,0,0),(20,'2024-10-12',20,100,100,0,0),(21,'2024-10-12',21,100,100,0,0),(22,'2024-10-12',22,100,100,0,0),(23,'2024-10-12',23,100,100,0,0),(24,'2024-10-12',24,100,100,0,0),(25,'2024-10-12',25,50,50,0,0),(26,'2024-10-12',26,100,100,0,0),(27,'2024-10-12',27,100,100,0,0),(28,'2024-10-12',28,70,70,0,0),(29,'2024-10-12',29,100,100,0,0),(30,'2024-10-12',30,100,100,0,0),(31,'2024-10-12',31,100,100,0,0),(32,'2024-10-12',32,89,89,0,0),(33,'2024-10-12',33,96,96,0,0),(34,'2024-10-12',34,96,96,0,0),(35,'2024-10-12',35,96,96,0,0),(36,'2024-10-12',36,0,0,0,0),(37,'2024-10-12',37,90,90,0,0),(38,'2024-10-12',38,100,100,0,0),(39,'2024-10-12',39,100,100,0,0);
-/*!40000 ALTER TABLE `inventory_daily_summary` ENABLE KEYS */;
-
---
--- Table structure for table `inventory_logs`
---
-
-DROP TABLE IF EXISTS `inventory_logs`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `inventory_logs` (
-  `log_id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
-  `ingredient_id` int unsigned NOT NULL,
-  `action_type` enum('restock','manual_order','usage') NOT NULL,
-  `quantity_change` int NOT NULL,
-  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`log_id`),
-  KEY `fk_inventory_logs_ingredient_id` (`ingredient_id`),
-  CONSTRAINT `fk_inventory_logs_ingredient_id` FOREIGN KEY (`ingredient_id`) REFERENCES `inventory` (`ingredient_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='logs for inventory changes';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `inventory_logs`
---
-
-/*!40000 ALTER TABLE `inventory_logs` DISABLE KEYS */;
-/*!40000 ALTER TABLE `inventory_logs` ENABLE KEYS */;
-
+CREATE TABLE inventory_summary_logs (
+    log_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    ingredient_id INT UNSIGNED NOT NULL,
+    starting_amount INT UNSIGNED NOT NULL,
+    ending_amount INT UNSIGNED NOT NULL,
+    restocked_amount INT UNSIGNED NOT NULL DEFAULT 0,
+    used_amount INT UNSIGNED NOT NULL DEFAULT 0,
+    action_type ENUM('restock', 'usage', 'manual_adjustment') NOT NULL,
+    quantity_change INT NOT NULL,
+    PRIMARY KEY (log_id),
+    INDEX idx_timestamp_ingredient (timestamp, ingredient_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 --
 -- Table structure for table `menu`
 --
-
 DROP TABLE IF EXISTS `menu`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -387,50 +332,6 @@ INSERT INTO `users` VALUES (1,'Mike','Ross','mikeross@gmail.com','mike123','user
 /*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'IGNORE_SPACE,ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `generate_daily_inventory_summary`()
-BEGIN
-    DECLARE report_date DATE;
-    SET report_date = CURDATE() - INTERVAL 1 DAY;
-    -- Insert or update the inventory_daily_summary table
-    INSERT INTO inventory_daily_summary (
-        date, 
-        ingredient_id, 
-        starting_amount, 
-        ending_amount, 
-        restocked_amount, 
-        used_amount
-    )
-    SELECT 
-        report_date,
-        i.ingredient_id,
-        COALESCE(prev_summary.ending_amount, i.amount) AS starting_amount,
-        i.amount AS ending_amount,
-        COALESCE(restocked.amount, 0) AS restocked_amount,
-        COALESCE(used.amount, 0) AS used_amount
-    FROM 
-        inventory i
-        LEFT JOIN inventory_daily_summary prev_summary ON i.ingredient_id = prev_summary.ingredient_id
-            AND prev_summary.date = report_date - INTERVAL 1 DAY
-        LEFT JOIN (
-            SELECT ingredient_id, SUM(quantity_change) AS amount
-            FROM inventory_logs
-            WHERE DATE(timestamp) = report_date AND action_type IN ('restock', 'manual_order')
-            GROUP BY ingredient_id
-        ) restocked ON i.ingredient_id = restocked.ingredient_id
-        LEFT JOIN (
-            SELECT ingredient_id, SUM(ABS(quantity_change)) AS amount
-            FROM inventory_logs
-            WHERE DATE(timestamp) = report_date AND action_type = 'usage'
-            GROUP BY ingredient_id
-        ) used ON i.ingredient_id = used.ingredient_id
-    ON DUPLICATE KEY UPDATE
-        starting_amount = VALUES(starting_amount),
-        ending_amount = VALUES(ending_amount),
-        restocked_amount = VALUES(restocked_amount),
-        used_amount = VALUES(used_amount);
-END ;;
-DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
