@@ -44,100 +44,203 @@ exports.inventory_stock = (req, res) => { // Get inventory stock
 };
 
 exports.confirm_order = (req, res) => {
-    console.log("Received request to add order");
-    let body = "";
-    req.on("data", (chunk) => {
-      body += chunk.toString();
-    });
-    req.on("end", () => {
-      const { selectedItems, waiterID, tableNumber, customerID, subtotal, tax, tipPercent, tipAmount, total, receivedAmount, changeAmount, specialRequest } = JSON.parse(body);
-      const addedPoints = Math.floor(subtotal)
-      pool.query(
-        "INSERT INTO orders (items, waiter_id, table_number, customer_id, subtotal, tip_percent, tip_amount, total, received_amount, change_amount, tax_amount, special_requests, pointsEarned) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
-        [selectedItems, waiterID, tableNumber, customerID, subtotal, tipPercent, tipAmount, total, receivedAmount, changeAmount, tax, specialRequest, addedPoints],
-        (error, result) => {
-          if (error) {
-            res.writeHead(500, { "Content-Type": "application/json" });
-            res.end(
-              JSON.stringify({
-                success: false,
-                message: "Server Error inserting into orders",
-              })
-            );
-            console.log(error)
-            return;
-          } // Else
-          res.writeHead(200, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ success: true }));
-          console.log("Successfully added order");
+  console.log("Received request to add order");
+  let body = "";
+  req.on("data", (chunk) => {
+    body += chunk.toString();
+  });
+  req.on("end", () => {
+    const {
+      selectedItems,
+      waiterID,
+      tableNumber,
+      customerID,
+      subtotal,
+      tax,
+      tipPercent,
+      tipAmount,
+      total,
+      receivedAmount,
+      changeAmount,
+      specialRequest,
+      promoCode_id,
+      isMilitaryString,
+      discount_percentage
+    } = JSON.parse(body);
+    const isMilitary = isMilitaryString == "no" ? 0 : 1; // Convert to binary (0 or 1)
+    const checkedPromoCodeID = promoCode_id == "" ? null : promoCode_id // If no code was given, set it to null
+    const addedPoints = Math.floor(subtotal);
+
+    pool.getConnection((err, connection) => {
+      if (err) {
+        console.error('Error getting connection:', err);
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: false, message: "Server Error: Unable to connect to database." }));
+        return;
+      }
+      connection.beginTransaction((err) => {
+        if (err) {
+          connection.release();
+          console.error('Error starting transaction:', err);
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ success: false, message: "Server Error: Unable to start transaction." }));
+          return;
         }
-      );
+        // Subtract uses left for the promotion code
+        if (checkedPromoCodeID != null && discount_percentage > 10) { // A discount was applied
+          console.log("There is a promocode")
+          connection.query(`SELECT promoCode_id, uses_left
+            FROM promotion_codes
+            WHERE is_active = 1 AND promoCode_id = ? AND (uses_left > 0 OR uses_left IS null)`,
+            [checkedPromoCodeID],
+            (err, results) => {
+              if (err || results.length == 0) {
+                return connection.rollback(() => {
+                  connection.release();
+                  console.error('Invalid or inactive promo code:', err);
+                  res.writeHead(400, { "Content-Type": "application/json" });
+                  res.end(JSON.stringify({ success: false, message: "Invalid promo code or there was an error" }));
+                });
+              }
+              // The code was valid and has uses_left
+              console.log(results)
+              const updatedUsesLeft = results[0].uses_left == null ? null : results[0].uses_left - 1
+              connection.query("UPDATE promotion_codes SET uses_left = ? WHERE promoCode_id = ?",
+                [updatedUsesLeft, checkedPromoCodeID],
+                (err) => {
+                  if (err) {
+                    return connection.rollback(() => {
+                      connection.release();
+                      console.error('Error updating promotional code uses left:', err);
+                      res.writeHead(500, { "Content-Type": "application/json" });
+                      res.end(JSON.stringify({ success: false, message: "Server Error: Unable to update promotional code." }));
+                    });
+                  }
+                  else
+                    console.log('Successfully subtracted uses left from promocode ID:', checkedPromoCodeID);
+                }
+              );
+            }
+          );
+        }
+        // If there was or wasn't a promocode used, continue
+        connection.query(
+          `INSERT INTO orders 
+           (items, waiter_id, table_number, customer_id, subtotal, tip_percent, tip_amount, 
+            total, received_amount, change_amount, tax_amount, special_requests,
+            pointsEarned, promoCode_ID, isMilitary, discount_percentage)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [selectedItems, waiterID, tableNumber, customerID, subtotal, tipPercent, tipAmount, 
+          total, receivedAmount, changeAmount, tax, specialRequest,
+          addedPoints, checkedPromoCodeID, isMilitary, discount_percentage],
+          (error, result) => {
+            if (error) {
+              return connection.rollback(() => {
+                connection.release();
+                console.error('Error inserting order:', error);
+                res.writeHead(500, { "Content-Type": "application/json" });
+                res.end(JSON.stringify({ success: false, message: "Server Error: Unable to insert order." }));
+              });
+            }
+
+            // Update inventory for each item and ingredient
+            let inventoryPromises = [];
+            const selectedItemsObject = JSON.parse(selectedItems); // Convert from string to objects
+            const totalNumberItems = selectedItemsObject.length;
+
+            for (let i = 0; i < totalNumberItems; i++) {
+              const item = selectedItemsObject[i];
+              const itemQuantity = item.quantity;
+              const ingredients = item.ingredients;
+              
+              for (let j = 0; j < ingredients.length; j++) {
+                const ingredient = ingredients[j];
+                const ingredientID = ingredient.ingredient_id;
+                const ingredientQuantity = ingredient.quantity; 
+                
+                // Subtract from the inventory
+                const promise = new Promise((resolve, reject) => {
+                  connection.query(
+                    `UPDATE inventory SET amount = amount - ? WHERE ingredient_id = ?`,
+                    [itemQuantity * ingredientQuantity, ingredientID],
+                    (err, result) => {
+                      if (err)
+                        reject(err);
+                      else
+                        resolve(result);
+                    }
+                  );
+                });
+                inventoryPromises.push(promise);
+              }
+            }
+             // Run inventory updates in parallel
+            Promise.all(inventoryPromises)
+              .then(() => {
+                // Update customer points if their email was provided
+                if (customerID && addedPoints) {
+                  connection.query(
+                    `UPDATE users SET points = points + ? WHERE user_id = ?`,
+                    [addedPoints, customerID],
+                    (err, result) => {
+                      if (err) {
+                        return connection.rollback(() => {
+                          connection.release();
+                          console.error('Error updating points:', err);
+                          res.writeHead(500, { "Content-Type": "application/json" });
+                          res.end(JSON.stringify({ success: false, message: "Server Error: Unable to update points." }));
+                        });
+                      }
+                      // Commit transaction if all operations are successful
+                      connection.commit((err) => {
+                        if (err) {
+                          return connection.rollback(() => {
+                            connection.release();
+                            console.error('Error committing transaction:', err);
+                            res.writeHead(500, { "Content-Type": "application/json" });
+                            res.end(JSON.stringify({ success: false, message: "Server Error: Unable to commit transaction." }));
+                          });
+                        }
+
+                        connection.release();
+                        console.log("Successfully added order, updated inventory, and customer points");
+                        res.writeHead(200, { "Content-Type": "application/json" });
+                        res.end(JSON.stringify({ success: true }));
+                      });
+                    }
+                  );
+                  } 
+                  else {
+                  // Commit without updating points if no customer or points
+                  connection.commit((err) => {
+                    if (err) {
+                      return connection.rollback(() => {
+                        connection.release();
+                        console.error('Error committing transaction:', err);
+                        res.writeHead(500, { "Content-Type": "application/json" });
+                        res.end(JSON.stringify({ success: false, message: "Server Error: Unable to commit transaction." }));
+                      });
+                    }
+                    
+                    connection.release();
+                    console.log("Successfully added order and updated inventory");
+                    res.writeHead(200, { "Content-Type": "application/json" });
+                    res.end(JSON.stringify({ success: true }));
+                  });
+                }
+              })
+              .catch((err) => {
+                // Rollback on inventory update failure
+                connection.rollback(() => {
+                  connection.release();
+                  console.error('Error updating inventory:', err);
+                  res.writeHead(500, { "Content-Type": "application/json" });
+                  res.end(JSON.stringify({ success: false, message: "Server Error: Unable to update inventory." }));
+                });
+              });
+          }
+        );
+      });
     });
-};
-// exports.subtract_inventory = (req, res) => { // Given a list and quantity, subtract from INVENTORY
-//   console.log("Received request to subtract from inventory");
-//   let body = "";
-
-//   req.on("data", (chunk) => {
-//     body += chunk.toString();
-//   });
-
-//   req.on("end", () => {
-//     const { ingredientsNeeded } = JSON.parse(body);
-//     pool.getConnection((err, connection) => {
-//       if (err) {
-//         res.writeHead(500, { "Content-Type": "application/json" });
-//         res.end(JSON.stringify({ success: false, message: "Could not connect to the database" }));
-//         console.log(err);
-//         return; // Exit if it can't connect
-//       }
-
-//       connection.beginTransaction((err) => {
-//         if (err) {
-//           connection.release();
-//           res.writeHead(500, { "Content-Type": "application/json" });
-//           res.end(JSON.stringify({ success: false, message: "Could not start transaction" }));
-//           console.log(err);
-//           return;
-//         }
-
-//         let promises = ingredientsNeeded.map((ingredient) => {
-//           const query = "UPDATE inventory SET amount = amount - ? WHERE ingredient_id = ?";
-//           return new Promise((resolve, reject) => {
-//             connection.query(query, [ingredient.quantity, ingredient.ingredient_id], (error) => {
-//               if (error) {
-//                 return reject(error);
-//               }
-//               resolve();
-//             });
-//           });
-//         });
-
-//         Promise.all(promises)
-//           .then(() => {
-//             connection.commit((err) => {
-//               if (err) {
-//                 return connection.rollback(() => {
-//                   connection.release();
-//                   res.writeHead(500, { "Content-Type": "application/json" });
-//                   res.end(JSON.stringify({ success: false, message: "Server Error committing transaction" }));
-//                 });
-//               }
-//               connection.release();
-//               res.writeHead(200, { "Content-Type": "application/json" });
-//               res.end(JSON.stringify({ success: true })); // Success response
-//               console.log("Successfully modified INVENTORY");
-//             });
-//           })
-//           .catch((error) => {
-//             connection.rollback(() => {
-//               connection.release();
-//               res.writeHead(500, { "Content-Type": "application/json" });
-//               res.end(JSON.stringify({ success: false, message: "Server Error modifying ingredients in INVENTORY" }));
-//               console.log(error);
-//             });
-//           });
-//       });
-//     });
-//   });
-// };
+  });
+}

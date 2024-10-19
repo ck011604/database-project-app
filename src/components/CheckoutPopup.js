@@ -23,24 +23,44 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
   const [ingredientsNeeded, setIngredientsNeeded] = useState([]); // List of ingredients and quantity for the order
   const [specialRequest, setSpecialRequest] = useState("");
   const [promoCode, setPromoCode] = useState("");
-  const [discountAmount, setDiscountAmount] = useState(0);
+  const [promoCodeID, setPromoCodeID] = useState("");
+  const [promoCodePercent, setPromoCodePercent] = useState(0);
+  const [promoCodeLock, setPromoCodeLock] = useState(false); // Once the submit promo button is pressed, don't allow more
+  const [discountAmount, setDiscountAmount] = useState(0.00);
+  const [highestDiscountPercent, setHighestDiscountPercent] = useState(0);
+  const [isMilitary, setIsMilitary] = useState('no');
 
   useEffect(() => { // Handle all of the calculations
     const numericSubtotal = parseFloat(subtotal); // Treat as number, not string
 
+    let calculatedDiscount = 0
+    if (isMilitary === "yes" && promoCodePercent < 10) {
+      setHighestDiscountPercent(10);
+      calculatedDiscount = numericSubtotal * 0.10;
+      setDiscountAmount(calculatedDiscount.toFixed(2));
+    }
+    else if (promoCodePercent > 0) {
+      setHighestDiscountPercent(promoCodePercent);
+      calculatedDiscount = numericSubtotal * (promoCodePercent/100);
+      setDiscountAmount(calculatedDiscount.toFixed(2));
+    }
+    else
+      setDiscountAmount(0.00);
+    const afterDiscount = numericSubtotal - calculatedDiscount;
+
     const taxRate = 0.0825; // 8.25% tax rate
-    const calculatedTax = numericSubtotal * taxRate;
+    const calculatedTax = afterDiscount * taxRate;
     setTax(calculatedTax.toFixed(2));
 
-    const calculateTip = numericSubtotal * (tipPercent/100);
+    const calculateTip = afterDiscount * (tipPercent/100);
     setTipAmount(calculateTip.toFixed(2))
 
-    const total = calculateTip + calculatedTax + numericSubtotal;
+    const total = calculateTip + calculatedTax + afterDiscount;
     setTotal(total.toFixed(2));
 
     const calculateChange = receivedAmount - total;
     setChangeAmount(calculateChange.toFixed(2))
-  }, [subtotal, tipPercent, receivedAmount]);
+  }, [subtotal, tipPercent, receivedAmount, promoCodePercent, isMilitary]);
 
   const handleOnClose = () => {
     if (successfulOrder)
@@ -52,13 +72,35 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
       setItemsWithConIng([]);
     }
     setFormLock(false);
+    setPromoCodeLock(false);
     setConfirmOrderButton("Confirm Order");
     setSuccessfulOrder(false);
     fetchInventory();
     onClose();
   }
-  const handleCheckPromoCode = () => {
-
+  const handlePromoCode = async (e) => {
+    if (promoCode.length > 0) {
+      try {
+        const promoCodeResponse = await axios.get(`http://localhost:3001/check-promo-code?promoCode=${promoCode}`);
+        if (promoCodeResponse.data.success === false) {
+          setError('Not a valid promotional code');
+          return;
+        }
+        else {
+          setPromoCodePercent(promoCodeResponse.data.discountPercent);
+          setPromoCodeID(promoCodeResponse.data.promoCode_ID);
+          setPromoCodeLock(true);
+        }
+      } catch(err) {
+        if (err.response && err.response.data && err.response.data.message)
+          setError(err.response.data.message);
+        else
+          setError(
+            `An error has occured checking the validity of the promotional code: ${promoCode}`
+          );
+        return;
+      }
+    }
   }
   const handleConfirmOrder = async (e) => {
     e.preventDefault();
@@ -69,7 +111,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
     }
     else {
       if (tableNumber < 0 || tableNumber > 30) { // Check if its a valid table (1-30)
-        setError("Invalid table nummber")
+        setError("Invalid table number")
         return;
       }
       // Check if the customer email is valid
@@ -196,21 +238,14 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
             receivedAmount,
             changeAmount,
             specialRequest,
+            promoCode_id: promoCodeID,
+            isMilitary,
+            discount_percentage: highestDiscountPercent
           }
         );
         if (response.data.success) setFormLock(true);
         setSuccessfulOrder(true);
         setConfirmOrderButton("Success!");
-        // try {
-        //   // Subtract from inventory
-        //   await axios.patch("http://localhost:3001/subtract-inventory", {
-        //     ingredientsNeeded: requiredIngredients,
-        //   });
-        // } catch (err) {
-        //   if (err.response && err.response.data && err.response.data.message)
-        //     setError(err.response.data.message);
-        //   else setError("An error has occured");
-        // }
       } catch (err) {
         if (err.response && err.response.data && err.response.data.message)
           setError(err.response.data.message);
@@ -242,6 +277,12 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
             <label>Subtotal: </label>
             <p>${subtotal}</p>
           </div>
+          {discountAmount > 0 &&
+            <div className="checkout-label">
+              <label>Discount {highestDiscountPercent}%: </label>
+              <p>-${discountAmount}</p>
+            </div>
+          }
           <div className="checkout-label">
             <label>Tax: </label>
             <p>${tax}</p>
@@ -263,15 +304,35 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
             />
           </div>
           <div className="checkout-label">
+            <label>Member of Military: </label>
+            <input
+              type="radio"
+              value="yes"
+              checked={isMilitary === "yes"}
+              onChange={() => setIsMilitary("yes")}
+              disabled={formLock}
+            /> Yes
+            <input
+              type="radio"
+              value="no"
+              checked={isMilitary === "no"}
+              onChange={() => setIsMilitary("no")}
+              disabled={formLock}
+            /> No
+          </div>
+          <div className="checkout-label">
             <label>Promotional Code: </label>
             <input className="promo-code-input"
               type="text" 
               value={promoCode}
               onChange={(e) => setPromoCode(e.target.value)}
-              disabled={formLock}
+              disabled={formLock || promoCodeLock}
             />
-            <button type="button" disabled={formLock}>Apply</button>
+            <button className="promo-code-apply-button" type="button" onClick={handlePromoCode} disabled={formLock || promoCodeLock}>
+              {promoCodeLock == true ? "Applied" : "Apply"}
+            </button>
           </div>
+          <small>Only the highest discount will be applied to your order.</small>
           <div className="checkout-label">
             <label>Total: </label>
             <p>${total}</p>

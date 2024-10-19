@@ -88,8 +88,33 @@ CREATE TABLE `inventory` (
 --
 
 /*!40000 ALTER TABLE `inventory` DISABLE KEYS */;
-INSERT INTO `inventory` VALUES (1,'mozzarella',50,20,100),(2,'tomato sauce',90,10,100),(3,'dough',90,10,50),(4,'pepperoni',100,50,100),(5,'cheddar cheese',100,20,100),(6,'beef patty',100,20,50),(7,'lettuce',100,20,50),(8,'tomato',100,20,50),(9,'pasta',100,20,50),(10,'chicken',100,20,70),(11,'garlic',100,20,50),(12,'fish fillets',70,10,30),(13,'tortillas',100,20,50),(14,'cabbage',100,20,50),(15,'lime',100,40,50),(16,'sour cream',50,20,50),(17,'milk',100,20,50),(18,'butter',100,30,100),(19,'flour',100,40,200),(20,'hamburger bun',100,20,75),(21,'hot dog sausage',100,20,50),(22,'hot dog bun',100,30,100),(23,'mustard',100,40,100),(24,'ketchup',100,30,100),(25,'relish',50,20,45),(26,'potatoes',100,30,100),(27,'carrots',100,20,60),(28,'mayonnaise',70,10,40),(29,'bread',100,10,40),(30,'corn',100,10,50),(31,'salt',100,40,100),(32,'Sprite',89,20,100),(33,'Coca-Cola',96,20,100),(34,'Pepsi',96,20,100),(35,'Dr. Pepper',96,20,100),(36,'Fanta Orange',0,20,100),(37,'Diet Coke',90,20,100),(38,'Black Tea',100,20,70),(39,'Sugar',100,20,100);
+INSERT INTO `inventory` VALUES (1,'mozzarella',75,20,100),(2,'tomato sauce',95,10,100),(3,'dough',95,10,50),(4,'pepperoni',100,50,100),(5,'cheddar cheese',100,20,100),(6,'beef patty',100,20,50),(7,'lettuce',100,20,50),(8,'tomato',100,20,50),(9,'pasta',100,20,50),(10,'chicken',100,20,70),(11,'garlic',100,20,50),(12,'fish fillets',100,10,30),(13,'tortillas',100,20,50),(14,'cabbage',100,20,50),(15,'lime',100,40,50),(16,'sour cream',100,20,50),(17,'milk',100,20,50),(18,'butter',50,30,100),(19,'flour',100,40,200),(20,'hamburger bun',100,20,75),(21,'hot dog sausage',100,20,50),(22,'hot dog bun',100,30,100),(23,'mustard',100,40,100),(24,'ketchup',100,30,100),(25,'relish',100,20,45),(26,'potatoes',100,30,100),(27,'carrots',100,20,60),(28,'mayonnaise',100,10,40),(29,'bread',100,10,40),(30,'corn',80,10,50),(31,'salt',70,40,100),(32,'Sprite',58,20,100),(33,'Coca-Cola',65,20,100),(34,'Pepsi',100,20,100),(35,'Dr. Pepper',100,20,100),(36,'Fanta Orange',0,20,100),(37,'Diet Coke',95,20,100),(38,'Black Tea',100,20,70),(39,'Sugar',100,20,100);
 /*!40000 ALTER TABLE `inventory` ENABLE KEYS */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'IGNORE_SPACE,ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `check_inventory_thresholds` AFTER UPDATE ON `inventory` FOR EACH ROW BEGIN
+    DECLARE v_restock_amount INT UNSIGNED;
+    IF NEW.amount <= NEW.restock_threshold THEN
+        SET v_restock_amount = NEW.restock_amount;
+        UPDATE inventory 
+        SET amount = amount + v_restock_amount 
+        WHERE ingredient_id = NEW.ingredient_id;
+        INSERT INTO inventory_logs (ingredient_id, action_type, quantity_change) 
+        VALUES (NEW.ingredient_id, 'restock', v_restock_amount);
+    END IF;
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
 -- Table structure for table `inventory_daily_summary`
@@ -110,7 +135,7 @@ CREATE TABLE `inventory_daily_summary` (
   UNIQUE KEY `date_ingredient` (`date`,`ingredient_id`),
   KEY `ingredient_id` (`ingredient_id`),
   CONSTRAINT `inventory_daily_summary_ibfk_1` FOREIGN KEY (`ingredient_id`) REFERENCES `inventory` (`ingredient_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -194,21 +219,21 @@ CREATE TABLE `orders` (
   `received_amount` decimal(10,2) unsigned NOT NULL,
   `change_amount` decimal(10,2) unsigned NOT NULL,
   `tax_amount` decimal(10,2) unsigned NOT NULL,
-  `status` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'In-Queue',
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `special_requests` varchar(255) DEFAULT NULL,
   `promoCode_id` int unsigned DEFAULT NULL,
   `table_number` int unsigned NOT NULL,
   `pointsEarned` int unsigned DEFAULT NULL,
+  `isMilitary` tinyint unsigned NOT NULL DEFAULT '0',
+  `discount_percentage` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`order_id`),
   KEY `fk_orders_waiter_id` (`waiter_id`),
   KEY `fk_orders_customer_id` (`customer_id`),
   KEY `fk_orders_promoCode_id` (`promoCode_id`),
   CONSTRAINT `fk_orders_customer_id` FOREIGN KEY (`customer_id`) REFERENCES `users` (`user_id`) ON UPDATE CASCADE,
   CONSTRAINT `fk_orders_promoCode_id` FOREIGN KEY (`promoCode_id`) REFERENCES `promotion_codes` (`promoCode_id`) ON UPDATE CASCADE,
-  CONSTRAINT `fk_orders_waiter_id` FOREIGN KEY (`waiter_id`) REFERENCES `employees` (`employee_id`) ON UPDATE CASCADE,
-  CONSTRAINT `chk_orders_status` CHECK ((`status` in (_utf8mb4'In-Queue',_utf8mb4'In-Progress',_utf8mb4'Ready for Pickup',_utf8mb4'Delievered')))
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='receipt and payment info';
+  CONSTRAINT `fk_orders_waiter_id` FOREIGN KEY (`waiter_id`) REFERENCES `employees` (`employee_id`) ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='receipt and payment info';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -216,66 +241,8 @@ CREATE TABLE `orders` (
 --
 
 /*!40000 ALTER TABLE `orders` DISABLE KEYS */;
-INSERT INTO `orders` VALUES (1,'[{\"name\": \"Cheese Pizza\", \"type\": \"main\", \"image\": \"cheese_pizza.jpg\", \"price\": \"15.99\", \"quantity\": 3, \"recipe_id\": 1, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 2}, {\"quantity\": 5, \"ingredient_id\": 1}, {\"quantity\": 1, \"ingredient_id\": 3}]}]',1,1,47.97,25,11.99,63.92,64.00,0.08,3.96,'In-Queue','2024-09-29 23:02:50','This is a test for special requests.',NULL,0,NULL),(2,'[{\"name\": \"Cheese Pizza\", \"type\": \"main\", \"image\": \"cheese_pizza.jpg\", \"price\": \"15.99\", \"quantity\": 10, \"recipe_id\": 1, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 2}, {\"quantity\": 5, \"ingredient_id\": 1}, {\"quantity\": 1, \"ingredient_id\": 3}]}]',1,1,159.90,20,31.98,205.07,206.00,0.93,13.19,'In-Queue','2024-09-29 23:07:32','',NULL,0,NULL),(3,'[{\"name\": \"Dr. Pepper\", \"type\": \"drink\", \"image\": \"dr-pepper.png\", \"price\": \"1.99\", \"quantity\": 5, \"recipe_id\": 15, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 35}]}]',1,1,9.95,0,0.00,10.77,11.00,0.23,0.82,'In-Queue','2024-09-29 23:09:53','',NULL,0,NULL),(4,'[{\"name\": \"Dr. Pepper\", \"type\": \"drink\", \"image\": \"dr-pepper.png\", \"price\": \"1.99\", \"quantity\": 5, \"recipe_id\": 15, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 35}]}]',1,1,9.95,0,0.00,10.77,11.00,0.23,0.82,'In-Queue','2024-09-30 02:55:15','',NULL,0,NULL),(5,'[{\"name\": \"Dr. Pepper\", \"type\": \"drink\", \"image\": \"dr-pepper.png\", \"price\": \"1.99\", \"quantity\": 5, \"recipe_id\": 15, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 35}]}]',1,1,9.95,0,0.00,10.77,11.00,0.23,0.82,'In-Queue','2024-09-30 03:06:34','',NULL,0,NULL),(6,'[{\"name\": \"Sweet Tea\", \"type\": \"drink\", \"image\": \"sweet_tea.jpg\", \"price\": \"1.99\", \"quantity\": 5, \"recipe_id\": 18, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 38}, {\"quantity\": 5, \"ingredient_id\": 39}]}]',1,1,9.95,15,1.49,12.26,15.00,2.74,0.82,'In-Queue','2024-09-30 03:15:09','Add less sugar',NULL,0,NULL),(7,'[{\"name\": \"Pepperoni Pizza\", \"type\": \"main\", \"image\": \"pepperoni_pizza.jpg\", \"price\": \"15.99\", \"quantity\": 5, \"recipe_id\": 2, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 2}, {\"quantity\": 5, \"ingredient_id\": 1}, {\"quantity\": 1, \"ingredient_id\": 3}, {\"quantity\": 20, \"ingredient_id\": 4}]}]',1,1,79.95,15,11.99,98.54,100.00,1.46,6.60,'In-Queue','2024-09-30 03:28:49','Double pepperoni',NULL,0,NULL),(8,'[{\"name\": \"Sprite\", \"type\": \"drink\", \"image\": \"sprite.png\", \"price\": \"1.99\", \"quantity\": 1, \"recipe_id\": 12, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 32}]}]',1,NULL,1.99,5,0.10,2.25,5.00,2.75,0.16,'In-Queue','2024-09-30 04:37:36','',NULL,0,NULL),(9,'[{\"name\": \"Sprite\", \"type\": \"drink\", \"image\": \"sprite.png\", \"price\": \"1.99\", \"quantity\": 2, \"recipe_id\": 12, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 32}]}]',1,NULL,3.98,0,0.00,4.31,5.00,0.69,0.33,'In-Queue','2024-09-30 05:02:47','',NULL,0,NULL),(10,'[{\"name\": \"Fanta Orange\", \"type\": \"drink\", \"image\": \"fanta.png\", \"price\": \"1.99\", \"quantity\": 1, \"recipe_id\": 16, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 36}]}]',1,NULL,1.99,0,0.00,2.15,3.00,0.85,0.16,'In-Queue','2024-09-30 05:06:36','',NULL,0,NULL),(11,'[{\"name\": \"Diet Coke\", \"type\": \"drink\", \"image\": \"diet_coke.png\", \"price\": \"1.99\", \"quantity\": 1, \"recipe_id\": 17, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 37}]}]',1,NULL,1.99,0,0.00,2.15,3.00,0.85,0.16,'In-Queue','2024-09-30 05:08:57','',NULL,0,NULL),(12,'[{\"name\": \"Diet Coke\", \"type\": \"drink\", \"image\": \"diet_coke.png\", \"price\": \"1.99\", \"quantity\": 1, \"recipe_id\": 17, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 37}]}]',1,2,1.99,0,0.00,2.15,3.00,0.85,0.16,'In-Queue','2024-09-30 05:16:18','',NULL,0,NULL),(13,'[{\"name\": \"Diet Coke\", \"type\": \"drink\", \"image\": \"diet_coke.png\", \"price\": \"1.99\", \"quantity\": 5, \"recipe_id\": 17, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 37}]}]',1,NULL,9.95,0,0.00,10.77,11.00,0.23,0.82,'In-Queue','2024-09-30 05:21:05','',NULL,0,NULL),(14,'[{\"name\": \"Sprite\", \"type\": \"drink\", \"image\": \"sprite.png\", \"price\": \"1.99\", \"quantity\": 1, \"recipe_id\": 12, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 32}]}, {\"name\": \"Coca-Cola\", \"type\": \"drink\", \"image\": \"coca-cola.png\", \"price\": \"1.99\", \"quantity\": 1, \"recipe_id\": 13, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 33}]}, {\"name\": \"Pepsi\", \"type\": \"drink\", \"image\": \"pepsi.png\", \"price\": \"1.99\", \"quantity\": 1, \"recipe_id\": 14, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 34}]}, {\"name\": \"Dr. Pepper\", \"type\": \"drink\", \"image\": \"dr-pepper.png\", \"price\": \"1.99\", \"quantity\": 1, \"recipe_id\": 15, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 35}]}, {\"name\": \"Diet Coke\", \"type\": \"drink\", \"image\": \"diet_coke.png\", \"price\": \"1.99\", \"quantity\": 1, \"recipe_id\": 17, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 37}]}]',1,NULL,9.95,0,0.00,10.77,11.00,0.23,0.82,'In-Queue','2024-10-01 16:07:51','',NULL,0,NULL),(15,'[{\"name\": \"Sprite\", \"type\": \"drink\", \"image\": \"sprite.png\", \"price\": \"1.99\", \"quantity\": 2, \"recipe_id\": 12, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 32}]}, {\"name\": \"Coca-Cola\", \"type\": \"drink\", \"image\": \"coca-cola.png\", \"price\": \"1.99\", \"quantity\": 2, \"recipe_id\": 13, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 33}]}, {\"name\": \"Pepsi\", \"type\": \"drink\", \"image\": \"pepsi.png\", \"price\": \"1.99\", \"quantity\": 2, \"recipe_id\": 14, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 34}]}, {\"name\": \"Dr. Pepper\", \"type\": \"drink\", \"image\": \"dr-pepper.png\", \"price\": \"1.99\", \"quantity\": 2, \"recipe_id\": 15, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 35}]}, {\"name\": \"Diet Coke\", \"type\": \"drink\", \"image\": \"diet_coke.png\", \"price\": \"1.99\", \"quantity\": 2, \"recipe_id\": 17, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 37}]}]',1,NULL,19.90,25,4.97,26.52,30.00,3.48,1.64,'In-Queue','2024-10-01 16:08:50','',NULL,0,NULL),(16,'[{\"name\": \"Coca-Cola\", \"type\": \"drink\", \"image\": \"coca-cola.png\", \"price\": \"1.99\", \"quantity\": 1, \"recipe_id\": 13, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 33}]}, {\"name\": \"Pepsi\", \"type\": \"drink\", \"image\": \"pepsi.png\", \"price\": \"1.99\", \"quantity\": 1, \"recipe_id\": 14, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 34}]}, {\"name\": \"Dr. Pepper\", \"type\": \"drink\", \"image\": \"dr-pepper.png\", \"price\": \"1.99\", \"quantity\": 1, \"recipe_id\": 15, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 35}]}]',1,NULL,5.97,0,0.00,6.46,10.00,3.54,0.49,'In-Queue','2024-10-01 20:37:14','',NULL,0,NULL),(17,'[{\"name\": \"Cheese Pizza\", \"type\": \"main\", \"image\": \"cheese_pizza.jpg\", \"price\": \"15.99\", \"quantity\": 5, \"is_active\": 1, \"recipe_id\": 1, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 2}, {\"quantity\": 5, \"ingredient_id\": 1}, {\"quantity\": 1, \"ingredient_id\": 3}]}]',1,NULL,79.95,5,4.00,90.54,100.00,9.46,6.60,'In-Queue','2024-10-11 20:28:48','Thin crust for 3 pizzas',NULL,30,NULL),(18,'[{\"name\": \"Cheese Pizza\", \"type\": \"main\", \"image\": \"cheese_pizza.jpg\", \"price\": \"15.99\", \"quantity\": 5, \"is_active\": 1, \"recipe_id\": 1, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 2}, {\"quantity\": 5, \"ingredient_id\": 1}, {\"quantity\": 1, \"ingredient_id\": 3}]}]',1,NULL,79.95,0,0.00,86.55,90.00,3.45,6.60,'In-Queue','2024-10-11 23:20:54','',NULL,29,NULL),(19,'[{\"name\": \"Sprite\", \"type\": \"drink\", \"image\": \"sprite.png\", \"price\": \"1.99\", \"quantity\": 5, \"is_active\": 1, \"recipe_id\": 12, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 32}]}]',1,1,9.95,0,0.00,10.77,11.00,0.23,0.82,'In-Queue','2024-10-12 02:21:00','',NULL,23,9);
+INSERT INTO `orders` VALUES (1,'[{\"name\": \"Cheese Pizza\", \"type\": \"main\", \"image\": \"cheese_pizza.jpg\", \"price\": \"15.99\", \"quantity\": 5, \"is_active\": 1, \"recipe_id\": 1, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 2}, {\"quantity\": 5, \"ingredient_id\": 1}, {\"quantity\": 1, \"ingredient_id\": 3}]}]',1,NULL,79.95,0,0.00,86.55,90.00,3.45,6.60,'2024-10-17 04:50:02','',NULL,5,79,0,0),(2,'[{\"name\": \"Sprite\", \"type\": \"drink\", \"image\": \"sprite.png\", \"price\": \"1.99\", \"quantity\": 5, \"is_active\": 1, \"recipe_id\": 12, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 32}]}]',1,1,9.95,15,1.49,12.26,15.00,2.74,0.82,'2024-10-17 04:51:46','',NULL,1,9,0,0),(3,'[{\"name\": \"Coca-Cola\", \"type\": \"drink\", \"image\": \"coca-cola.png\", \"price\": \"1.99\", \"quantity\": 10, \"is_active\": 1, \"recipe_id\": 13, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 33}]}]',1,1,19.90,5,0.80,18.03,20.00,1.97,1.31,'2024-10-17 13:28:20','',1,21,19,1,20),(4,'[{\"name\": \"Coca-Cola\", \"type\": \"drink\", \"image\": \"coca-cola.png\", \"price\": \"1.99\", \"quantity\": 15, \"is_active\": 1, \"recipe_id\": 13, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 33}]}]',1,1,29.85,0,0.00,25.85,30.00,4.15,1.97,'2024-10-17 13:31:01','',1,22,29,1,20),(5,'[{\"name\": \"Corn\", \"type\": \"side\", \"image\": \"corn.jpg\", \"price\": \"3.99\", \"quantity\": 5, \"is_active\": 1, \"recipe_id\": 11, \"ingredients\": [{\"quantity\": 2, \"ingredient_id\": 30}, {\"quantity\": 3, \"ingredient_id\": 31}, {\"quantity\": 5, \"ingredient_id\": 18}]}]',1,NULL,19.95,0,0.00,19.44,20.00,0.56,1.48,'2024-10-17 14:50:15','',NULL,3,19,1,10),(6,'[{\"name\": \"Sprite\", \"type\": \"drink\", \"image\": \"sprite.png\", \"price\": \"1.99\", \"quantity\": 5, \"is_active\": 1, \"recipe_id\": 12, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 32}]}]',1,NULL,9.95,5,0.45,10.14,15.00,4.86,0.74,'2024-10-17 15:34:03','',NULL,5,9,1,10),(7,'[{\"name\": \"Sprite\", \"type\": \"drink\", \"image\": \"sprite.png\", \"price\": \"1.99\", \"quantity\": 10, \"is_active\": 1, \"recipe_id\": 12, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 32}]}]',1,1,19.90,10,1.59,18.83,20.00,1.17,1.31,'2024-10-17 15:38:17','',1,30,19,1,20),(8,'[{\"name\": \"Sprite\", \"type\": \"drink\", \"image\": \"sprite.png\", \"price\": \"1.99\", \"quantity\": 10, \"is_active\": 1, \"recipe_id\": 12, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 32}]}]',1,NULL,19.90,0,0.00,17.23,20.00,2.77,1.31,'2024-10-17 15:43:40','',1,22,19,1,20),(9,'[{\"name\": \"Sprite\", \"type\": \"drink\", \"image\": \"sprite.png\", \"price\": \"1.99\", \"quantity\": 5, \"is_active\": 1, \"recipe_id\": 12, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 32}]}]',1,NULL,9.95,15,1.19,9.81,10.00,0.19,0.66,'2024-10-17 15:52:53','',1,11,9,1,20),(10,'[{\"name\": \"Sprite\", \"type\": \"drink\", \"image\": \"sprite.png\", \"price\": \"1.99\", \"quantity\": 1, \"is_active\": 1, \"recipe_id\": 12, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 32}]}]',1,NULL,1.99,0,0.00,1.72,2.00,0.28,0.13,'2024-10-17 15:54:54','',1,23,1,1,20),(11,'[{\"name\": \"Sprite\", \"type\": \"drink\", \"image\": \"sprite.png\", \"price\": \"1.99\", \"quantity\": 1, \"is_active\": 1, \"recipe_id\": 12, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 32}]}]',1,NULL,1.99,0,0.00,1.72,2.00,0.28,0.13,'2024-10-17 15:56:26','',1,1,1,1,20),(12,'[{\"name\": \"Sprite\", \"type\": \"drink\", \"image\": \"sprite.png\", \"price\": \"1.99\", \"quantity\": 1, \"is_active\": 1, \"recipe_id\": 12, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 32}]}]',1,NULL,1.99,0,0.00,1.72,2.00,0.28,0.13,'2024-10-17 16:00:25','',1,1,1,1,20),(13,'[{\"name\": \"Sprite\", \"type\": \"drink\", \"image\": \"sprite.png\", \"price\": \"1.99\", \"quantity\": 1, \"is_active\": 1, \"recipe_id\": 12, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 32}]}]',1,NULL,1.99,0,0.00,1.72,2.00,0.28,0.13,'2024-10-17 16:02:16','',1,1,1,1,20),(14,'[{\"name\": \"Sprite\", \"type\": \"drink\", \"image\": \"sprite.png\", \"price\": \"1.99\", \"quantity\": 3, \"is_active\": 1, \"recipe_id\": 12, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 32}]}]',1,NULL,5.97,0,0.00,5.17,6.00,0.83,0.39,'2024-10-17 16:08:42','',1,3,5,1,20),(15,'[{\"name\": \"Corn\", \"type\": \"side\", \"image\": \"corn.jpg\", \"price\": \"3.99\", \"quantity\": 5, \"is_active\": 1, \"recipe_id\": 11, \"ingredients\": [{\"quantity\": 2, \"ingredient_id\": 30}, {\"quantity\": 3, \"ingredient_id\": 31}, {\"quantity\": 5, \"ingredient_id\": 18}]}]',1,1,19.95,10,1.80,21.23,25.00,3.77,1.48,'2024-10-17 16:12:38','',NULL,5,19,1,10),(16,'[{\"name\": \"Coca-Cola\", \"type\": \"drink\", \"image\": \"coca-cola.png\", \"price\": \"1.99\", \"quantity\": 10, \"is_active\": 1, \"recipe_id\": 13, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 33}]}]',1,NULL,19.90,0,0.00,17.23,20.00,2.77,1.31,'2024-10-17 19:26:00','',1,5,19,1,20),(17,'[{\"name\": \"Diet Coke\", \"type\": \"drink\", \"image\": \"diet_coke.png\", \"price\": \"1.99\", \"quantity\": 5, \"is_active\": 1, \"recipe_id\": 17, \"ingredients\": [{\"quantity\": 1, \"ingredient_id\": 37}]}]',1,NULL,9.95,0,0.00,9.59,10.00,0.41,0.73,'2024-10-17 19:29:23','',2,5,9,1,11);
 /*!40000 ALTER TABLE `orders` ENABLE KEYS */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'IGNORE_SPACE,ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `updateInventoryAfterOrder` AFTER INSERT ON `orders` FOR EACH ROW BEGIN
-	DECLARE itemIndex INT DEFAULT 0;
-    DECLARE ingredientIndex INT DEFAULT 0;
-    DECLARE totalNumberItems INT;
-    DECLARE totalNumberIngredients INT;
-    DECLARE itemQuantity INT;
-    DECLARE ingredientID INT;
-    DECLARE ingredientQuantity INT;
-	-- Loop through every menu item in the order
-    SET totalNumberItems = JSON_LENGTH(NEW.items);
-    WHILE itemIndex < totalNumberItems DO
-		SET itemQuantity = JSON_UNQUOTE(JSON_EXTRACT(NEW.items, CONCAT('$[', itemIndex, '].quantity')));
-        -- Loop through every ingredient in that menu item
-        SET totalNumberIngredients = JSON_LENGTH(JSON_EXTRACT(NEW.items, CONCAT('$[', itemIndex, '].ingredients')));
-        SET ingredientIndex = 0; -- Reset ingredient index
-        WHILE ingredientIndex < totalNumberIngredients DO
-			SET ingredientID = JSON_UNQUOTE(JSON_EXTRACT(NEW.items, CONCAT('$[', itemIndex, '].ingredients[', ingredientIndex, '].ingredient_id')));
-            SET ingredientQuantity = JSON_UNQUOTE(JSON_EXTRACT(NEW.items, CONCAT('$[', itemIndex, '].ingredients[', ingredientIndex, '].quantity')));
-			-- Subtract from the inventory
-            UPDATE inventory SET amount = amount - (itemQuantity * ingredientQuantity) WHERE ingredient_id = ingredientID;
-            SET ingredientIndex = ingredientIndex + 1;
-        END WHILE;
-        SET itemIndex = itemIndex + 1;
-    END WHILE;
-END */;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'IGNORE_SPACE,ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `addPointsAfterOrder` AFTER INSERT ON `orders` FOR EACH ROW BEGIN
-    IF NEW.customer_id IS NOT NULL AND NEW.pointsEarned IS NOT NULL THEN
-	    UPDATE users SET points = points + NEW.pointsEarned WHERE user_id = NEW.customer_id;
-    END IF;
-END */;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
 -- Table structure for table `promotion_codes`
@@ -291,7 +258,7 @@ CREATE TABLE `promotion_codes` (
   `uses_left` int unsigned DEFAULT NULL COMMENT 'NULL = infinite uses',
   `is_active` tinyint unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`promoCode_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -299,7 +266,7 @@ CREATE TABLE `promotion_codes` (
 --
 
 /*!40000 ALTER TABLE `promotion_codes` DISABLE KEYS */;
-INSERT INTO `promotion_codes` VALUES (1,'database',10,NULL,1);
+INSERT INTO `promotion_codes` VALUES (1,'database',20,18,1),(2,'infinity',11,NULL,1);
 /*!40000 ALTER TABLE `promotion_codes` ENABLE KEYS */;
 
 --
@@ -405,7 +372,7 @@ CREATE TABLE `users` (
 --
 
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'Mike','Ross','mikeross@gmail.com','mike123','user',1,9),(2,'Tony','Smith','ts@example.com','ts123','user',1,0);
+INSERT INTO `users` VALUES (1,'Mike','Ross','mikeross@gmail.com','mike123','user',1,104),(2,'Tony','Smith','ts@example.com','ts123','user',1,0);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 
 --
@@ -478,4 +445,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-10-13 13:56:49
+-- Dump completed on 2024-10-17 14:36:37
