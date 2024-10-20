@@ -1,5 +1,42 @@
 const pool = require("../pool")
 
+exports.employee_detail = (req, res) => {
+    console.log("Recieved request to get find an employee");
+    const recipeID = req.url.split("/")[3];
+    if (!recipeID) {
+        res.writeHead(400, {"Content-Type": "application/json"});
+        res.end(JSON.stringify({success: false, message: "Recipe ID is required"}));
+        return;
+    }
+    // Query database for item with specified ID
+    pool.query("SELECT * FROM menu WHERE recipe_id = ?", [recipeID], (error, results) => {
+        if (error) {
+            res.writeHead(500, { "Content-Type": "application/json" });
+            res.end(
+                JSON.stringify({ 
+                    success: false,
+                    message: "Server Error fetching item details",
+                })
+            );
+            console.error("Error fetching item details:", error);
+            return;
+        }
+        if (results.length === 0) {
+            // No item is found with the given ID
+            res.writeHead(404, {"Content-Type": "application/json"});
+            res.end(
+                JSON.stringify({
+                    success: false,
+                    message: "Item not found",
+                })
+            );
+            return;
+        }
+        // If the item is found, return details
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: true, employee: results[0]}));
+    });
+}
 exports.menu_create_post = (req, res) => {
     console.log("Received request to add menu item");
     let body = '';
@@ -9,8 +46,8 @@ exports.menu_create_post = (req, res) => {
     req.on('end', () => {
         // Ensure required fields
         console.log("Body received:", body);
-        const{name, ingredients, price, image, type} = JSON.parse(body);
-        if (!name || !ingredients || !price || !image || !type) {
+        const{name, ingredients, price, type} = JSON.parse(body);
+        if (!name || !ingredients || !price || !type) {
             res.writeHead(400, {'Content-Type': 'application/json'});
             res.end(
                 JSON.stringify({
@@ -23,8 +60,8 @@ exports.menu_create_post = (req, res) => {
         const ingredientsJson = JSON.stringify(ingredients);
         pool.query(
             // Insert menu item into database
-            "INSERT INTO menu (name, ingredients, price, image, type) VALUES (?, ?, ?, ?, ?)",
-            [name, JSON.stringify(ingredients), price, image, type],
+            "INSERT INTO menu (name, ingredients, price, type, image) VALUES (?, ?, ?, ?, ?)",
+            [name, JSON.stringify(ingredients), price, type, ""],
             (error, result) => {
                 if (error) {
                     res.writeHead(500, {'Content-Type': 'application/json'});

@@ -3,20 +3,15 @@ import { useForm, Controller } from 'react-hook-form';
 import Select from "react-select";
 
 // Reusable Form Component
-function Form({ template, onSubmit, watchFields, validate }) {
+function Form({ template, onSubmit, watchFields, validate, preloadedValues }) {
 
     const { register, handleSubmit, formState: { errors }, watch, setError, clearErrors, control } = useForm({
-        // defaultValues: {
-        //     itemName: '',
-        //     ID: ''
-        // }
+        defaultValues: preloadedValues
     });
-    
     // Parameters needed to create Form
     const { title, fields } = template;
 
     const watchValues = watch();
-    console.log(watchValues);
     
     // useEffect(() => {
     //     validate(watchValues, { errors, setError, clearErrors });
@@ -47,8 +42,8 @@ function Form({ template, onSubmit, watchFields, validate }) {
                     )
                 case 'select':
                     return (
-                        <div key={name} style={{ marginTop: '10px' }}>
-                            <label htmlFor={name}>{title}</label>
+                        <div key={name}>
+                            <label htmlFor={name} style={{ marginTop: '10px' }}>{title}</label>
                             <Controller
                                 name={name}
                                 control={control}
@@ -56,6 +51,13 @@ function Form({ template, onSubmit, watchFields, validate }) {
                                 render={render}
                             />
                             {errors[name] && <span className='red-text'>{errors[name]['message']}</span>}
+                        </div>
+                    );
+                case 'file':
+                    return (
+                        <div key={name}>
+                            <label htmlFor={name} style={{ marginTop: '10px' }}>{title}</label>
+                            <input type='file' {...register('image', {required: true, accept: 'image/jpeg'})}></input>
                         </div>
                     );
                 default:

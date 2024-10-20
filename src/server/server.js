@@ -44,6 +44,9 @@ const server = http.createServer((req, res) => {
         if (req.url === "/api/request_schedule") {
             request_schedule_controller.request_schedule_create_post(req, res);
         }
+        if (req.url === "/api/inventory") {
+            inventory_controller.inventory_create_post(req, res);
+        }
     }
     if(req.method === "GET") {
         if (req.url === "/menu") {
@@ -76,11 +79,14 @@ const server = http.createServer((req, res) => {
         if (req.url.startsWith("/api/inventory-report")) {
             inventory_report_controller.getInventoryReport(req, res);
         }
-        if (req.url === ("/api/inventory")) {
+        if (req.url === "/api/inventory") {
             inventory_controller.index(req, res);
         }
         if (req.url.startsWith("/api/inventory/")) {
             inventory_controller.inventory_detail(req, res);
+        }
+        if (req.url.startsWith("/api/menu_management/")) {
+            menu_management_controller.menu_detail(req, res);
         }
     }
     if (req.method === "PATCH") {
