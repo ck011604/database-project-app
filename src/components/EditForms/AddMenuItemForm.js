@@ -4,9 +4,47 @@ import React from "react";
 import Form from "../Reusable/Form";
 import Select from "react-select";
 
-const AddMenuItemForm = (props) => {
-    const onSubmit = (values) => {
-        console.log(values);
+const AddMenuItemForm = ({setModal, item}) => {
+    const onSubmit = async(values, event) => {
+        try{
+            console.log(values)
+            let props = ["name", "price", "ingredients", "type"]
+            let data = {}
+            for(let key of props){
+                if(key === "ingredients"){
+                    data["ingredients"] = []
+                    for(let ingredient of values[key]){
+                        data["ingredients"].push({
+                            "quantity": 1, 
+                            "ingredient_id": ingredient.value
+                        });
+                    }
+                }
+                else if(key === "type"){
+                    data["type"] = values[key].value
+                }
+                else if(props.includes(key)){
+                    data[key] = values[key]
+                }
+            }
+
+            let method = (item === null) ? 'POST' : 'PATCH';
+            let endpoint = (item === null) ? `http://localhost:3001/api/menu_management` :
+                `http://localhost:3001/api/menu_management/${item.id}`;
+
+            console.log(data)
+            let res = await fetch(endpoint, {
+                method: method,
+                headers: {
+                    'content-type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            setModal(false);
+            window.location.reload()
+        } catch (err) {
+            console.log(`Error posting new menu item: ${err}`)
+        }
     };
     const [ingredientsOptions, setIngredientsOptions] = useState([]);
     const [typeOptions, setTypeOptions] = useState([]);
@@ -23,7 +61,6 @@ const AddMenuItemForm = (props) => {
                         label: ingredient.name,
                     })
                 }
-                console.log(new_ingredients)
                 setIngredientsOptions(new_ingredients);
             } catch (err) {
                 console.log(`Error fetching ingredients: ${err}`);
@@ -48,7 +85,6 @@ const AddMenuItemForm = (props) => {
                         });
                     }
                 }
-                console.log(new_items)
                 setTypeOptions(new_items);
             } catch (err) {
                 console.log(`Error fetching types: ${err}`)
@@ -63,20 +99,6 @@ const AddMenuItemForm = (props) => {
         { value: 'drink', label: 'Drink' },
     ];
 
-    // const validate = (watchValues, errorMethods) => {
-    //     const { errors, setError, clearErrors } = errorMethods;
-    
-    //     // clearErrors('itemName');
-    
-    //     // itemName validation
-    //     if(watchValues['itemName'] === 'pizza') {
-    //         setError('itemName', {
-    //             type: 'manual',
-    //             message: 'Item already exists'
-    //         });
-    //     }
-    // }
-
     const template =  {
         title: 'Add New Menu Item',
         fields: [
@@ -84,7 +106,7 @@ const AddMenuItemForm = (props) => {
             {
                 title: 'Item Name',
                 type: 'text',
-                name: 'itemName',
+                name: 'name',
                 validationProps: {
                     required: 'Item name is mandatory'
                 }
@@ -107,14 +129,14 @@ const AddMenuItemForm = (props) => {
                     required: 'Price is mandatory'
                 }
             },
-            {
-                title: 'Image',
-                type: 'text',
-                name: 'image',
-                // validationProps: {
-                //     required: 'Image is mandatory'
-                // }
-            },
+            // {
+            //     title: 'Image',
+            //     type: 'file',
+            //     name: 'image',
+            //     validationProps: {
+            //         required: 'JPG Image is mandatory'
+            //     }
+            // },
             {
                 title: 'Type',
                 name: 'type',
@@ -128,13 +150,12 @@ const AddMenuItemForm = (props) => {
         ]
     }
 
-    return (
-        <Form
-            template={template}
-            watchFields={['itemName']}
-            // validate={validate}
-            // Allow access to data within component
-            onSubmit={onSubmit}
+    return ( 
+        <Form 
+        template={template}
+        watchFields={['itemName']}
+        onSubmit={onSubmit}
+        preloadedValues={item}
         />
     );
 }
