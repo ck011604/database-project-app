@@ -1,3 +1,4 @@
+const jwt = require("jsonwebtoken");
 const pool = require("../pool");
 const url = require("url");
 
@@ -19,8 +20,10 @@ exports.login = (req, res) => {
                     return;
                 }
                 if (results.length > 0) {
+                    const { employee_id, first_name, last_name, role } = results[0];
+                    const token = jwt.sign({ employee_id, first_name, last_name, role }, process.env.JWT_SECRET, { expiresIn: '1d' });
                     res.writeHead(200, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ success: true, role: results[0].role }));
+                    res.end(JSON.stringify({ success: true, token}));
                     console.log('Correct Employee Login');
                     return;
                 }
@@ -33,8 +36,10 @@ exports.login = (req, res) => {
                             return;
                         }
                         if (results.length > 0) {
+                            const { user_id, first_name, last_name, role } = results[0];
+                            const token = jwt.sign({ user_id, first_name, last_name, role }, process.env.JWT_SECRET, { expiresIn: '1d' });
                             res.writeHead(200, { 'Content-Type': 'application/json' });
-                            res.end(JSON.stringify({ success: true, role: results[0].role }));
+                            res.end(JSON.stringify({ success: true, token}));
                             console.log('Correct user Login');
                             return;
                         }

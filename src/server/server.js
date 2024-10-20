@@ -1,3 +1,4 @@
+require('dotenv').config({ path: '../../.env' });
 const http = require('http');
 const url = require('url');
 const accountController = require('./controllers/account_controller');
