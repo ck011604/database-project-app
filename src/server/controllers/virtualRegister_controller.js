@@ -43,38 +43,6 @@ exports.inventory_stock = (req, res) => { // Get inventory stock
     );
 };
 
-// exports.confirm_order = (req, res) => {
-//     console.log("Received request to add order");
-//     let body = "";
-//     req.on("data", (chunk) => {
-//       body += chunk.toString();
-//     });
-//     req.on("end", () => {
-//       const { selectedItems, waiterID, tableNumber, customerID, subtotal, tax, tipPercent, tipAmount, total, receivedAmount, changeAmount, specialRequest } = JSON.parse(body);
-//       const addedPoints = Math.floor(subtotal)
-//       pool.query(
-//         "INSERT INTO orders (items, waiter_id, table_number, customer_id, subtotal, tip_percent, tip_amount, total, received_amount, change_amount, tax_amount, special_requests, pointsEarned) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
-//         [selectedItems, waiterID, tableNumber, customerID, subtotal, tipPercent, tipAmount, total, receivedAmount, changeAmount, tax, specialRequest, addedPoints],
-//         (error, result) => {
-//           if (error) {
-//             res.writeHead(500, { "Content-Type": "application/json" });
-//             res.end(
-//               JSON.stringify({
-//                 success: false,
-//                 message: "Server Error inserting into orders",
-//               })
-//             );
-//             console.log(error)
-//             return;
-//           } // Else
-//           res.writeHead(200, { "Content-Type": "application/json" });
-//           res.end(JSON.stringify({ success: true }));
-//           console.log("Successfully added order");
-//         }
-//       );
-//     });
-// };
-
 exports.confirm_order = (req, res) => {
   console.log("Received request to add order");
   let body = "";
@@ -95,7 +63,12 @@ exports.confirm_order = (req, res) => {
       receivedAmount,
       changeAmount,
       specialRequest,
+      promoCode_id,
+      isMilitaryString,
+      discount_percentage
     } = JSON.parse(body);
+    const isMilitary = isMilitaryString == "no" ? 0 : 1; // Convert to binary (0 or 1)
+    const checkedPromoCodeID = promoCode_id == "" ? null : promoCode_id // If no code was given, set it to null
     const addedPoints = Math.floor(subtotal);
 
     pool.getConnection((err, connection) => {
@@ -113,12 +86,53 @@ exports.confirm_order = (req, res) => {
           res.end(JSON.stringify({ success: false, message: "Server Error: Unable to start transaction." }));
           return;
         }
+        // Subtract uses left for the promotion code
+        if (checkedPromoCodeID != null && discount_percentage > 10) { // A discount was applied
+          console.log("There is a promocode")
+          connection.query(`SELECT promoCode_id, uses_left
+            FROM promotion_codes
+            WHERE is_active = 1 AND promoCode_id = ? AND (uses_left > 0 OR uses_left IS null)`,
+            [checkedPromoCodeID],
+            (err, results) => {
+              if (err || results.length == 0) {
+                return connection.rollback(() => {
+                  connection.release();
+                  console.error('Invalid or inactive promo code:', err);
+                  res.writeHead(400, { "Content-Type": "application/json" });
+                  res.end(JSON.stringify({ success: false, message: "Invalid promo code or there was an error" }));
+                });
+              }
+              // The code was valid and has uses_left
+              console.log(results)
+              const updatedUsesLeft = results[0].uses_left == null ? null : results[0].uses_left - 1
+              connection.query("UPDATE promotion_codes SET uses_left = ? WHERE promoCode_id = ?",
+                [updatedUsesLeft, checkedPromoCodeID],
+                (err) => {
+                  if (err) {
+                    return connection.rollback(() => {
+                      connection.release();
+                      console.error('Error updating promotional code uses left:', err);
+                      res.writeHead(500, { "Content-Type": "application/json" });
+                      res.end(JSON.stringify({ success: false, message: "Server Error: Unable to update promotional code." }));
+                    });
+                  }
+                  else
+                    console.log('Successfully subtracted uses left from promocode ID:', checkedPromoCodeID);
+                }
+              );
+            }
+          );
+        }
+        // If there was or wasn't a promocode used, continue
         connection.query(
           `INSERT INTO orders 
            (items, waiter_id, table_number, customer_id, subtotal, tip_percent, tip_amount, 
-            total, received_amount, change_amount, tax_amount, special_requests, pointsEarned)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-          [selectedItems, waiterID, tableNumber, customerID, subtotal, tipPercent, tipAmount, total, receivedAmount, changeAmount, tax, specialRequest, addedPoints],
+            total, received_amount, change_amount, tax_amount, special_requests,
+            pointsEarned, promoCode_ID, isMilitary, discount_percentage)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [selectedItems, waiterID, tableNumber, customerID, subtotal, tipPercent, tipAmount, 
+          total, receivedAmount, changeAmount, tax, specialRequest,
+          addedPoints, checkedPromoCodeID, isMilitary, discount_percentage],
           (error, result) => {
             if (error) {
               return connection.rollback(() => {
