@@ -3,7 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 
 const ProtectedRoute = ({ element, allowedRoles }) => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     let role = null;
 
     if (token) {
@@ -15,7 +15,7 @@ const ProtectedRoute = ({ element, allowedRoles }) => {
         }
     }
 
-    return token && allowedRoles.includes(role) ? element : <Navigate to="/login" />;
+    return token && allowedRoles.includes(role) ? element : <Navigate to="/404-Page-Not-Found" />;
 };
 
 export default ProtectedRoute;
