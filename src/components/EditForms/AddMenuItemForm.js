@@ -4,7 +4,7 @@ import React from "react";
 import Form from "../Reusable/Form";
 import Select from "react-select";
 
-const AddMenuItemForm = ({setModal, item}) => {
+const AddMenuItemForm = ({setModal, item, callback}) => {
     const onSubmit = async(values, event) => {
         try{
             console.log(values)
@@ -41,7 +41,7 @@ const AddMenuItemForm = ({setModal, item}) => {
                 body: JSON.stringify(data)
             })
             setModal(false);
-            window.location.reload()
+            callback()
         } catch (err) {
             console.log(`Error posting new menu item: ${err}`)
         }
@@ -72,7 +72,7 @@ const AddMenuItemForm = ({setModal, item}) => {
     useEffect(() => {
         const fetchAllItems = async ()=>{
             try{
-                let res = await axios.get("http://localhost:3001/menu")
+                let res = await axios.get("http://localhost:3001/api/menu_management")
                 let typeOptions = res.data.menu;
                 let uniqueTypes = new Set();
                 let new_items = [];

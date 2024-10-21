@@ -85,6 +85,9 @@ const server = http.createServer((req, res) => {
         if (req.url.startsWith("/api/inventory/")) {
             inventory_controller.inventory_detail(req, res);
         }
+        if (req.url === "/api/menu_management") {
+            menu_management_controller.menu(req, res);
+        }
         if (req.url.startsWith("/api/menu_management/")) {
             menu_management_controller.menu_detail(req, res);
         }
