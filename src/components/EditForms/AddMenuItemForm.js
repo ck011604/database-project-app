@@ -8,7 +8,7 @@ const AddMenuItemForm = ({setModal, item, callback}) => {
     const onSubmit = async(values, event) => {
         try{
             console.log(values)
-            let props = ["name", "price", "ingredients", "type"]
+            let props = ["name", "price", "ingredients", "type", "image"]
             let data = {}
             for(let key of props){
                 if(key === "ingredients"){
@@ -23,7 +23,11 @@ const AddMenuItemForm = ({setModal, item, callback}) => {
                 else if(key === "type"){
                     data["type"] = values[key].value
                 }
-                else if(props.includes(key)){
+                else if (key === "image"){
+                    console.log(values[key][0].name)
+                    data[key] = values[key][0].name
+                }
+                else{
                     data[key] = values[key]
                 }
             }
@@ -32,7 +36,6 @@ const AddMenuItemForm = ({setModal, item, callback}) => {
             let endpoint = (item === null) ? `http://localhost:3001/api/menu_management` :
                 `http://localhost:3001/api/menu_management/${item.id}`;
 
-            console.log(data)
             let res = await fetch(endpoint, {
                 method: method,
                 headers: {
@@ -129,14 +132,14 @@ const AddMenuItemForm = ({setModal, item, callback}) => {
                     required: 'Price is mandatory'
                 }
             },
-            // {
-            //     title: 'Image',
-            //     type: 'file',
-            //     name: 'image',
-            //     validationProps: {
-            //         required: 'JPG Image is mandatory'
-            //     }
-            // },
+            {
+                title: 'Image',
+                type: 'file',
+                name: 'image',
+                validationProps: {
+                    required: 'JPG Image is mandatory'
+                }
+            },
             {
                 title: 'Type',
                 name: 'type',

@@ -1,4 +1,7 @@
 const pool = require("../pool")
+const busboy = require('busboy')
+const fs = require('fs')
+const path = require('path')
 
 exports.menu = (req, res) => { // Get full menu
     console.log("Received request to get menu");
@@ -65,9 +68,8 @@ exports.menu_create_post = (req, res) => {
     });
     req.on('end', () => {
         // Ensure required fields
-        console.log("Body received:", body);
-        const{name, ingredients, price, type} = JSON.parse(body);
-        if (!name || !ingredients || !price || !type) {
+        const{name, ingredients, price, type, image } = JSON.parse(body);
+        if (!name || !ingredients || !price || !type || !image) {
             res.writeHead(400, {'Content-Type': 'application/json'});
             res.end(
                 JSON.stringify({
@@ -81,7 +83,7 @@ exports.menu_create_post = (req, res) => {
         pool.query(
             // Insert menu item into database
             "INSERT INTO menu (name, ingredients, price, type, image) VALUES (?, ?, ?, ?, ?)",
-            [name, JSON.stringify(ingredients), price, type, ""],
+            [name, JSON.stringify(ingredients), price, type, image],
             (error, result) => {
                 if (error) {
                     res.writeHead(500, {'Content-Type': 'application/json'});
@@ -175,4 +177,23 @@ exports.menu_delete = (req, res) => {
         res.end(JSON.stringify({ success: true, message: "Recipe deleted successfully" }));
         console.log("Successfully deleted recipe");
     });
+}
+
+exports.menu_image_upload = (req, res) => {
+    console.log("Received request to upload menu image");
+    let filename = '';
+    const bb = busboy({ headers: req.headers });
+    bb.on('file', (name, file, info) => {
+        filename = info.filename;
+        const saveTo =  path.join(__dirname+ `../../../../public/menu_images/${filename}`)
+        if(fs.existsSync(saveTo))
+            fs.unlinkSync(saveTo)
+        file.pipe(fs.createWriteStream(saveTo, { flags: 'w+'}))
+    });
+    bb.on('close', () => {
+        console.log("upload success")
+        res.writeHead(200, { 'Content-Type': 'text/plain' })
+        res.end(`upload success: ${filename}`)
+    });
+    req.pipe(bb);
 }

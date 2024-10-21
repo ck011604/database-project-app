@@ -1,6 +1,7 @@
 import React, {useEffect} from "react";
 import { useForm, Controller } from 'react-hook-form';
 import Select from "react-select";
+import axios from "axios";
 
 // Reusable Form Component
 function Form({ template, onSubmit, watchFields, validate, preloadedValues }) {
@@ -11,7 +12,37 @@ function Form({ template, onSubmit, watchFields, validate, preloadedValues }) {
     // Parameters needed to create Form
     const { title, fields } = template;
 
-    const watchValues = watch();
+    const uploadImage = async (file) => {  
+        console.log(file)
+        const formData = new FormData()
+        formData.append("image", file)
+        let res = await fetch("http://localhost:3001/api/menu_image", {
+            method: "POST",
+            body: formData
+        })
+    }
+
+    useEffect(() => {
+        const subscription = watch((value, { name, type }) =>{
+            if(name != "image")
+                return
+            const fileList = value.image
+            if(fileList == undefined)
+                return
+    
+            let files = fileList.length
+            if(files < 1){
+                return
+            }
+    
+            let file = fileList[0]
+            if(file.type != "image/jpeg")
+                return
+    
+            uploadImage(file)
+        })
+        return () => subscription.unsubscribe()
+    }, [watch])
     
     // useEffect(() => {
     //     validate(watchValues, { errors, setError, clearErrors });
