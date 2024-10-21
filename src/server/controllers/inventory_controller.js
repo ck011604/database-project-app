@@ -22,7 +22,7 @@ exports.index = (req, res) => {
 }
 
 exports.inventory_detail = (req, res) => { // Get info of a shift
-    console.log("Recieved request to get an ingredient");
+    // console.log("Recieved request to get an ingredient");
     // Getting the ID from the URL
     const ingredientId = req.url.split("/")[3];
     if (!ingredientId) {

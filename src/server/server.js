@@ -16,7 +16,6 @@ const server = http.createServer((req, res) => {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.setHeader('Access-Control-Allow-Methods', 'POST, GET, PATCH, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    console.log("Creating Server");
     if (req.method === 'OPTIONS') {
         res.writeHead(204);
         res.end();
@@ -46,6 +45,9 @@ const server = http.createServer((req, res) => {
         }
         if (req.url === "/api/inventory") {
             inventory_controller.inventory_create_post(req, res);
+        }
+        if (req.url === "/api/menu_image") {
+            menu_management_controller.menu_image_upload(req, res);
         }
     }
     if(req.method === "GET") {
