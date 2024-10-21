@@ -1,7 +1,27 @@
 const pool = require("../pool")
 
-exports.employee_detail = (req, res) => {
-    console.log("Recieved request to get find an employee");
+exports.menu = (req, res) => { // Get full menu
+    console.log("Received request to get menu");
+    pool.query("SELECT * FROM menu ORDER BY price DESC", (error, results) => {
+      if (error) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({
+            success: false,
+            message: "Server Error fetching menu",
+          })
+        );
+        console.log("Error fetching menu");
+        return;
+      } // Else
+      console.log("Successfully fetched menu");
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: true, menu: results }));
+    });
+};
+
+exports.menu_detail = (req, res) => {
+    console.log("Recieved request to get find an item");
     const recipeID = req.url.split("/")[3];
     if (!recipeID) {
         res.writeHead(400, {"Content-Type": "application/json"});
@@ -109,7 +129,7 @@ exports.menu_update_patch = (req, res) => {
         if (price) { query_string += "price = ?, "; params.push(price); }
         if (image) { query_string += "image = ?, "; params.push(image); }
         if (type) { query_string += "type = ?, "; params.push(type); }
-        if (is_active !== undefined) { query_string += "is_active = ? "; params.push(is_active); }
+        if (is_active !== undefined) { query_string += "is_active = ?, "; params.push(is_active); }
         // Remove trailing comma and spaces in array
         // Specify which menu item
         query_string = query_string.replace(/, $/, ' WHERE recipe_id = ?');

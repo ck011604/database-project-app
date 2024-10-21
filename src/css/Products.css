@@ -123,7 +123,7 @@ body.active-modal {
 }
 .product-actions {
     display: flex;
-    float:right;
+    float: right;
     gap: 10px;
 }
 .product-actions svg{
@@ -131,4 +131,9 @@ body.active-modal {
 }
 .product-delete-btn {
     color: #e10d05
+}
+.product-reactivate-btn {
+    display: flex;
+    float: right;
+    gap: 10px;
 }

@@ -13,7 +13,6 @@ const Products = () => {
     const [item, setItem] = useState(null);
 
     const toggleModal = async (item = null) => {
-        console.log(item)
         if(item){
             let data = {
                 id: item.id,
@@ -35,33 +34,32 @@ const Products = () => {
             }
             item = data
         }
-        console.log(item)
         setItem(item)
         setModal(!modal)
     };
+
+    const fetchAllItems = async ()=>{
+        try{
+            let res = await axios.get("http://localhost:3001/api/menu_management")
+            let items = res.data.menu;
+            let new_items = []
+            for(let item of items){
+                new_items.push({
+                    id: item.recipe_id,
+                    name: item.name,
+                    ingredients: item.ingredients,
+                    type: item.type,
+                    price: item.price,
+                    isActive: item.is_active
+                })
+            }
+            setItems(new_items);
+        } catch (err) {
+            console.log(`Error fetching Menu Items: ${err}`)
+        }
+    }
     
     useEffect(() => {
-        const fetchAllItems = async ()=>{
-            try{
-                let res = await axios.get("http://localhost:3001/menu")
-                let items = res.data.menu;
-                let new_items = []
-                for(let item of items){
-                    new_items.push({
-                        id: item.recipe_id,
-                        name: item.name,
-                        ingredients: item.ingredients,
-                        type: item.type,
-                        price: item.price,
-                        isActive: item.is_active
-                    })
-                }
-                console.log(new_items)
-                setItems(new_items);
-            } catch (err) {
-                console.log(`Error fetching Menu Items: ${err}`)
-            }
-        }
         fetchAllItems()
     }, [])
     useEffect(() => {
@@ -79,20 +77,35 @@ const Products = () => {
         }
     }, [productFilter])
 
-    const handleDelete = async (id) => {
+    const handleDelete = async(id) => {
         try {
             await axios.delete(`http://localhost:3001/api/menu_management/${id}`);
-            setItems(items.filter(item => item.id !== id));
+            // setItems(items.filter(item => item.id !== id));
         } catch (err) {
             console.error(`Error deleting item: ${err}`);
         }
-        window.location.reload()
+        fetchAllItems()
     };
+
+    const handleReactivate = async(id) => {
+        try {
+            let res = await fetch(`http://localhost:3001/api/menu_management/${id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ is_active: true })
+            });
+        } catch (err) {
+            console.error(`Error reactivating item: ${err}`);
+        }
+        fetchAllItems()
+    }
 
     return (
         <div className="products">
             <Modal modal={modal} setModal={setModal}>
-                <AddMenuItemForm setModal={setModal} item={item}/>
+                <AddMenuItemForm setModal={setModal} item={item} callback={fetchAllItems}/>
             </Modal>
             <div className="menu-navbar">
                 <button onClick={() => setProductFilter("MENU_ITEMS")}>Menu Items</button>
@@ -130,13 +143,15 @@ const Products = () => {
                                     <td>
                                         <div>
                                             <span className={`product-label ${item.isActive ? 'product-label-isActive' : 'product-label-isNotActive'}`}>
-                                            {item.isActive ? "Active" : "Disabled"}
+                                                {item.isActive ? "Active" : "Disabled"}
                                             </span>
-                                            
-                                            <span className='product-actions'>
-                                                <BsFillPencilFill onClick = {() => { toggleModal(item)}}/>
-                                                <BsFillTrashFill className='product-delete-btn' onClick={() => handleDelete(item.id)}/>
-                                            </span>
+                                            {item.isActive ? 
+                                                <span className='product-actions'>
+                                                    <BsFillPencilFill onClick = {() => { toggleModal(item)}}/>
+                                                    <BsFillTrashFill className='product-delete-btn' onClick={() => handleDelete(item.id)}/>
+                                                </span> :
+                                                <button className="product-reactivate-btn" onClick = {() => {handleReactivate(item.id)}}> Reactivate </button>
+                                            }
                                         </div>
                                     </td>
                                 </tr>
