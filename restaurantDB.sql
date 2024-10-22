@@ -31,7 +31,7 @@ CREATE TABLE `employees` (
   `is_active` tinyint(1) DEFAULT '1',
   `password` varchar(50) NOT NULL,
   PRIMARY KEY (`employee_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='employee accounts';
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='employee accounts';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -39,7 +39,7 @@ CREATE TABLE `employees` (
 --
 
 /*!40000 ALTER TABLE `employees` DISABLE KEYS */;
-INSERT INTO `employees` VALUES (1,'Amy','Lee','amy@example.com','Manager',1,'123'),(2,'Bob','Ross','bob@example.com','Waiter',0,'123'),(4,'Taylor','Swift','taylor@example.com','Manager',1,'123');
+INSERT INTO `employees` VALUES (1,'Amy','Lee','amy@example.com','Manager',1,'mpass'),(2,'Bob','Ross','bob@example.com','Waiter',1,'wpass'),(4,'Taylor','Swift','taylor@example.com','Waiter',0,'wpass'),(8,'John','Doe','john@example.com','Accountant',1,'apass');
 /*!40000 ALTER TABLE `employees` ENABLE KEYS */;
 
 --
@@ -445,4 +445,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-10-17 14:36:37
+-- Dump completed on 2024-10-21 19:30:58
