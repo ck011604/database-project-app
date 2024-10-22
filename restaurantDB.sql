@@ -1,4 +1,4 @@
--- MySQL dump 10.13  Distrib 8.0.33, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 9.0.1, for Win64 (x86_64)
 --
 -- Host: localhost    Database: restaurantdb
 -- ------------------------------------------------------
@@ -98,6 +98,58 @@ INSERT INTO `inventory` VALUES (1,'mozzarella',115,20,100),(2,'tomato sauce',90,
 /*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'IGNORE_SPACE,ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `inventory_changes` BEFORE UPDATE ON `inventory` FOR EACH ROW BEGIN
+    DECLARE change_amount INT;
+    
+    -- Calculate the change amount (can be negative)
+    IF NEW.amount < OLD.amount THEN
+        SET change_amount = -(OLD.amount - NEW.amount);  -- Negative for usage
+    ELSE
+        SET change_amount = NEW.amount - OLD.amount;     -- Positive for restock
+    END IF;
+
+    -- Log the inventory change
+    INSERT INTO inventory_logs (
+        ingredient_id,
+        action_type,
+        quantity_change,
+        log_date,
+        log_time
+    )
+    VALUES (
+        NEW.ingredient_id,
+        CASE 
+            WHEN NEW.amount < OLD.amount THEN 'used'
+            ELSE 'restock'
+        END,
+        change_amount,
+        CURRENT_DATE,
+        CURRENT_TIME
+    );
+
+    -- Check if restock is needed
+    IF NEW.amount <= NEW.restock_threshold THEN
+        SET NEW.amount = NEW.amount + NEW.restock_amount;
+        
+        -- Log the restock
+        INSERT INTO inventory_logs (
+            ingredient_id,
+            action_type,
+            quantity_change,
+            log_date,
+            log_time
+        )
+        VALUES (
+            NEW.ingredient_id,
+            'restock',
+            NEW.restock_amount,
+            CURRENT_DATE,
+            CURRENT_TIME
+        );
+    END IF;
+END */;;
+DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
@@ -347,4 +399,4 @@ INSERT INTO `users` VALUES (1,'Mike','Ross','mikeross@gmail.com','mike123','user
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-10-21 22:00:41
+-- Dump completed on 2024-10-21 22:45:33
