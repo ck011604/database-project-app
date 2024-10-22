@@ -1,5 +1,65 @@
 const pool = require("../pool")
+const busboy = require('busboy')
+const fs = require('fs')
+const path = require('path')
 
+exports.menu = (req, res) => { // Get full menu
+    console.log("Received request to get menu");
+    pool.query("SELECT * FROM menu ORDER BY price DESC", (error, results) => {
+      if (error) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({
+            success: false,
+            message: "Server Error fetching menu",
+          })
+        );
+        console.log("Error fetching menu");
+        return;
+      } // Else
+      console.log("Successfully fetched menu");
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: true, menu: results }));
+    });
+};
+
+exports.menu_detail = (req, res) => {
+    console.log("Recieved request to get find an item");
+    const recipeID = req.url.split("/")[3];
+    if (!recipeID) {
+        res.writeHead(400, {"Content-Type": "application/json"});
+        res.end(JSON.stringify({success: false, message: "Recipe ID is required"}));
+        return;
+    }
+    // Query database for item with specified ID
+    pool.query("SELECT * FROM menu WHERE recipe_id = ?", [recipeID], (error, results) => {
+        if (error) {
+            res.writeHead(500, { "Content-Type": "application/json" });
+            res.end(
+                JSON.stringify({ 
+                    success: false,
+                    message: "Server Error fetching item details",
+                })
+            );
+            console.error("Error fetching item details:", error);
+            return;
+        }
+        if (results.length === 0) {
+            // No item is found with the given ID
+            res.writeHead(404, {"Content-Type": "application/json"});
+            res.end(
+                JSON.stringify({
+                    success: false,
+                    message: "Item not found",
+                })
+            );
+            return;
+        }
+        // If the item is found, return details
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: true, employee: results[0]}));
+    });
+}
 exports.menu_create_post = (req, res) => {
     console.log("Received request to add menu item");
     let body = '';
@@ -8,9 +68,8 @@ exports.menu_create_post = (req, res) => {
     });
     req.on('end', () => {
         // Ensure required fields
-        console.log("Body received:", body);
-        const{name, ingredients, price, image, type} = JSON.parse(body);
-        if (!name || !ingredients || !price || !image || !type) {
+        const{name, ingredients, price, type, image } = JSON.parse(body);
+        if (!name || !ingredients || !price || !type || !image) {
             res.writeHead(400, {'Content-Type': 'application/json'});
             res.end(
                 JSON.stringify({
@@ -23,8 +82,8 @@ exports.menu_create_post = (req, res) => {
         const ingredientsJson = JSON.stringify(ingredients);
         pool.query(
             // Insert menu item into database
-            "INSERT INTO menu (name, ingredients, price, image, type) VALUES (?, ?, ?, ?, ?)",
-            [name, JSON.stringify(ingredients), price, image, type],
+            "INSERT INTO menu (name, ingredients, price, type, image) VALUES (?, ?, ?, ?, ?)",
+            [name, JSON.stringify(ingredients), price, type, image],
             (error, result) => {
                 if (error) {
                     res.writeHead(500, {'Content-Type': 'application/json'});
@@ -72,7 +131,7 @@ exports.menu_update_patch = (req, res) => {
         if (price) { query_string += "price = ?, "; params.push(price); }
         if (image) { query_string += "image = ?, "; params.push(image); }
         if (type) { query_string += "type = ?, "; params.push(type); }
-        if (is_active !== undefined) { query_string += "is_active = ? "; params.push(is_active); }
+        if (is_active !== undefined) { query_string += "is_active = ?, "; params.push(is_active); }
         // Remove trailing comma and spaces in array
         // Specify which menu item
         query_string = query_string.replace(/, $/, ' WHERE recipe_id = ?');
@@ -118,4 +177,23 @@ exports.menu_delete = (req, res) => {
         res.end(JSON.stringify({ success: true, message: "Recipe deleted successfully" }));
         console.log("Successfully deleted recipe");
     });
+}
+
+exports.menu_image_upload = (req, res) => {
+    console.log("Received request to upload menu image");
+    let filename = '';
+    const bb = busboy({ headers: req.headers });
+    bb.on('file', (name, file, info) => {
+        filename = info.filename;
+        const saveTo =  path.join(__dirname+ `../../../../public/menu_images/${filename}`)
+        if(fs.existsSync(saveTo))
+            fs.unlinkSync(saveTo)
+        file.pipe(fs.createWriteStream(saveTo, { flags: 'w+'}))
+    });
+    bb.on('close', () => {
+        console.log("upload success")
+        res.writeHead(200, { 'Content-Type': 'text/plain' })
+        res.end(`upload success: ${filename}`)
+    });
+    req.pipe(bb);
 }
