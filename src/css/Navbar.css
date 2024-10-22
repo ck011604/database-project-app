@@ -6,7 +6,6 @@
     left: 0;
     width: 100%;
     padding: 20px 5%;
-    /* background: #0E0E52; */
     background-color: #003366;
     display: flex;
     justify-content: space-between;
@@ -19,10 +18,57 @@
     font-size: 32px;
     color: white;
     font-weight: 700;
+    white-space: nowrap;
 }
-.navbar a {
+.navbar {
+    display: flex;
+    /* justify-content: space-between; */
+    align-items: center;
+    width: 100%;
+}
+.navbar-pages {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+.navbar-pages a {
     font-size: 18px;
     color: white;
     font-weight: 500;
     margin-left: 40px;
+}
+.employee-name {
+    font-size: 18px;
+    color: white;
+    font-weight: 500;
+}
+.user-dropdown {
+    position: relative;
+    display: inline-block;
+    margin-left: 40px;
+    cursor: pointer;
+}
+.user-dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    width: 150%;
+}
+.user-dropdown-content a {
+    color: black;
+    padding: 10px;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+}
+.user-dropdown-content a:hover {
+    background-color: #ddd;
+}
+.user-dropdown:hover .user-dropdown-content {
+    display: block;
 }

@@ -105,8 +105,35 @@ body.active-modal {
 .add-menu-item {
     margin-top: 10px;
 }
-
 .form-details label {
     display: block;
     margin-bottom: 1px;
   }
+.product-label {
+    border-radius: 3px;
+    padding: 0.3rem;
+    color: white;
+    width: 45px;
+}
+.product-label-isActive {
+    background-color: #42a942
+}
+.product-label-isNotActive {
+    background-color: #777
+}
+.product-actions {
+    display: flex;
+    float: right;
+    gap: 10px;
+}
+.product-actions svg{
+    cursor: pointer;
+}
+.product-delete-btn {
+    color: #e10d05
+}
+.product-reactivate-btn {
+    display: flex;
+    float: right;
+    gap: 10px;
+}

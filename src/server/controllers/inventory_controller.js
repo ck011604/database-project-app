@@ -22,7 +22,7 @@ exports.index = (req, res) => {
 }
 
 exports.inventory_detail = (req, res) => { // Get info of a shift
-    console.log("Recieved request to get find an ingredient");
+    // console.log("Recieved request to get an ingredient");
     // Getting the ID from the URL
     const ingredientId = req.url.split("/")[3];
     if (!ingredientId) {
@@ -58,4 +58,8 @@ exports.inventory_detail = (req, res) => { // Get info of a shift
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ success: true, ingredient: results[0]}));
     });
+}
+
+exports.inventory_create_post = (req, res) => {
+
 }

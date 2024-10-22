@@ -26,8 +26,14 @@ const LoginPage = () => {
         e.preventDefault();
         try {
           const response = await axios.post('http://localhost:3001/login', {email, password});
-          if (response.data.success)
+          if (response.data.success) {
+            const token = response.data.token;
+            const role = response.data.role;
+            // localStorage.setItem('token', token);
+            // localStorage.setItem('role', role);
+            sessionStorage.setItem("token", token);
             navigate("/home");
+          }
         }
         catch(err){
           setPassword("");
