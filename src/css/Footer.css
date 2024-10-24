@@ -3,3 +3,6 @@ footer {
     color: white;
     text-align: center;
 }
+body:has(.inventory-report-container) footer {
+    display: none !important;
+}

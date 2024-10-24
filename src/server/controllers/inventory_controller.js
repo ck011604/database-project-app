@@ -60,6 +60,55 @@ exports.inventory_detail = (req, res) => { // Get info of a shift
     });
 }
 
+exports.inventory_update_patch = (req, res) => {
+    const id = req.url.split("/")[3];
+    let body = "";
+    req.on("data", function (chunk) {
+        body += chunk;
+    });
+    req.on("end", function () {
+        const { quantity, action_type } = JSON.parse(body);
+        
+        // First update the inventory quantity
+        const updateQuery = `
+            UPDATE inventory 
+            SET quantity = quantity + ?
+            WHERE ingredient_id = ?;
+        `;
+
+        // Then add a log entry
+        const logQuery = `
+            INSERT INTO inventory_logs 
+            (ingredient_id, action_type, quantity_change, log_date, log_time)
+            VALUES (?, ?, ?, CURDATE(), CURTIME())
+        `;
+
+        pool.query(updateQuery, [quantity, id], (error, results) => {
+            if (error) {
+                res.writeHead(500, { "Content-Type": "application/json" });
+                res.end(JSON.stringify({ 
+                    success: false, 
+                    message: "Error updating inventory"
+                }));
+                return;
+            }
+
+            // After updating inventory, log the action
+            pool.query(logQuery, [id, action_type, quantity], (logError) => {
+                if (logError) {
+                    console.error("Error logging inventory change:", logError);
+                }
+
+                res.writeHead(200, { "Content-Type": "application/json" });
+                res.end(JSON.stringify({ 
+                    success: true, 
+                    message: "Inventory updated successfully"
+                }));
+            });
+        });
+    });
+}
+
 exports.inventory_create_post = (req, res) => {
 
 }
