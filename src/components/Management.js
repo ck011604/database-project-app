@@ -3,12 +3,13 @@ import { useState, useEffect } from "react";
 import Ingredient from "./Ingredient";
 import Modal from "./Reusable/Modal";
 import AddMenuItemForm from "./EditForms/AddMenuItemForm";
+import InventoryManagement from "./InventoryManagement";
 import { BsFillTrashFill, BsFillPencilFill } from "react-icons/bs";
-import '../css/Products.css';
+import '../css/Management.css';  // We'll rename this CSS file too
 
-const Products = () => {
+const Management = () => {
     const [items, setItems] = useState([]);
-    const [productFilter, setProductFilter] = useState("Menu Items");
+    const [productFilter, setProductFilter] = useState("MENU_ITEMS");
     const [modal, setModal] = useState(false);
     const [item, setItem] = useState(null);
 
@@ -38,7 +39,7 @@ const Products = () => {
         setModal(!modal)
     };
 
-    const fetchAllItems = async ()=>{
+    const fetchAllItems = async () => {
         try{
             let res = await axios.get("http://localhost:3001/api/menu_management")
             let items = res.data.menu;
@@ -60,107 +61,103 @@ const Products = () => {
     }
     
     useEffect(() => {
-        fetchAllItems()
-    }, [])
-    useEffect(() => {
         if (productFilter === "MENU_ITEMS") {
-            
+            fetchAllItems();
         }
-        else if (productFilter === "INVENTORY") {
-            
-        }
-        else if (productFilter === "REWARDS") {
-            
-        }
-        else if (productFilter === "EVENTS") {
-            
-        }
-    }, [productFilter])
+    }, [productFilter]);
 
     const handleDelete = async(id) => {
         try {
             await axios.delete(`http://localhost:3001/api/menu_management/${id}`);
-            // setItems(items.filter(item => item.id !== id));
+            fetchAllItems();
         } catch (err) {
             console.error(`Error deleting item: ${err}`);
         }
-        fetchAllItems()
     };
 
     const handleReactivate = async(id) => {
         try {
-            let res = await fetch(`http://localhost:3001/api/menu_management/${id}`, {
+            await fetch(`http://localhost:3001/api/menu_management/${id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ is_active: true })
             });
+            fetchAllItems();
         } catch (err) {
             console.error(`Error reactivating item: ${err}`);
         }
-        fetchAllItems()
     }
 
     return (
-        <div className="products">
+        <div className="management">
             <Modal modal={modal} setModal={setModal}>
                 <AddMenuItemForm setModal={setModal} item={item} callback={fetchAllItems}/>
             </Modal>
-            <div className="menu-navbar">
+            <div className="management-navbar">
                 <button onClick={() => setProductFilter("MENU_ITEMS")}>Menu Items</button>
                 <button onClick={() => setProductFilter("INVENTORY")}>Inventory</button>
                 <button onClick={() => setProductFilter("REWARDS")}>Rewards</button>
                 <button onClick={() => setProductFilter("EVENTS")}>Events</button>
             </div>
-            <div>
-                <div className="add-menu-item">
-                    <h2 style={{display: "inline"}} >List of Menu Items</h2>
-                    <button onClick = {() => {toggleModal()}} className="btn-modal"> + </button>
-                </div> 
-                <table className = "menu_items_table">
-                    <thead> 
-                        <tr className = "item_info">
-                            <th>Item Number</th>
-                            <th>Name</th>
-                            <th>Ingredients</th>
-                            <th>Type</th>
-                            <th>Price</th>
-                            <th>Is Active</th>
-                        </tr>
-                    </thead>
-                    <tbody id = "items_table">
-                        {items.map((item, _) => {
-                            return (   
-                                <tr>
+            
+            {productFilter === "MENU_ITEMS" && (
+                <div>
+                    <div className="add-menu-item">
+                        <h2 style={{display: "inline"}} >List of Menu Items</h2>
+                        <button onClick={() => toggleModal()} className="btn-modal"> + </button>
+                    </div> 
+                    <table className="management-table">
+                        <thead> 
+                            <tr className="item-info">
+                                <th>Item Number</th>
+                                <th>Name</th>
+                                <th>Ingredients</th>
+                                <th>Type</th>
+                                <th>Price</th>
+                                <th>Is Active</th>
+                            </tr>
+                        </thead>
+                        <tbody id="items-table">
+                            {items.map((item) => (
+                                <tr key={item.id}>
                                     <td>{item.id}</td>
                                     <td>{item.name}</td>
-                                    <td>{item.ingredients.map((ingredient, _) => {
-                                        return ( <Ingredient ingredient_id={ingredient.ingredient_id} />)
-                                    })}</td>
+                                    <td>{item.ingredients.map((ingredient) => (
+                                        <Ingredient key={ingredient.ingredient_id} ingredient_id={ingredient.ingredient_id} />
+                                    ))}</td>
                                     <td>{item.type}</td>
                                     <td>{item.price}</td>
                                     <td>
                                         <div>
-                                            <span className={`product-label ${item.isActive ? 'product-label-isActive' : 'product-label-isNotActive'}`}>
+                                            <span className={`status-label ${item.isActive ? 'status-label-active' : 'status-label-inactive'}`}>
                                                 {item.isActive ? "Active" : "Disabled"}
                                             </span>
                                             {item.isActive ? 
-                                                <span className='product-actions'>
-                                                    <BsFillPencilFill onClick = {() => { toggleModal(item)}}/>
-                                                    <BsFillTrashFill className='product-delete-btn' onClick={() => handleDelete(item.id)}/>
+                                                <span className='item-actions'>
+                                                    <BsFillPencilFill onClick={() => toggleModal(item)}/>
+                                                    <BsFillTrashFill className='delete-btn' onClick={() => handleDelete(item.id)}/>
                                                 </span> :
-                                                <button className="product-reactivate-btn" onClick = {() => {handleReactivate(item.id)}}> Reactivate </button>
+                                                <button className="reactivate-btn" onClick={() => handleReactivate(item.id)}> Reactivate </button>
                                             }
                                         </div>
                                     </td>
                                 </tr>
-                            )})}
-                    </tbody>
-                </table>
-            </div>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+            {productFilter === "INVENTORY" && <InventoryManagement />}
+            {productFilter === "REWARDS" && (
+                <div>Rewards Content Coming Soon</div>
+            )}
+            {productFilter === "EVENTS" && (
+                <div>Events Content Coming Soon</div>
+            )}
         </div>
     );
 }
  
-export default Products;
+export default Management;

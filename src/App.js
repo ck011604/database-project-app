@@ -8,7 +8,7 @@ import CreateAccount from "./components/CreateAccount";
 import Navbar from "./components/Navbar";
 import VirtualRegister from "./components/VirtualRegister";
 import Footer from "./components/Footer";
-import Products from "./components/Products";
+import Management from './components/Management';
 import InventoryReport from "./components/InventoryReport";
 import NotFoundPage from "./components/NotFoundPage";
 
@@ -42,8 +42,8 @@ function App() {
           />
 
           <Route 
-            path="/products" 
-            element={ <ProtectedRoute element={<Products />} allowedRoles={['Manager']} /> }
+            path="/Management" 
+            element={ <ProtectedRoute element={<Management />} allowedRoles={['Manager']} /> }
           />
 
           <Route
