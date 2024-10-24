@@ -1,54 +1,248 @@
-/* src/css/InventoryReport.css */
-.inventory-report {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
+.inventory-report-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.inventory-report-container .report-header {
+  margin-bottom: 2rem;
+}
+
+.inventory-report-container .report-header h1 {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.inventory-report-container .date-filters {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.inventory-report-container .date-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 300px;
+}
+
+.inventory-report-container .date-filter-group h3 {
+  font-size: 1rem;
+  color: #4b5563;
+  margin-bottom: 0.5rem;
+}
+
+.inventory-report-container .date-inputs {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.inventory-report-container .date-inputs input {
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+}
+
+.inventory-report-container .date-inputs input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 1px #2563eb;
+}
+
+.inventory-report-container .apply-date-btn {
+  padding: 0.5rem 1rem;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.inventory-report-container .apply-date-btn:hover {
+  background-color: #1d4ed8;
+}
+
+.inventory-report-container .apply-date-btn:active {
+  background-color: #1e40af;
+}
+
+.inventory-report-container .logs-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.inventory-report-container .logs-container h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.inventory-report-container .logs-table-container {
+  max-height: 600px;
+  overflow-y: auto;
+  border-radius: 4px;
+  border: 1px solid #e5e7eb;
+}
+
+.inventory-report-container .logs-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+}
+
+.inventory-report-container .logs-table th {
+  background-color: #f8f9fa;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.inventory-report-container .logs-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 0.875rem;
+}
+
+.inventory-report-container .logs-table tr:hover {
+  background-color: #f9fafb;
+}
+
+.inventory-report-container .logs-table tr:last-child td {
+  border-bottom: none;
+}
+
+.inventory-report-container .action-restock {
+  color: #059669;
+  font-weight: 500;
+}
+
+.inventory-report-container .action-used {
+  color: #2563eb;
+  font-weight: 500;
+}
+
+.inventory-report-container .action-discarded {
+  color: #dc2626;
+  font-weight: 500;
+}
+
+.inventory-report-container .quantity-positive {
+  color: #059669;
+  font-weight: 500;
+}
+
+.inventory-report-container .quantity-negative {
+  color: #dc2626;
+  font-weight: 500;
+}
+
+.inventory-report-container .stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.inventory-report-container .chart-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+}
+
+.inventory-report-container .chart-container h2 {
+  font-size: 1.25rem;
+  color: #1f2937;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+.inventory-report-container .no-data {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+  font-style: italic;
+  font-size: 0.875rem;
+}
+
+.inventory-report-container .error-message {
+  color: #dc2626;
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border-radius: 4px;
+  background-color: #fef2f2;
+  font-size: 0.875rem;
+}
+
+/* Custom scrollbar styles */
+.inventory-report-container .logs-table-container {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.inventory-report-container .logs-table-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.inventory-report-container .logs-table-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.inventory-report-container .logs-table-container::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 4px;
+  border: 2px solid #f1f5f9;
+}
+
+.inventory-report-container .logs-table-container::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .inventory-report-container {
+      padding: 1rem;
   }
-  
-.inventory-report  form {
-    margin-bottom: 20px;
+
+  .inventory-report-container .date-filter-group {
+      min-width: 100%;
   }
-  
-.inventory-report  label {
-    display: block;
-    margin-bottom: 10px;
+
+  .inventory-report-container .stats-grid {
+      grid-template-columns: 1fr;
   }
-  
-.inventory-report  select, input[type="date"] {
-    width: 100%;
-    padding: 8px;
-    margin-top: 5px;
+
+  .inventory-report-container .date-inputs input {
+      flex: 1;
   }
-  
-.inventory-report  button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    cursor: pointer;
-  }
-  
-.inventory-report  button:hover {
-    background-color: #45a049;
-  }
-  
-  .error {
-    color: red;
-    margin-bottom: 10px;
-  }
-  
-.inventory-report  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-.inventory-report  th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-  }
-  
-.inventory-report  th {
-    background-color: #4CAF50;
-    color: white;
-  }
+  .inventory-report-container .loading-message {
+    text-align: center;
+    padding: 2rem;
+    color: #6b7280;
+    font-size: 1.125rem;
+}
+}
