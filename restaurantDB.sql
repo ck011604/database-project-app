@@ -351,6 +351,18 @@ CREATE TABLE `rewards` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+DROP TABLE IF EXISTS `discount_next_visit`;
+
+CREATE TABLE `discount_next_visit`(
+  `user_id` int unsigned NOT NULL,
+  `counter` int unsigned NOT NULL,
+  `date` datetime DEFAULT CURRENT_TIMESTAMP,
+
+  KEY `fk_discount_next_visit` (`user_id`),
+  CONSTRAINT `fk_discount_next_visit` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)
+)ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
 --
 -- Dumping data for table `rewards`
 --
