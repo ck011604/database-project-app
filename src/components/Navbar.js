@@ -28,7 +28,7 @@ const Navbar = () => {
       <nav className="navbar">
         <div className="navbar-pages">
             <a href="/virtual-register">Virtual Register</a>
-            <a href="/products">Products</a>
+            <a href="/management">Management</a>
             <a href="/inventory-report">Inventory Report</a>
         </div>
         <div className="user-dropdown">

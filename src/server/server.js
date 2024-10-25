@@ -6,7 +6,7 @@ const virtualRegisterController = require('./controllers/virtualRegister_control
 const promotionalCodeController = require('./controllers/promotional_code_controller');
 const employee_controller = require("./controllers/employee_controller")
 const shift_controller = require("./controllers/shift_controller")
-const inventory_controller = require("./controllers/inventory_controller")
+const inventory_controller = require("./controllers/inventory_controller");
 const menu_management_controller = require("./controllers/menu_management_controller")
 const request_schedule_controller = require("./controllers/request_schedule_controller")
 const inventory_report_controller = require("./controllers/inventory_report_controller"); 
@@ -17,6 +17,11 @@ const server = http.createServer((req, res) => {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.setHeader('Access-Control-Allow-Methods', 'POST, GET, PATCH, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    if (req.method === 'OPTIONS') {
+        res.writeHead(204);
+        res.end();
+        return;
+    }
     if (req.method === 'OPTIONS') {
         res.writeHead(204);
         res.end();
@@ -45,8 +50,12 @@ const server = http.createServer((req, res) => {
             request_schedule_controller.request_schedule_create_post(req, res);
         }
         if (req.url === "/api/inventory") {
-            inventory_controller.inventory_create_post(req, res);
+            inventory_controller.index(req, res);
         }
+        if (req.url.startsWith("/api/inventory/")) {
+            inventory_controller.inventory_detail(req, res);
+        }
+
         if (req.url === "/api/menu_image") {
             menu_management_controller.menu_image_upload(req, res);
         }
@@ -79,8 +88,10 @@ const server = http.createServer((req, res) => {
         if (req.url.startsWith ("/api/request_schedule/")) {
             request_schedule_controller.request_schedule_detail(req, res);
         }
-        if (req.url.startsWith("/api/inventory-report")) {
-            inventory_report_controller.getInventoryReport(req, res);
+        if (req.url.startsWith("/api/inventory-report/logs")) {
+            inventory_report_controller.getInventoryLogs(req, res);
+        } else if (req.url.startsWith("/api/inventory-report/stats")) {
+            inventory_report_controller.getStats(req, res);
         }
         if (req.url === "/api/inventory") {
             inventory_controller.index(req, res);
@@ -107,6 +118,9 @@ const server = http.createServer((req, res) => {
         }
         if (req.url.startsWith("/api/request_schedule/")) {
             request_schedule_controller.request_schedule_update_patch(req, res);
+        }
+        if (req.url.startsWith("/api/inventory/")) {
+            inventory_controller.inventory_update_patch(req, res);
         }
     }
     if (req.method === "DELETE") {
