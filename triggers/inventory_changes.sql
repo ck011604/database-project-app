@@ -1,6 +1,6 @@
 DELIMITER ;;
 
-DROP TRIGGER inventory_changes
+DROP TRIGGER IF EXISTS inventory_changes;;
 
 CREATE TRIGGER inventory_changes
 BEFORE UPDATE ON inventory 
@@ -26,7 +26,11 @@ BEGIN
     VALUES (
         NEW.ingredient_id,
         CASE 
-            WHEN NEW.amount < OLD.amount THEN 'used'
+            WHEN NEW.amount < OLD.amount THEN 
+                CASE 
+                    WHEN @action_type = 'discarded' THEN 'discarded'
+                    ELSE 'used'
+                END
             ELSE 'restock'
         END,
         change_amount,
