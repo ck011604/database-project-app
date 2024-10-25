@@ -181,19 +181,51 @@ exports.menu_delete = (req, res) => {
 
 exports.menu_image_upload = (req, res) => {
     console.log("Received request to upload menu image");
-    let filename = '';
-    const bb = busboy({ headers: req.headers });
-    bb.on('file', (name, file, info) => {
-        filename = info.filename;
-        const saveTo =  path.join(__dirname+ `../../../../public/menu_images/${filename}`)
-        if(fs.existsSync(saveTo))
-            fs.unlinkSync(saveTo)
-        file.pipe(fs.createWriteStream(saveTo, { flags: 'w+'}))
-    });
-    bb.on('close', () => {
-        console.log("upload success")
-        res.writeHead(200, { 'Content-Type': 'text/plain' })
-        res.end(`upload success: ${filename}`)
-    });
-    req.pipe(bb);
+    try{
+        let fileTmpPromise;
+        let filename = '';
+        const bb = busboy({ headers: req.headers });
+        bb.on('file', (name, file, info) => {
+            filename = info.filename;
+            const saveTo =  path.join(__dirname+ `../../../../public/menu_images/${filename}`)
+            if(fs.existsSync(saveTo))
+                fs.unlinkSync(saveTo)
+            fileTmpPromise = new Promise((resolve, reject) => {
+                const writeStream = fs.createWriteStream(saveTo)
+                    .on('error', reject)
+                    .on('finish', resolve);
+                file.on('error', reject);
+                file.pipe(writeStream);
+            });
+        });
+        bb.on('close', async () => {
+            try {
+                if (!fileTmpPromise) {
+                    res.writeHead(400, { 'Content-Type': 'text/plain' })
+                    res.end(`Uploaded file '${filename}' is missing`)
+                    return;
+                }
+
+                // Wait for the temp file to be fully written to disk before proceeding
+                await fileTmpPromise;
+                console.log("upload success")
+                res.writeHead(200, { 'Content-Type': 'text/plain' })
+                res.end(`upload success: ${filename}`)
+            }
+            catch(err){
+                console.log(`failed to close upload file: ${err}`)
+                res.writeHead(500, { 'Content-Type': 'text/plain' })
+                res.end(`upload failed: ${err}`)  
+            }
+            finally {
+                bb.removeAllListeners();
+            }
+        });
+        req.pipe(bb);
+    }
+    catch(err){
+        console.log(`failed to upload file: ${err}`)
+        res.writeHead(500, { 'Content-Type': 'text/plain' })
+        res.end(`upload failed: ${err}`)  
+    }
 }

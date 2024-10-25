@@ -19,6 +19,7 @@ const Management = () => {
                 id: item.id,
                 name: item.name,
                 price: item.price,
+                image: item.image,
                 type: {
                     value: item.type,
                     label: item.type
@@ -51,7 +52,8 @@ const Management = () => {
                     ingredients: item.ingredients,
                     type: item.type,
                     price: item.price,
-                    isActive: item.is_active
+                    isActive: item.is_active,
+                    image: item.image
                 })
             }
             setItems(new_items);
@@ -136,7 +138,7 @@ const Management = () => {
                                             </span>
                                             {item.isActive ? 
                                                 <span className='item-actions'>
-                                                    <BsFillPencilFill onClick={() => toggleModal(item)}/>
+                                                    <BsFillPencilFill onClick={() => toggleModal(item)}/>                       
                                                     <BsFillTrashFill className='delete-btn' onClick={() => handleDelete(item.id)}/>
                                                 </span> :
                                                 <button className="reactivate-btn" onClick={() => handleReactivate(item.id)}> Reactivate </button>
