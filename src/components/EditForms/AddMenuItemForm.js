@@ -7,7 +7,6 @@ import Select from "react-select";
 const AddMenuItemForm = ({setModal, item, callback}) => {
     const onSubmit = async(values, event) => {
         try{
-            console.log(values)
             let props = ["name", "price", "ingredients", "type", "image"]
             let data = {}
             for(let key of props){
@@ -24,7 +23,6 @@ const AddMenuItemForm = ({setModal, item, callback}) => {
                     data["type"] = values[key].value
                 }
                 else if (key === "image"){
-                    console.log(values[key][0].name)
                     data[key] = values[key][0].name
                 }
                 else{
@@ -110,6 +108,7 @@ const AddMenuItemForm = ({setModal, item, callback}) => {
                 title: 'Item Name',
                 type: 'text',
                 name: 'name',
+                rules: { required: true },
                 validationProps: {
                     required: 'Item name is mandatory'
                 }
@@ -128,6 +127,7 @@ const AddMenuItemForm = ({setModal, item, callback}) => {
                 title: 'Price',
                 type: 'number',
                 name: 'price',
+                rules: { required: true },
                 validationProps: {
                     required: 'Price is mandatory'
                 }
@@ -136,6 +136,7 @@ const AddMenuItemForm = ({setModal, item, callback}) => {
                 title: 'Image',
                 type: 'file',
                 name: 'image',
+                rules: { required: item ? false : true },
                 validationProps: {
                     required: 'JPG Image is mandatory'
                 }
