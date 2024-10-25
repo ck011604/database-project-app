@@ -55,7 +55,9 @@ const server = http.createServer((req, res) => {
         if (req.url.startsWith("/api/inventory/")) {
             inventory_controller.inventory_detail(req, res);
         }
-
+        if (req.url === "/api/inventory-logs") {
+            inventory_controller.create_inventory_log(req, res);
+        }
         if (req.url === "/api/menu_image") {
             menu_management_controller.menu_image_upload(req, res);
         }
