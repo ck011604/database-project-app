@@ -86,7 +86,9 @@ exports.validCustomerEmail = (req, res) => {
     res.end(JSON.stringify({ success: false, message: "Email is required to check validity" }));
     return;
   }
-  pool.query("SELECT user_id, email FROM users WHERE email = ?", [email],
+  pool.query(`SELECT U.user_id, U.email, D.counter
+     FROM users AS U LEFT OUTER JOIN discount_next_visit AS D ON U.user_id = D.user_id
+     WHERE email = ?`, [email],
     (error, results) => {
       if (error) {
         res.writeHead(500, { "Content-Type": "application/json" });
@@ -96,7 +98,7 @@ exports.validCustomerEmail = (req, res) => {
       }
       if (results.length > 0) {
         res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ success: true, user_id: results[0].user_id }));
+        res.end(JSON.stringify({ success: true, user_id: results[0].user_id, nextVisitDiscount: results[0].counter * 10 }));
         console.log("Valid customer email");
         return;
       }

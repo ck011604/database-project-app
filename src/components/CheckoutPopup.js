@@ -15,6 +15,8 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
   const [waiterID, setWaiterID,] = useState(1); //For testing, needs to be passed along from login
   const [customerID, setCustomerID] = useState(null);
   const [customerEmail, setCustomerEmail] = useState(""); // From the form
+  const [customerEmailLock, setCustomerEmailLock] = useState(false);
+  const [nextVisitDiscount, setNextVisitDiscount] = useState(0); // In dollars
   const [formLock, setFormLock] = useState(false);
   const [successfulOrder, setSuccessfulOrder] = useState(false); // Needed for reseting selected items when closing
   const [conflictingIngredients, setConflictingIngredients] = useState([]); // Name and ID of conIng
@@ -26,41 +28,67 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
   const [promoCodeID, setPromoCodeID] = useState("");
   const [promoCodePercent, setPromoCodePercent] = useState(0);
   const [promoCodeLock, setPromoCodeLock] = useState(false); // Once the submit promo button is pressed, don't allow more
+  const [discountType, setDiscountType] = useState("");
   const [discountAmount, setDiscountAmount] = useState(0.00);
   const [highestDiscountPercent, setHighestDiscountPercent] = useState(0);
   const [isMilitary, setIsMilitary] = useState('no');
 
-  useEffect(() => { // Handle all of the calculations
+  useEffect(() => {
+    // Handle all of the calculations
     const numericSubtotal = parseFloat(subtotal); // Treat as number, not string
 
-    let calculatedDiscount = 0
-    if (isMilitary === "yes" && promoCodePercent < 10) {
+    // Find the highest discount
+    const discountOptions = { // The different options and the discount in dollars
+      Military: (isMilitary === "yes" ? numericSubtotal * 0.1 : 0.00).toFixed(2),
+      PromoCode: (numericSubtotal * (promoCodePercent / 100)).toFixed(2),
+      LoyaltyPoints: (nextVisitDiscount <= subtotal ? nextVisitDiscount : 0.00).toFixed(2),
+    };
+    const bestDiscount = Object.entries(discountOptions).reduce( // Get the best discount
+      (maxEntry, currentEntry) => {
+        const currentValue = parseFloat(currentEntry[1]); // Convert to number
+        const maxValue = parseFloat(maxEntry[1]);
+        return currentValue > maxValue ? currentEntry : maxEntry; // Check if the current value is greater than the max value
+      }
+    );
+    setDiscountAmount(parseFloat(bestDiscount[1]).toFixed(2)); // Set the discount amount from the best option
+    setDiscountType(bestDiscount[0]); // Set the best discount type
+    // Depending on the discount type, set the best discount percentage
+    if (bestDiscount[0] === "Military")
       setHighestDiscountPercent(10);
-      calculatedDiscount = numericSubtotal * 0.10;
-      setDiscountAmount(calculatedDiscount.toFixed(2));
-    }
-    else if (promoCodePercent > 0) {
+    else if (bestDiscount[0] === "PromoCode")
       setHighestDiscountPercent(promoCodePercent);
-      calculatedDiscount = numericSubtotal * (promoCodePercent/100);
-      setDiscountAmount(calculatedDiscount.toFixed(2));
-    }
-    else
-      setDiscountAmount(0.00);
-    const afterDiscount = numericSubtotal - calculatedDiscount;
+    else if (bestDiscount[0] === "LoyaltyPoints")
+      setHighestDiscountPercent(0);
+    const afterDiscount = numericSubtotal - bestDiscount[1];
+
+    // let calculatedDiscount = 0
+    // if (isMilitary === "yes" && promoCodePercent < 10) {
+    //   setHighestDiscountPercent(10);
+    //   calculatedDiscount = numericSubtotal * 0.10;
+    //   setDiscountAmount(calculatedDiscount.toFixed(2));
+    // }
+    // else if (promoCodePercent > 0) {
+    //   setHighestDiscountPercent(promoCodePercent);
+    //   calculatedDiscount = numericSubtotal * (promoCodePercent/100);
+    //   setDiscountAmount(calculatedDiscount.toFixed(2));
+    // }
+    // else
+    //   setDiscountAmount(0.00);
+    // const afterDiscount = numericSubtotal - calculatedDiscount;
 
     const taxRate = 0.0825; // 8.25% tax rate
     const calculatedTax = afterDiscount * taxRate;
     setTax(calculatedTax.toFixed(2));
 
-    const calculateTip = afterDiscount * (tipPercent/100);
-    setTipAmount(calculateTip.toFixed(2))
+    const calculateTip = afterDiscount * (tipPercent / 100);
+    setTipAmount(calculateTip.toFixed(2));
 
     const total = calculateTip + calculatedTax + afterDiscount;
     setTotal(total.toFixed(2));
 
     const calculateChange = receivedAmount - total;
-    setChangeAmount(calculateChange.toFixed(2))
-  }, [subtotal, tipPercent, receivedAmount, promoCodePercent, isMilitary]);
+    setChangeAmount(calculateChange.toFixed(2));
+  }, [subtotal, tipPercent, receivedAmount, promoCodePercent, isMilitary, nextVisitDiscount]);
 
   const handleOnClose = () => {
     if (successfulOrder)
@@ -102,6 +130,33 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
       }
     }
   }
+
+  const handleCustomerEmail = async (e) => {
+    if (customerEmail.length > 0) {
+      try {
+        const userResponse = await axios.get(`http://localhost:3001/valid-customer-email?email=${customerEmail}`);
+        if (userResponse.data.success === false) {
+          setError("Invalid customer email");
+          return;
+        } 
+        else {
+          setCustomerID(userResponse.data.user_id);
+          setNextVisitDiscount(userResponse.data.nextVisitDiscount)
+          setCustomerEmailLock(true)
+          console.log(userResponse.data.nextVisitDiscount);
+        }
+      } catch (err) {
+        if (err.response && err.response.data && err.response.data.message)
+          setError(err.response.data.message);
+        else
+          setError(
+            `An error has occured checking the validity of the customer email: ${customerEmail}`
+          );
+        return;
+      }
+    }
+  }
+
   const handleConfirmOrder = async (e) => {
     e.preventDefault();
     if (changeAmount < 0) {
@@ -114,31 +169,31 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
         setError("Invalid table number")
         return;
       }
-      // Check if the customer email is valid
-      let customerIDFromAPI; // Need because customerID is asynchronous meaning it is not updated immediately
-      if (customerEmail.length > 0) { // Customer email is optional. Only do check if something was provided
-        try {
-          const userResponse = await axios.get(
-            `http://localhost:3001/valid-customer-email?email=${customerEmail}`
-          );
-          if (userResponse.data.success === false) {
-            setError("Invalid customer email");
-            return;
-          }
-          else {
-            customerIDFromAPI = userResponse.data.user_id;
-            setCustomerID(customerIDFromAPI);
-          }
-        } catch (err) {
-          if (err.response && err.response.data && err.response.data.message)
-            setError(err.response.data.message);
-          else
-            setError(
-              `An error has occured checking the validity of the customer email: ${customerEmail}`
-            );
-          return;
-        }
-      }
+      // // Check if the customer email is valid
+      // let customerIDFromAPI; // Need because customerID is asynchronous meaning it is not updated immediately
+      // if (customerEmail.length > 0) { // Customer email is optional. Only do check if something was provided
+      //   try {
+      //     const userResponse = await axios.get(
+      //       `http://localhost:3001/valid-customer-email?email=${customerEmail}`
+      //     );
+      //     if (userResponse.data.success === false) {
+      //       setError("Invalid customer email");
+      //       return;
+      //     }
+      //     else {
+      //       customerIDFromAPI = userResponse.data.user_id;
+      //       setCustomerID(customerIDFromAPI);
+      //     }
+      //   } catch (err) {
+      //     if (err.response && err.response.data && err.response.data.message)
+      //       setError(err.response.data.message);
+      //     else
+      //       setError(
+      //         `An error has occured checking the validity of the customer email: ${customerEmail}`
+      //       );
+      //     return;
+      //   }
+      // }
 
       let requiredIngredients = []; // List of all the ingredients and the amount required for the order
       selectedItems.forEach((item) => {
@@ -229,7 +284,8 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
             selectedItems: itemsJSON,
             waiterID,
             tableNumber,
-            customerID: customerIDFromAPI,
+            // customerID: customerIDFromAPI,
+            customerID,
             subtotal,
             tax,
             tipPercent,
@@ -239,8 +295,10 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
             changeAmount,
             specialRequest,
             promoCode_id: promoCodeID,
-            isMilitary,
-            discount_percentage: highestDiscountPercent
+            discountType,
+            discountAmount,
+            // isMilitary,
+            discountPercentage: highestDiscountPercent
           }
         );
         if (response.data.success) setFormLock(true);
@@ -279,7 +337,8 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
           </div>
           {discountAmount > 0 &&
             <div className="checkout-label">
-              <label>Discount {highestDiscountPercent}%: </label>
+              {discountType != "LoyaltyPoints" && <label>Discount {highestDiscountPercent}%: </label>}
+              {discountType === "LoyaltyPoints" && <label>Discount: </label>}
               <p>-${discountAmount}</p>
             </div>
           }
@@ -372,8 +431,11 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
               value={customerEmail}
               onChange={(e) => setCustomerEmail(e.target.value)}
               placeholder="example@domain.com"
-              disabled={formLock}
+              disabled={formLock || customerEmailLock}
             />
+            <button className="customer-email-apply-button" type="button" onClick={handleCustomerEmail} disabled={formLock || customerEmailLock}>
+              {customerEmailLock == true ? "Applied" : "Apply"}
+            </button>
           </div>
           {error && <p className="confirm-order-error">{error}</p>}
           {itemsWithConIng.length > 0 && (
