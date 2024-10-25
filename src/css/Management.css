@@ -1,0 +1,232 @@
+.management {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.management .management-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: centered;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 1em;
+    min-width: 400px;
+    border-radius: 5px 5px 0 0;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.management .management-table thead tr {
+    background-color: #808080;
+    color: #ffffff;
+    text-align: left;
+    font-weight: bold;
+    min-width: 400px;
+}
+
+.management .item-info th {
+    height: 50px;
+    background-color: #808080;
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.management .items-table td {
+    padding: 12px 15px;
+}
+
+.management .item-info tbody tr {
+    border-bottom: 1px solid #ffffff
+}
+
+.management .item-info tbody tr:last-of-type {
+    border-bottom: 2x solid #808080
+}
+
+.management .status-label {
+    padding: .4rem 0;
+    border-radius: 2rem;
+}
+
+.management .status-label-active {
+    background-color: #42a942;
+    color: white;
+    padding: 0.3rem;
+    border-radius: 3px;
+}
+
+.management .status-label-inactive {
+    background-color: #777;
+    color: white;
+    padding: 0.3rem;
+    border-radius: 3px;
+}
+
+.management .item-actions {
+    display: flex;
+    float: right;
+    gap: 10px;
+}
+
+.management .item-actions svg {
+    cursor: pointer;
+}
+
+.management .delete-btn {
+    color: #e10d05
+}
+
+.management .reactivate-btn {
+    display: flex;
+    float: right;
+    gap: 10px;
+}
+
+.management .management-navbar {
+    margin-bottom: 20px;
+}
+
+.management .management-navbar button {
+    margin-right: 10px;
+    padding: 8px 16px;
+    border: none;
+    background-color: #808080;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.management .management-navbar button:hover {
+    background-color: #666;
+}
+
+.management .btn-modal {
+    padding: 10px 20px;
+    float: right;
+    border-radius: 4px;
+    font-size: 18px;
+    margin-bottom: 3px;
+    background-color: #808080;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.management .btn-modal:hover {
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19)
+}
+
+.management .modal, .management .overlay {
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: fixed;
+}
+
+.management .overlay {
+    background: rgba(49,49,49,0.8);
+}
+
+.management .modal-content {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    line-height: 1.5;
+    background: #f1f1f1;
+    padding: 15px 30px;
+    border-radius: 5px;
+    max-width: 600px;
+    min-width: 300px;
+}
+
+.management .close-modal {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 5px 7px;
+}
+
+.management .add-menu-item {
+    margin-top: 10px;
+}
+
+.management .form-details label {
+    display: block;
+    margin-bottom: 1px;
+}
+
+/* Inventory Management Styles */
+.management .inventory-form-container {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.management .form-group {
+    margin-bottom: 15px;
+}
+
+.management .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.management .form-select, 
+.management .form-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.management .btn-submit {
+    width: 100%;
+    padding: 10px;
+    background-color: #808080;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+
+.management .btn-submit:hover {
+    background-color: #666;
+}
+
+.management .btn-submit:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.management .message {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+}
+
+.management .message-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.management .message-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.management table td {
+    padding: 12px 8px;
+}
