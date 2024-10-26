@@ -4,6 +4,7 @@ import Ingredient from "./Ingredient";
 import Modal from "./Reusable/Modal";
 import AddMenuItemForm from "./EditForms/AddMenuItemForm";
 import InventoryManagement from "./InventoryManagement";
+import EmployeeManagement from "./EmployeeManagement";
 import { BsFillTrashFill, BsFillPencilFill } from "react-icons/bs";
 import '../css/Management.css';  // We'll rename this CSS file too
 
@@ -100,7 +101,7 @@ const Management = () => {
             <div className="management-navbar">
                 <button onClick={() => setProductFilter("MENU_ITEMS")}>Menu Items</button>
                 <button onClick={() => setProductFilter("INVENTORY")}>Inventory</button>
-                <button onClick={() => setProductFilter("REWARDS")}>Rewards</button>
+                <button onClick={() => setProductFilter("EMPLOYEES")}>Employees</button>
                 <button onClick={() => setProductFilter("EVENTS")}>Events</button>
             </div>
             
@@ -152,14 +153,12 @@ const Management = () => {
                 </div>
             )}
             {productFilter === "INVENTORY" && <InventoryManagement />}
-            {productFilter === "REWARDS" && (
-                <div>Rewards Content Coming Soon</div>
-            )}
+            {productFilter === "EMPLOYEES" && <EmployeeManagement/> }
             {productFilter === "EVENTS" && (
                 <div>Events Content Coming Soon</div>
             )}
         </div>
     );
 }
- 
+
 export default Management;
