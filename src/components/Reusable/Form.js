@@ -60,6 +60,14 @@ function Form({ template, onSubmit, watchFields, validate, preloadedValues }) {
                             { errors[name] && <span className='red-text'>{errors[name]['message']}</span>}
                         </div>
                     )
+                case 'email':
+                    return(
+                        <div key={name}>
+                            <label htmlFor={name} style={{ marginTop: '10px' }}>{title}</label>
+                            <input type='email' name={name} id={name} {...register(name, validationProps)}></input>
+                            { errors[name] && <span className='red-text'>{errors[name]['message']}</span>}
+                        </div>
+                    )
                 case 'select':
                     return (
                         <div key={name}>

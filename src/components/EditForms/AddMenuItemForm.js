@@ -94,12 +94,6 @@ const AddMenuItemForm = ({setModal, item, callback}) => {
         fetchAllItems()
     }, [])
 
-    const type = [
-        { value: 'main', label: 'Main Course' },
-        { value: 'side', label: 'Side Dish' },
-        { value: 'drink', label: 'Drink' },
-    ];
-
     const template =  {
         title: 'Add New Menu Item',
         fields: [
