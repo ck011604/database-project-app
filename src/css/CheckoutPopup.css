@@ -97,7 +97,8 @@
     resize: none;
     font-family: inherit;
 }
-.promo-code-apply-button {
+/* promo-code-apply-button */
+.checkout-label button { 
     margin-left: 10px;
     padding: 5px 10px;
     background-color: #007BFF;
