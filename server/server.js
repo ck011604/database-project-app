@@ -1,4 +1,4 @@
-require('dotenv').config({ path: '../../.env' });
+require('dotenv').config({ path: '../.env' });
 const https = require('https');
 const accountController = require('./controllers/account_controller');
 const virtualRegisterController = require('./controllers/virtualRegister_controller');
@@ -9,6 +9,7 @@ const inventory_controller = require("./controllers/inventory_controller");
 const menu_management_controller = require("./controllers/menu_management_controller")
 const request_schedule_controller = require("./controllers/request_schedule_controller")
 const inventory_report_controller = require("./controllers/inventory_report_controller");
+const sales_report_controller = require('./controllers/sales_report_controller');
 const pool = require("./pool") // put const pool = require("../pool") into controller files
 const fs = require("fs")
 const options = {
@@ -111,6 +112,9 @@ const server = https.createServer(options, (req, res) => {
         }
         if (req.url.startsWith("/api/menu_management/")) {
             menu_management_controller.menu_detail(req, res);
+        }
+        if (req.url.startsWith("/api/sales-report")) {
+            sales_report_controller.getSalesReport(req, res);
         }
     }
     if (req.method === "PATCH") {
