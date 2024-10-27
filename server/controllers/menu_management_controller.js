@@ -187,7 +187,7 @@ exports.menu_image_upload = (req, res) => {
         const bb = busboy({ headers: req.headers });
         bb.on('file', (name, file, info) => {
             filename = info.filename;
-            const saveTo =  path.join(__dirname+ `../../../../public/menu_images/${filename}`)
+            const saveTo =  path.join(__dirname+ `../../../public/menu_images/${filename}`)
             if(fs.existsSync(saveTo))
                 fs.unlinkSync(saveTo)
             fileTmpPromise = new Promise((resolve, reject) => {
