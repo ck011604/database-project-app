@@ -11,7 +11,7 @@ exports.menu = (req, res) => { // Get menu
             message: "Server Error fetching menu",
           })
         );
-        console.log("Error fetching menu");
+        console.log(`Error fetching menu ${error}`);
         return;
       } // Else
       console.log("Successfully fetched menu");

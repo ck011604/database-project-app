@@ -1,4 +1,5 @@
 require('dotenv').config({ path: '../.env' });
+const http = require('http');
 const https = require('https');
 const accountController = require('./controllers/account_controller');
 const virtualRegisterController = require('./controllers/virtualRegister_controller');
@@ -12,12 +13,10 @@ const inventory_report_controller = require("./controllers/inventory_report_cont
 const sales_report_controller = require('./controllers/sales_report_controller');
 const pool = require("./pool") // put const pool = require("../pool") into controller files
 const fs = require("fs")
-const options = {
-    cert: fs.readFileSync(process.env.PATH_TO_CERT),
-    key: fs.readFileSync(process.env.PATH_TO_KEY)
-}
+const https_mode = fs.existsSync(process.env.PATH_TO_CERT) && fs.existsSync(process.env.PATH_TO_KEY)
+const port = https_mode ? 443 : 3001
 
-const server = https.createServer(options, (req, res) => {
+const serverBlock = (req, res) => {
     // Set CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Credentials', true);
@@ -151,10 +150,22 @@ const server = https.createServer(options, (req, res) => {
             request_schedule_controller.request_schedule_delete(req, res);
         }
     }
-});
+}
 
-server.listen(443, () => {
-    console.log('Server running on port 443')
+let server;
+if(https_mode){
+    const options = {
+        cert: fs.readFileSync(process.env.PATH_TO_CERT),
+        key: fs.readFileSync(process.env.PATH_TO_KEY)
+    }
+    server = https.createServer(options, serverBlock);
+}
+else{
+    server = http.createServer(serverBlock);
+}
+
+server.listen(port, () => {
+    console.log(`Server running on port ${port}`)
 });
 
 // Remember to end the pool when your application terminates
