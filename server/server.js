@@ -67,6 +67,9 @@ const server = https.createServer(options, (req, res) => {
         if (req.url === "/api/menu_image") {
             menu_management_controller.menu_image_upload(req, res);
         }
+        if (req.url === "/api/batch-sales") {
+            sales_report_controller.runBatchSales(req, res);
+        }
     }
     if(req.method === "GET") {
         if (req.url === "/menu") {
