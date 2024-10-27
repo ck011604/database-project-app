@@ -16,7 +16,7 @@ const CreateAccount = () => {
     const handleCreateAccount = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(`${REACT_APP_API_URL}/create-account`, { email, firstName, lastName, password });
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/create-account`, { email, firstName, lastName, password });
             if (response.data.success)
                 navigate("/login", {replace: true, state: {email: email, message: 'Account successfully created!'}});
         }

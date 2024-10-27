@@ -13,7 +13,7 @@ const EmployeeManagement = () => {
 
     const fetchAllEmployees = async () => {
         try{
-            let res = await axios.get(`${REACT_APP_API_URL}/api/employees`)
+            let res = await axios.get(`${process.env.REACT_APP_API_URL}/api/employees`)
             let employees = res.data.employees;
             let new_employees = []
             for(let employee of employees){
@@ -62,7 +62,7 @@ const EmployeeManagement = () => {
 
     const handleDelete = async(id) => {
         try {
-            await axios.delete(`${REACT_APP_API_URL}/api/employees/${id}`);
+            await axios.delete(`${process.env.REACT_APP_API_URL}/api/employees/${id}`);
             fetchAllEmployees();
         } catch (err) {
             console.error(`Error deleting item: ${err}`);
@@ -71,7 +71,7 @@ const EmployeeManagement = () => {
 
     const handleReactivate = async(id) => {
         try {
-            await fetch(`${REACT_APP_API_URL}/api/employees/${id}`, {
+            await fetch(`${process.env.REACT_APP_API_URL}/api/employees/${id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'
