@@ -1,6 +1,5 @@
 require('dotenv').config({ path: '../../.env' });
-const http = require('http');
-const url = require('url');
+const https = require('https');
 const accountController = require('./controllers/account_controller');
 const virtualRegisterController = require('./controllers/virtualRegister_controller');
 const promotionalCodeController = require('./controllers/promotional_code_controller');
@@ -9,12 +8,18 @@ const shift_controller = require("./controllers/shift_controller")
 const inventory_controller = require("./controllers/inventory_controller");
 const menu_management_controller = require("./controllers/menu_management_controller")
 const request_schedule_controller = require("./controllers/request_schedule_controller")
-const inventory_report_controller = require("./controllers/inventory_report_controller"); 
+const inventory_report_controller = require("./controllers/inventory_report_controller");
 const pool = require("./pool") // put const pool = require("../pool") into controller files
+const fs = require("fs")
+const options = {
+    cert: fs.readFileSync(process.env.PATH_TO_CERT),
+    key: fs.readFileSync(process.env.PATH_TO_KEY)
+}
 
-const server = http.createServer((req, res) => {
+const server = https.createServer(options, (req, res) => {
     // Set CORS headers
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Methods', 'POST, GET, PATCH, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     if (req.method === 'OPTIONS') {
@@ -141,8 +146,8 @@ const server = http.createServer((req, res) => {
     }
 });
 
-server.listen(3001, () => {
-    console.log('Server running on port 3001')
+server.listen(443, () => {
+    console.log('Server running on port 443')
 });
 
 // Remember to end the pool when your application terminates
