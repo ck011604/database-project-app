@@ -15,7 +15,7 @@ function Form({ template, onSubmit, watchFields, validate, preloadedValues }) {
         const formData = new FormData()
         formData.append("image", file)
 
-        await fetch("http://localhost:3001/api/menu_image", {
+        await fetch(`${REACT_APP_API_URL}/api/menu_image`, {
             method: "POST",
             body: formData
         })

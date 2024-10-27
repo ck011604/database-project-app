@@ -109,7 +109,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
   const handlePromoCode = async (e) => {
     if (promoCode.length > 0) {
       try {
-        const promoCodeResponse = await axios.get(`http://localhost:3001/check-promo-code?promoCode=${promoCode}`);
+        const promoCodeResponse = await axios.get(`${REACT_APP_API_URL}/check-promo-code?promoCode=${promoCode}`);
         if (promoCodeResponse.data.success === false) {
           setError('Not a valid promotional code');
           return;
@@ -134,7 +134,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
   const handleCustomerEmail = async (e) => {
     if (customerEmail.length > 0) {
       try {
-        const userResponse = await axios.get(`http://localhost:3001/valid-customer-email?email=${customerEmail}`);
+        const userResponse = await axios.get(`${REACT_APP_API_URL}/valid-customer-email?email=${customerEmail}`);
         if (userResponse.data.success === false) {
           setError("Invalid customer email");
           return;
@@ -174,7 +174,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
       // if (customerEmail.length > 0) { // Customer email is optional. Only do check if something was provided
       //   try {
       //     const userResponse = await axios.get(
-      //       `http://localhost:3001/valid-customer-email?email=${customerEmail}`
+      //       `http://${REACT_APP_API_URL}/valid-customer-email?email=${customerEmail}`
       //     );
       //     if (userResponse.data.success === false) {
       //       setError("Invalid customer email");
@@ -217,7 +217,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
       let inventoryStock = [];
       try {
         const inventoryResponse = await axios.get(
-          "http://localhost:3001/inventory-stock"
+          `${REACT_APP_API_URL}/inventory-stock`
         );
         inventoryStock = inventoryResponse.data.inventory;
       } catch (err) {
@@ -279,7 +279,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
       setConfirmOrderButton("Loading...");
       try {
         const response = await axios.post(
-          "http://localhost:3001/confirm-order",
+          `${REACT_APP_API_URL}/confirm-order`,
           {
             selectedItems: itemsJSON,
             waiterID,

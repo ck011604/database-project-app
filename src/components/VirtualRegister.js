@@ -18,7 +18,7 @@ const VirtualRegister = () => {
 
     const fetchInventory = async () => {
         try {
-            const inventoryResponse = await axios.get('http://localhost:3001/inventory-stock');
+            const inventoryResponse = await axios.get(`${REACT_APP_API_URL}/inventory-stock`);
             setInventoryStock(inventoryResponse.data.inventory);
             setOriginalInventoryStock(inventoryResponse.data.inventory);
         } catch (err) {
@@ -31,7 +31,7 @@ const VirtualRegister = () => {
     useEffect(() => { // Load menu
         const fetchMenu = async () => {
             try {
-                const menuResponse = await axios.get('http://localhost:3001/menu');
+                const menuResponse = await axios.get(`${REACT_APP_API_URL}/menu`);
                 setItems(menuResponse.data.menu);
                 setOriginalItems(menuResponse.data.menu);
             } catch(err) {

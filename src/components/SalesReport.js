@@ -25,7 +25,7 @@ const handleEndDateChange = (e) => {
 const handleBatchSales = async () => {
   console.log("Batched sales button clicked");
   try{
-    const response = await axios.post('http://localhost:3001/api/batch-sales');
+    const response = await axios.post(`${REACT_APP_API_URL}/api/batch-sales`);
     setBatchMessage(response.data.message);
   } catch (error) {
     console.error("Error executing batch sales query", error);
@@ -36,7 +36,7 @@ const handleBatchSales = async () => {
 
 const submitReport = async () => {
   try {
-    const response = await axios.get(`http://localhost:3001/api/sales-report`, {
+    const response = await axios.get(`${REACT_APP_API_URL}/api/sales-report`, {
       params: {
         reportType: selectedOption,
         startDate: startDate,

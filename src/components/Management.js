@@ -28,7 +28,7 @@ const Management = () => {
                 ingredients: []
             }
             for(let ingredient of item.ingredients){
-                let res = await axios.get(`http://localhost:3001/api/inventory/${ingredient.ingredient_id}`)
+                let res = await axios.get(`${REACT_APP_API_URL}/api/inventory/${ingredient.ingredient_id}`)
                 ingredient = res.data.ingredient
                 data.ingredients.push({
                     value: ingredient.ingredient_id,
@@ -43,7 +43,7 @@ const Management = () => {
 
     const fetchAllItems = async () => {
         try{
-            let res = await axios.get("http://localhost:3001/api/menu_management")
+            let res = await axios.get(`${REACT_APP_API_URL}/api/menu_management`)
             let items = res.data.menu;
             let new_items = []
             for(let item of items){
@@ -71,7 +71,7 @@ const Management = () => {
 
     const handleDelete = async(id) => {
         try {
-            await axios.delete(`http://localhost:3001/api/menu_management/${id}`);
+            await axios.delete(`${REACT_APP_API_URL}/api/menu_management/${id}`);
             fetchAllItems();
         } catch (err) {
             console.error(`Error deleting item: ${err}`);
@@ -80,7 +80,7 @@ const Management = () => {
 
     const handleReactivate = async(id) => {
         try {
-            await fetch(`http://localhost:3001/api/menu_management/${id}`, {
+            await fetch(`${REACT_APP_API_URL}/api/menu_management/${id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'

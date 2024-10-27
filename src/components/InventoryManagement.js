@@ -15,7 +15,7 @@ const InventoryManagement = () => {
 
     const fetchIngredients = async () => {
         try {
-            const response = await axios.get('http://localhost:3001/api/inventory');
+            const response = await axios.get(`${REACT_APP_API_URL}/api/inventory`);
             if (response.data.success) {
                 const mappedIngredients = response.data.inventory.map(ing => ({
                     ...ing,
@@ -49,7 +49,7 @@ const InventoryManagement = () => {
                 -parseInt(quantity);
 
             const response = await axios.patch(
-                `http://localhost:3001/api/inventory/${selectedIngredient}`,
+                `${REACT_APP_API_URL}/api/inventory/${selectedIngredient}`,
                 {
                     quantity: adjustedQuantity,
                     action_type: action  // This will be either 'restock' or 'discarded'
