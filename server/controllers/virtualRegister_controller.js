@@ -64,12 +64,15 @@ exports.confirm_order = (req, res) => {
       changeAmount,
       specialRequest,
       promoCode_id,
-      isMilitaryString,
-      discount_percentage
+      discountType,
+      discountAmount,
+      //isMilitaryString,
+      discountPercentage,
     } = JSON.parse(body);
-    const isMilitary = isMilitaryString == "no" ? 0 : 1; // Convert to binary (0 or 1)
-    const checkedPromoCodeID = promoCode_id == "" ? null : promoCode_id // If no code was given, set it to null
-    const addedPoints = Math.floor(subtotal);
+    //const isMilitary = isMilitaryString == "no" ? 0 : 1; // Convert to binary (0 or 1)
+    const checkedPromoCodeID = promoCode_id == "" || discountType !== "PromoCode" ? null : promoCode_id // If no code was given, set it to null
+    const checkedDiscountPercent = discountType == "LoyaltyPoints" ? null : discountPercentage // If the discount type is loyalty points, set it to null
+    const addedPoints = Math.floor(total);
 
     pool.getConnection((err, connection) => {
       if (err) {
@@ -87,8 +90,7 @@ exports.confirm_order = (req, res) => {
           return;
         }
         // Subtract uses left for the promotion code
-        if (checkedPromoCodeID != null && discount_percentage > 10) { // A discount was applied
-          console.log("There is a promocode")
+        if (discountType == "PromoCode") { // A discount was applied
           connection.query(`SELECT promoCode_id, uses_left
             FROM promotion_codes
             WHERE is_active = 1 AND promoCode_id = ? AND (uses_left > 0 OR uses_left IS null)`,
@@ -103,7 +105,6 @@ exports.confirm_order = (req, res) => {
                 });
               }
               // The code was valid and has uses_left
-              console.log(results)
               const updatedUsesLeft = results[0].uses_left == null ? null : results[0].uses_left - 1
               connection.query("UPDATE promotion_codes SET uses_left = ? WHERE promoCode_id = ?",
                 [updatedUsesLeft, checkedPromoCodeID],
@@ -128,11 +129,11 @@ exports.confirm_order = (req, res) => {
           `INSERT INTO orders 
            (items, waiter_id, table_number, customer_id, subtotal, tip_percent, tip_amount, 
             total, received_amount, change_amount, tax_amount, special_requests,
-            pointsEarned, promoCode_ID, isMilitary, discount_percentage)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            pointsEarned, promoCode_id, discount_type, discount_amount, discount_percent)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [selectedItems, waiterID, tableNumber, customerID, subtotal, tipPercent, tipAmount, 
           total, receivedAmount, changeAmount, tax, specialRequest,
-          addedPoints, checkedPromoCodeID, isMilitary, discount_percentage],
+          addedPoints, checkedPromoCodeID, discountType, discountAmount, checkedDiscountPercent],
           (error, result) => {
             if (error) {
               return connection.rollback(() => {

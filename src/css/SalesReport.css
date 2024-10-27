@@ -1,0 +1,80 @@
+.report-container {
+    text-align: center;
+    margin-top: 50px;
+  }
+  
+  h1 {
+    font-size: 24px;
+    color: #333;
+  }
+  
+  .button-group {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+  }
+  
+  .report-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .report-button:hover {
+    background-color: #45a049;
+  }
+  
+  .report-button:active {
+    background-color: #388e3c;
+  }
+  
+  .sales-options {
+    margin-top: 20px;
+  }
+  
+  .option-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .option-button {
+    padding: 10px 15px;
+    background-color: #2196F3; /* Blue color */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .option-button:hover {
+    background-color: #1976D2;
+  }
+  
+  .date-prompt {
+    margin-top: 20px;
+  }
+  
+  .date-input {
+    padding: 8px;
+    font-size: 16px;
+  }
+  
+  .submit-button {
+    margin-left: 10px;
+    padding: 10px 15px;
+    background-color: #FF5722; /* Orange color */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .submit-button:hover {
+    background-color: #E64A19;
+  }

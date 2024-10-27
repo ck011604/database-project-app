@@ -3,7 +3,7 @@ const pool = require("../pool")
 exports.index = (req, res) => { // Get list of all employees
     console.log("Recieved request to get employees");
     // Query database for all employees
-    pool.query("SELECT * FROM employees WHERE is_active = true", (error, results) => {
+    pool.query("SELECT * FROM employees", (error, results) => {
         if(error) {
             res.writeHead(500,{"Content-Type": "application/json"});
             res.end(
@@ -121,7 +121,7 @@ exports.employee_update_patch = (req, res) => { // Update employee details
         if (last_name) { query_string += "last_name = ?, "; params.push(last_name); }
         if (email) { query_string += "email = ?, "; params.push(email); }
         if (role) { query_string += "role = ?, "; params.push(role); }
-        if (is_active !== undefined) { query_string += "is_active = ? "; params.push(is_active); }
+        if (is_active !== undefined) { query_string += "is_active = ?, "; params.push(is_active); }
         // Remove trailing comma and spaces in array
         // Specify which employee
         query_string = query_string.replace(/, $/, ' WHERE employee_id = ?');

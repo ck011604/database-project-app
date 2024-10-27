@@ -4,6 +4,7 @@ import Ingredient from "./Ingredient";
 import Modal from "./Reusable/Modal";
 import AddMenuItemForm from "./EditForms/AddMenuItemForm";
 import InventoryManagement from "./InventoryManagement";
+import EmployeeManagement from "./EmployeeManagement";
 import { BsFillTrashFill, BsFillPencilFill } from "react-icons/bs";
 import '../css/Management.css';  // We'll rename this CSS file too
 
@@ -19,6 +20,7 @@ const Management = () => {
                 id: item.id,
                 name: item.name,
                 price: item.price,
+                image: item.image,
                 type: {
                     value: item.type,
                     label: item.type
@@ -51,7 +53,8 @@ const Management = () => {
                     ingredients: item.ingredients,
                     type: item.type,
                     price: item.price,
-                    isActive: item.is_active
+                    isActive: item.is_active,
+                    image: item.image
                 })
             }
             setItems(new_items);
@@ -98,7 +101,7 @@ const Management = () => {
             <div className="management-navbar">
                 <button onClick={() => setProductFilter("MENU_ITEMS")}>Menu Items</button>
                 <button onClick={() => setProductFilter("INVENTORY")}>Inventory</button>
-                <button onClick={() => setProductFilter("REWARDS")}>Rewards</button>
+                <button onClick={() => setProductFilter("EMPLOYEES")}>Employees</button>
                 <button onClick={() => setProductFilter("EVENTS")}>Events</button>
             </div>
             
@@ -136,7 +139,7 @@ const Management = () => {
                                             </span>
                                             {item.isActive ? 
                                                 <span className='item-actions'>
-                                                    <BsFillPencilFill onClick={() => toggleModal(item)}/>
+                                                    <BsFillPencilFill onClick={() => toggleModal(item)}/>                       
                                                     <BsFillTrashFill className='delete-btn' onClick={() => handleDelete(item.id)}/>
                                                 </span> :
                                                 <button className="reactivate-btn" onClick={() => handleReactivate(item.id)}> Reactivate </button>
@@ -150,14 +153,12 @@ const Management = () => {
                 </div>
             )}
             {productFilter === "INVENTORY" && <InventoryManagement />}
-            {productFilter === "REWARDS" && (
-                <div>Rewards Content Coming Soon</div>
-            )}
+            {productFilter === "EMPLOYEES" && <EmployeeManagement/> }
             {productFilter === "EVENTS" && (
                 <div>Events Content Coming Soon</div>
             )}
         </div>
     );
 }
- 
+
 export default Management;
