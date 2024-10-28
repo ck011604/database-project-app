@@ -42,21 +42,23 @@ module.exports = {
         const { reportType, startDate, endDate } = parsedUrl.query;
         let query = '';
         let params = [];
-        if (reportType === 'Daily') {
-            query = `
-            SELECT sales_date, total_sales, total_cash, total_discounts
-            FROM restaurant_sales
-            WHERE sales_date = ${startDate};
-            `;
-            params = [startDate];
-        } else if (reportType === 'Monthly' || reportType === 'Yearly') {
+        if (reportType === "Daily") {
             query = `
             SELECT sales_date, total_sales, total_cash, total_taxes, total_discounts
             FROM restaurant_sales
-            WHERE sales_date BETWEEN ${startDate} AND ${endDate};
+            WHERE sales_date = '${startDate}';
+            `;
+            params = [startDate];
+
+        } else if (reportType === "Monthly" || reportType === "Yearly") {
+            query = `
+            SELECT sales_date, total_sales, total_cash, total_taxes, total_discounts
+            FROM restaurant_sales
+            WHERE sales_date BETWEEN '${startDate}' AND '${endDate}';
             `;
             params = [startDate, endDate];
         } else {
+            res.writeHead(400, { "Content-Type": "application/json" });
             return res.end(JSON.stringify({
                 success: false,
                 message: "Error in executing the sales report query, please check the dates selected and try again."
@@ -75,19 +77,23 @@ module.exports = {
         `;
         
         try {
-            const [rows] = pool.query(query, params);
-            pool.query(bestEmployees);
-            console.log("Query executed successfully!")
+            const [salesData] = pool.query(query, params);
+            const [topEmployees] = pool.query(bestEmployees);
+            console.log("Query executed");
+
+            res.writeHead(200, { "Content-Type": "application/json" });
             res.end(JSON.stringify({
                 success: true,
-                salesData: rows,
+                salesData: salesData,
+                topEmployees: topEmployees,
                 message: "SUCCESS."
             }));
         } catch (error) {
             console.log("Error fetching report");
+            res.writeHead(500, { "Content-Type": "application/json" });
             res.end(JSON.stringify({
                 success: false,
-                message: "Failed to fetch the report."
+                message: `Failed to fetch the report.`
             }));
         }
     }

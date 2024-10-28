@@ -8,6 +8,7 @@ const [selectedOption, setSelectedOption] = useState('');
 const [startDate, setStartDate] = useState('');
 const [endDate, setEndDate] = useState('');
 const [salesData, setSalesData] = useState(null);
+const [topEmployees, setTopEmployees] = useState(null);
 const [batchMessage, setBatchMessage] = useState('');
 
 const handleOptionClick = (option) => {
@@ -39,14 +40,21 @@ const submitReport = async () => {
     const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/sales-report`, {
       params: {
         reportType: selectedOption,
-        startDate: startDate,
-        endDate: endDate
+        startDate,
+        endDate
       }
     });
 
-    setSalesData(response.data.salesData);
+    if (response.data.success) {
+      setSalesData(response.data.salesData);
+      setTopEmployees(response.data.topEmployees);
+    } else {
+      console.error(response.data.message);
+      alert(response.data.message);
+    }
   } catch (error) {
     console.error("Error generating report", error);
+    alert("There was an error generating the report.");
   }
 };
 
@@ -60,7 +68,7 @@ return (
     </div>
     {batchMessage && (
       <p className="batch-message">{batchMessage}</p>
-    )}
+    )} 
     {showSalesOptions && (
       <div className="sales-options">
           <h3>please select a type of report:</h3>
@@ -94,8 +102,8 @@ return (
           </div>
     )}
     {salesData && (
-      <div>
-        <h2> {selectedOption} Sales Report starting {startDate} and ending {endDate} </h2>
+      <div className="sales-data">
+        <h2 className="section-heading"> {selectedOption} Sales Report starting {startDate} and ending {endDate} </h2>
         <table>
           <thead>
             <tr>
@@ -117,6 +125,33 @@ return (
             </tr>
           ))}
          </tbody>
+        </table>
+      </div>
+    )}
+    {topEmployees && (
+      <div className="employee-data">
+        <h2 className="section-heading">Employees Performance:</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Employee ID</th>
+              <th>Last Name</th>
+              <th>First Name</th>
+              <th>Role</th>
+              <th>Total Sales</th>
+            </tr>
+          </thead>
+          <tbody>
+            {topEmployees.map((employee, index) => (
+              <tr key={index}>
+                <td>{employee.employee_id}</td>
+                <td>{employee.last_name}</td>
+                <td>{employee.first_name}</td>
+                <td>{employee.role}</td>
+                <td>{employee.total_sales}</td>
+              </tr>
+            ))}
+          </tbody>
         </table>
       </div>
     )}

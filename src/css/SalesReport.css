@@ -78,3 +78,45 @@
   .submit-button:hover {
     background-color: #E64A19;
   }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+.section-heading {
+  font-size: 1.5em;
+  margin: 20px 0 10px;
+  color: #333;
+}
+
+.sales-data, .employee-data {
+  margin-top: 20px;
+}
+
+.report-container table {
+  width: 100%;
+  overflow-x: auto;
+  display: block;
+}
+
+.batch-message, .error-message, .loading-message {
+  margin-top: 10px;
+  color: #3db818; /* or a success color like green if it’s a success message */
+  font-weight: bold;
+}
