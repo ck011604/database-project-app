@@ -85,51 +85,52 @@ const EmployeeManagement = () => {
     }
 
     return(
-        <div className="employee_management">
+        <div className="add-menu-item">
             <Modal modal={modal} setModal={setModal}>
                 <AddEmployeeForm setModal={setModal} employee={employee} callback={fetchAllEmployees}/>
             </Modal>
-            <div className="add-employee">
-                <h2 style={{display: "inline"}} >List of Employees</h2>
-                <button onClick={() => toggleModal()} className="btn-modal"> + </button>
+            <div className="add-employee" style={{"padding-bottom": "5px"}}>
+                <h2 style={{display: "inline"}} >Employee Management</h2>
             </div>
-            <table className="management-table">
-                <thead> 
-                    <tr className="item-info">
-                        <th>ID</th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Is Active</th>
-                    </tr>
-                </thead>
-                    <tbody id="items-table">
-                        {employees.map((employee) => (
-                            <tr key={employee.id}>
-                                <td>{employee.id}</td>
-                                <td>{employee.first_name}</td>
-                                <td>{employee.last_name}</td>
-                                <td>{employee.email}</td>
-                                <td>{employee.role}</td>
-                                <td>
-                                    <div>
-                                        <span className={`status-label ${employee.isActive ? 'status-label-active' : 'status-label-inactive'}`}>
-                                            {employee.isActive ? "Active" : "Inactive"}
-                                        </span>
-                                        {employee.isActive ? 
-                                            <span className='item-actions'>
-                                                <BsFillPencilFill onClick={() => toggleModal(employee)}/>                       
-                                                <BsFillTrashFill className='delete-btn' onClick={() => handleDelete(employee.id)}/>
-                                            </span> :
-                                            <button className="reactivate-btn" onClick={() => handleReactivate(employee.id)}> Reactivate </button>
-                                        }
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-            </table>
+            <div className="inventory-form-container">
+                <table className="management-table">
+                    <thead> 
+                        <tr className="item-info">
+                            <th>ID</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Is Active</th>
+                        </tr>
+                    </thead>
+                        <tbody id="items-table">
+                            {employees.map((employee) => (
+                                <tr key={employee.id}>
+                                    <td>{employee.id}</td>
+                                    <td>{employee.first_name}</td>
+                                    <td>{employee.last_name}</td>
+                                    <td>{employee.email}</td>
+                                    <td>{employee.role}</td>
+                                    <td>
+                                        <div>
+                                            <span className={`status-label ${employee.isActive ? 'status-label-active' : 'status-label-inactive'}`}>
+                                                {employee.isActive ? "Active" : "Inactive"}
+                                            </span>
+                                            {employee.isActive ? 
+                                                <span className='item-actions'>
+                                                    <BsFillPencilFill onClick={() => toggleModal(employee)}/>                       
+                                                    <BsFillTrashFill className='delete-btn' onClick={() => handleDelete(employee.id)}/>
+                                                </span> :
+                                                <button className="reactivate-btn" onClick={() => handleReactivate(employee.id)}> Reactivate </button>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                </table>
+            </div>
         </div>
     );
 
