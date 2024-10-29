@@ -54,7 +54,7 @@ function App() {
 
           <Route
             path="/sales-report"
-            element={ <ProtectedRoute element={<SalesReport />} allowedRoles={['Manager']} /> }
+            element={ <ProtectedRoute element={<SalesReport />} allowedRoles={['Manager', 'Accountant']} /> }
           />
           <Route path="*" element={<Navigate to="/404-Page-Not-Found" />} />
         </Routes>

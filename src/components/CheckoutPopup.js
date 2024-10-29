@@ -321,6 +321,19 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
             />
           </div>
           <div className="checkout-label">
+            <label>Customer Account: </label>
+            <input
+              type="text"
+              value={customerEmail}
+              onChange={(e) => setCustomerEmail(e.target.value)}
+              placeholder="example@domain.com"
+              disabled={formLock || customerEmailLock}
+            />
+            <button className="customer-email-apply-button" type="button" onClick={handleCustomerEmail} disabled={formLock || customerEmailLock}>
+              {customerEmailLock == true ? "Applied" : "Apply"}
+            </button>
+          </div>
+          <div className="checkout-label">
             <label>Member of Military: </label>
             <input
               type="radio"
@@ -381,19 +394,6 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
               rows={3}
               disabled={formLock}
             />
-          </div>
-          <div className="checkout-label">
-            <label>Customer Account: </label>
-            <input
-              type="text"
-              value={customerEmail}
-              onChange={(e) => setCustomerEmail(e.target.value)}
-              placeholder="example@domain.com"
-              disabled={formLock || customerEmailLock}
-            />
-            <button className="customer-email-apply-button" type="button" onClick={handleCustomerEmail} disabled={formLock || customerEmailLock}>
-              {customerEmailLock == true ? "Applied" : "Apply"}
-            </button>
           </div>
           {error && <p className="confirm-order-error">{error}</p>}
           {itemsWithConIng.length > 0 && (
