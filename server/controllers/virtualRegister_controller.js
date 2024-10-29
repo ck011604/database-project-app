@@ -124,6 +124,36 @@ exports.confirm_order = (req, res) => {
             }
           );
         }
+        if (customerID != null && discountType == "LoyaltyPoints") { // If the discount type is loyalty points (discountNextVisit)
+          connection.query("SELECT user_id, counter FROM discount_next_visit WHERE user_id = ?",
+            [customerID],
+            (err, results) => { // If there is no customer or some error, rollback the changes
+              if (err || results.length == 0) {
+                return connection.rollback(() => {
+                  connection.release();
+                  console.error(`Error fetching or there is no user: ${customerID} in discount_next_visit`)
+                  res.writeHead(500, { "Content-Type": "application/json" });
+                  res.end(JSON.stringify({ success: false, message: "Server Error: Unable to fetch user in discount_next_visit table." }));
+                })
+              }
+              else {
+                connection.query("DELETE FROM discount_next_visit WHERE user_id = ?",
+                  [results[0].user_id],
+                  (err) => {
+                    if (err) {
+                      return connection.rollback(() => {
+                        connection.release();
+                        console.error('Error deleting user from discount_next_visit table');
+                        res.writeHead(500, { "Content-Type": "application/json" });
+                        res.end(JSON.stringify({ success: false, message: "Server Error: Unable to delete from discount_next_visit table" }));
+                      });
+                    }
+                  }
+                )
+              }
+            }
+          )
+        }
         // If there was or wasn't a promocode used, continue
         connection.query(
           `INSERT INTO orders 

@@ -61,21 +61,6 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
       setHighestDiscountPercent(0);
     const afterDiscount = numericSubtotal - bestDiscount[1];
 
-    // let calculatedDiscount = 0
-    // if (isMilitary === "yes" && promoCodePercent < 10) {
-    //   setHighestDiscountPercent(10);
-    //   calculatedDiscount = numericSubtotal * 0.10;
-    //   setDiscountAmount(calculatedDiscount.toFixed(2));
-    // }
-    // else if (promoCodePercent > 0) {
-    //   setHighestDiscountPercent(promoCodePercent);
-    //   calculatedDiscount = numericSubtotal * (promoCodePercent/100);
-    //   setDiscountAmount(calculatedDiscount.toFixed(2));
-    // }
-    // else
-    //   setDiscountAmount(0.00);
-    // const afterDiscount = numericSubtotal - calculatedDiscount;
-
     const taxRate = 0.0825; // 8.25% tax rate
     const calculatedTax = afterDiscount * taxRate;
     setTax(calculatedTax.toFixed(2));
@@ -169,31 +154,6 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
         setError("Invalid table number")
         return;
       }
-      // // Check if the customer email is valid
-      // let customerIDFromAPI; // Need because customerID is asynchronous meaning it is not updated immediately
-      // if (customerEmail.length > 0) { // Customer email is optional. Only do check if something was provided
-      //   try {
-      //     const userResponse = await axios.get(
-      //       `http://${process.env.REACT_APP_API_URL}/valid-customer-email?email=${customerEmail}`
-      //     );
-      //     if (userResponse.data.success === false) {
-      //       setError("Invalid customer email");
-      //       return;
-      //     }
-      //     else {
-      //       customerIDFromAPI = userResponse.data.user_id;
-      //       setCustomerID(customerIDFromAPI);
-      //     }
-      //   } catch (err) {
-      //     if (err.response && err.response.data && err.response.data.message)
-      //       setError(err.response.data.message);
-      //     else
-      //       setError(
-      //         `An error has occured checking the validity of the customer email: ${customerEmail}`
-      //       );
-      //     return;
-      //   }
-      // }
 
       let requiredIngredients = []; // List of all the ingredients and the amount required for the order
       selectedItems.forEach((item) => {
@@ -284,7 +244,6 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
             selectedItems: itemsJSON,
             waiterID,
             tableNumber,
-            // customerID: customerIDFromAPI,
             customerID,
             subtotal,
             tax,
@@ -297,7 +256,6 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
             promoCode_id: promoCodeID,
             discountType,
             discountAmount,
-            // isMilitary,
             discountPercentage: highestDiscountPercent
           }
         );
