@@ -1,0 +1,23 @@
+# .env file for localhost
+
+JWT_SECRET=J8D$3!h$uY4q%v9W&zE1m^X2sT@7fB6a
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=restaurantdb
+DB_USER=root
+DB_PASSWORD=P@sswordDB123
+REACT_APP_API_URL=http://localhost:3001
+PATH_TO_CERT=/etc/letsencrypt/live/nodebackend.westus2.cloudapp.azure.com/fullchain.pem
+PATH_TO_KEY=/etc/letsencrypt/live/nodebackend.westus2.cloudapp.azure.com/privkey.pem
+
+# Remember to change back (or just don't push the changes)
+
+JWT_SECRET=J8D$3!h$uY4q%v9W&zE1m^X2sT@7fB6a
+DB_HOST=restaurantpos.mysql.database.azure.com
+DB_PORT=3306
+DB_NAME=restaurantdb
+DB_USER=mysql
+DB_PASSWORD=P@sswordDB123
+REACT_APP_API_URL=https://nodebackend.westus2.cloudapp.azure.com
+PATH_TO_CERT=/etc/letsencrypt/live/nodebackend.westus2.cloudapp.azure.com/fullchain.pem
+PATH_TO_KEY=/etc/letsencrypt/live/nodebackend.westus2.cloudapp.azure.com/privkey.pem

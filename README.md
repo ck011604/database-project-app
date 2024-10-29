@@ -1,12 +1,18 @@
+Deployed via Microsoft Azure: https://polite-sand-0f80b0a10.5.azurestaticapps.net/
+
 # How to run project
 
 ## Download dependencies
+
+## Run locally (localhost)
+
+Copy the environment variables in localHost.txt and replace the variables in the .env file. Remember to replace the .env file back to its original before pushing (can also be found in localHost.txt) or simply don't push the .env changes.
 
 ### `npm install`
 
 node_modules never gets put into the repository because of the large size. By running this command, it downloads all of the packages needed. Do this everytime. Usually it will say there are high issues or something like that. Ignore them and whatever you do don't npm audit them or they will cause more issues.
 
-## Turn local server on
+## Turn local database server on
 
 If you chose to not have it start up with windows, run cmd as administrator and type:
 
@@ -18,11 +24,11 @@ Assuming you downloaded the same mysql version. To stop the server you do the fo
 
 ## Import sql file
 
- If you are using the "MySQL" Extension by Weijan Chen, right click the database, click import sql, and select the file. (Should be in the root folder of the repo)
+ If you are using the "MySQL" Extension by Weijan Chen, right click the database, click import sql, and select the file. (Should be in the root folder of the repo). Before importing you should drop the entire database, recreate it, and then import the .sql file to keep the latest version intact.
 
 ## Start server
 
-Navigate to the server.js file `cd src/server` then the js file.
+Navigate to the server.js file `cd server` then the js file.
 
 ### `node server.js`
 
