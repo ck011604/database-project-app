@@ -107,49 +107,51 @@ const Management = () => {
             
             {productFilter === "MENU_ITEMS" && (
                 <div>
-                    <div className="add-menu-item">
-                        <h2 style={{display: "inline"}} >List of Menu Items</h2>
+                    <div className="add-menu-item" style={{"padding-bottom": "5px"}}>
+                        <h2 style={{display: "inline"}} >Menu Management</h2>
                         <button onClick={() => toggleModal()} className="btn-modal"> + </button>
                     </div> 
-                    <table className="management-table">
-                        <thead> 
-                            <tr className="item-info">
-                                <th>Item Number</th>
-                                <th>Name</th>
-                                <th>Ingredients</th>
-                                <th>Type</th>
-                                <th>Price</th>
-                                <th>Is Active</th>
-                            </tr>
-                        </thead>
-                        <tbody id="items-table">
-                            {items.map((item) => (
-                                <tr key={item.id}>
-                                    <td>{item.id}</td>
-                                    <td>{item.name}</td>
-                                    <td>{item.ingredients.map((ingredient) => (
-                                        <Ingredient key={ingredient.ingredient_id} ingredient_id={ingredient.ingredient_id} />
-                                    ))}</td>
-                                    <td>{item.type}</td>
-                                    <td>{item.price}</td>
-                                    <td>
-                                        <div>
-                                            <span className={`status-label ${item.isActive ? 'status-label-active' : 'status-label-inactive'}`}>
-                                                {item.isActive ? "Active" : "Disabled"}
-                                            </span>
-                                            {item.isActive ? 
-                                                <span className='item-actions'>
-                                                    <BsFillPencilFill onClick={() => toggleModal(item)}/>                       
-                                                    <BsFillTrashFill className='delete-btn' onClick={() => handleDelete(item.id)}/>
-                                                </span> :
-                                                <button className="reactivate-btn" onClick={() => handleReactivate(item.id)}> Reactivate </button>
-                                            }
-                                        </div>
-                                    </td>
+                    <div className="inventory-form-container">
+                        <table className="management-table">
+                            <thead> 
+                                <tr className="item-info">
+                                    <th>Item Number</th>
+                                    <th>Name</th>
+                                    <th>Ingredients</th>
+                                    <th>Type</th>
+                                    <th>Price</th>
+                                    <th>Is Active</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody id="items-table">
+                                {items.map((item) => (
+                                    <tr key={item.id}>
+                                        <td>{item.id}</td>
+                                        <td>{item.name}</td>
+                                        <td>{item.ingredients.map((ingredient) => (
+                                            <Ingredient key={ingredient.ingredient_id} ingredient_id={ingredient.ingredient_id} />
+                                        ))}</td>
+                                        <td>{item.type}</td>
+                                        <td>{item.price}</td>
+                                        <td>
+                                            <div>
+                                                <span className={`status-label ${item.isActive ? 'status-label-active' : 'status-label-inactive'}`}>
+                                                    {item.isActive ? "Active" : "Disabled"}
+                                                </span>
+                                                {item.isActive ? 
+                                                    <span className='item-actions'>
+                                                        <BsFillPencilFill onClick={() => toggleModal(item)}/>                       
+                                                        <BsFillTrashFill className='delete-btn' onClick={() => handleDelete(item.id)}/>
+                                                    </span> :
+                                                    <button className="reactivate-btn" onClick={() => handleReactivate(item.id)}> Reactivate </button>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             )}
             {productFilter === "INVENTORY" && <InventoryManagement />}
