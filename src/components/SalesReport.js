@@ -39,7 +39,6 @@ const submitReport = async () => {
   try {
     const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/sales-report`, {
       params: {
-        reportType: selectedOption,
         startDate,
         endDate
       }
@@ -56,6 +55,10 @@ const submitReport = async () => {
     console.error("Error generating report", error);
     alert("There was an error generating the report.");
   }
+};
+
+const formatDate = (dateString) => {
+  return new Date(dateString).toISOString().split('T')[0];
 };
 
 return (
@@ -109,19 +112,19 @@ return (
             <tr>
               <th>Date</th>
               <th>Total Sales</th>
-              <th>Total Discounts</th>
-              <th>Total Taxes</th>
               <th>Total Cash</th>
+              <th>Total Taxes</th>
+              <th>Total Discounts</th>
             </tr>
           </thead>
         <tbody>
           {salesData.map((row, index) => (
             <tr key={index}>
-              <td>{row.sales_date}</td>
+              <td>{formatDate(row.sales_date)}</td>
               <td>{row.total_sales}</td>
-              <td>{row.total_discounts}</td>
-              <td>{row.total_taxes}</td>
               <td>{row.total_cash}</td>
+              <td>{row.total_taxes}</td>
+              <td>{row.total_discounts}</td>
             </tr>
           ))}
          </tbody>
