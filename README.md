@@ -2,11 +2,11 @@ Deployed via Microsoft Azure: https://polite-sand-0f80b0a10.5.azurestaticapps.ne
 
 # How to run project
 
-## Download dependencies
-
 ## Run locally (localhost)
 
 Copy the environment variables in localHost.txt and replace the variables in the .env file. Remember to replace the .env file back to its original before pushing (can also be found in localHost.txt) or simply don't push the .env changes.
+
+## Download dependencies
 
 ### `npm install`
 
