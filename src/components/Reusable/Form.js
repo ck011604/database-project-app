@@ -15,7 +15,7 @@ function Form({ template, onSubmit, watchFields, validate, preloadedValues }) {
         const formData = new FormData()
         formData.append("image", file)
 
-        await fetch("http://localhost:3001/api/menu_image", {
+        await fetch(`${process.env.REACT_APP_API_URL}/api/menu_image`, {
             method: "POST",
             body: formData
         })
@@ -57,6 +57,14 @@ function Form({ template, onSubmit, watchFields, validate, preloadedValues }) {
                         <div key={name}>
                             <label htmlFor={name} style={{ marginTop: '10px' }}>{title}</label>
                             <input type='number' name={name} id={name} {...register(name, validationProps)}></input>
+                            { errors[name] && <span className='red-text'>{errors[name]['message']}</span>}
+                        </div>
+                    )
+                case 'email':
+                    return(
+                        <div key={name}>
+                            <label htmlFor={name} style={{ marginTop: '10px' }}>{title}</label>
+                            <input type='email' name={name} id={name} {...register(name, validationProps)}></input>
                             { errors[name] && <span className='red-text'>{errors[name]['message']}</span>}
                         </div>
                     )

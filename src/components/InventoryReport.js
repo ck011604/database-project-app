@@ -23,7 +23,7 @@ const InventoryReport = () => {
     const fetchLogs = async (dates) => {
       try {
           const params = new URLSearchParams(dates).toString();
-          const response = await axios.get(`http://localhost:3001/api/inventory-report/logs?${params}`);
+          const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/inventory-report/logs?${params}`);
           if (response.data && response.data.success) {
               setLogs(response.data.logs);
           } else {
@@ -38,7 +38,7 @@ const InventoryReport = () => {
   const fetchStats = async (dates) => {
     try {
         const params = new URLSearchParams(dates).toString();
-        const response = await axios.get(`http://localhost:3001/api/inventory-report/stats?${params}`);  // Updated endpoint
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/inventory-report/stats?${params}`);  // Updated endpoint
         if (response.data.success) {
             setStats(response.data.stats);
         }

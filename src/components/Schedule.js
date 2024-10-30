@@ -12,11 +12,11 @@ const Schedule = () => {
     useEffect(() => {
         const fetchAllShifts = async ()=>{
             try {
-                let res = await axios.get("http://localhost:3001/api/shifts")
+                let res = await axios.get(`${process.env.REACT_APP_API_URL}/api/shifts`)
                 let shifts = res.data.shifts;
                 let new_shifts = []
                 for(let shift of shifts){
-                    res = await axios.get(`http://localhost:3001/api/employees/${shift.employee_id}`)
+                    res = await axios.get(`${process.env.REACT_APP_API_URL}/api/employees/${shift.employee_id}`)
                     let name = `${res.data.employee.first_name} ${res.data.employee.last_name}`
 
                     new_shifts.push({

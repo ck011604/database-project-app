@@ -1,6 +1,7 @@
-require('dotenv').config({ path: '../../.env' });
+const env_dir = __dirname + `/../.env`
+require('dotenv').config({ path: env_dir });
 const http = require('http');
-const url = require('url');
+const https = require('https');
 const accountController = require('./controllers/account_controller');
 const virtualRegisterController = require('./controllers/virtualRegister_controller');
 const promotionalCodeController = require('./controllers/promotional_code_controller');
@@ -9,12 +10,17 @@ const shift_controller = require("./controllers/shift_controller")
 const inventory_controller = require("./controllers/inventory_controller");
 const menu_management_controller = require("./controllers/menu_management_controller")
 const request_schedule_controller = require("./controllers/request_schedule_controller")
-const inventory_report_controller = require("./controllers/inventory_report_controller"); 
+const inventory_report_controller = require("./controllers/inventory_report_controller");
+const sales_report_controller = require('./controllers/sales_report_controller');
 const pool = require("./pool") // put const pool = require("../pool") into controller files
+const fs = require("fs")
+const https_mode = fs.existsSync(process.env.PATH_TO_CERT) && fs.existsSync(process.env.PATH_TO_KEY)
+const port = https_mode ? 443 : 3001
 
-const server = http.createServer((req, res) => {
+const serverBlock = (req, res) => {
     // Set CORS headers
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Methods', 'POST, GET, PATCH, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     if (req.method === 'OPTIONS') {
@@ -60,6 +66,9 @@ const server = http.createServer((req, res) => {
         }
         if (req.url === "/api/menu_image") {
             menu_management_controller.menu_image_upload(req, res);
+        }
+        if (req.url === "/api/batch-sales") {
+            sales_report_controller.runBatchSales(req, res);
         }
     }
     if(req.method === "GET") {
@@ -107,6 +116,9 @@ const server = http.createServer((req, res) => {
         if (req.url.startsWith("/api/menu_management/")) {
             menu_management_controller.menu_detail(req, res);
         }
+        if (req.url.startsWith("/api/sales-report")) {
+            sales_report_controller.getSalesReport(req, res);
+        }
     }
     if (req.method === "PATCH") {
         if (req.url.startsWith("/api/employees/")) {
@@ -139,10 +151,22 @@ const server = http.createServer((req, res) => {
             request_schedule_controller.request_schedule_delete(req, res);
         }
     }
-});
+}
 
-server.listen(3001, () => {
-    console.log('Server running on port 3001')
+let server;
+if(https_mode){
+    const options = {
+        cert: fs.readFileSync(process.env.PATH_TO_CERT),
+        key: fs.readFileSync(process.env.PATH_TO_KEY)
+    }
+    server = https.createServer(options, serverBlock);
+}
+else{
+    server = http.createServer(serverBlock);
+}
+
+server.listen(port, () => {
+    console.log(`Server running on port ${port}`)
 });
 
 // Remember to end the pool when your application terminates
