@@ -65,7 +65,6 @@ module.exports = {
         LIMIT 5;
         `;
         
-        Promise.all
         pool.query(query, params, (error, salesData) => {
             if (error) {
                 console.error('Error in report query:', error);
