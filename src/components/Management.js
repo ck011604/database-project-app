@@ -107,11 +107,11 @@ const Management = () => {
             
             {productFilter === "MENU_ITEMS" && (
                 <div>
-                    <div className="add-menu-item" style={{"padding-bottom": "5px"}}>
-                        <h2 style={{display: "inline"}} >Menu Management</h2>
-                        <button onClick={() => toggleModal()} className="btn-modal"> + </button>
-                    </div> 
                     <div className="inventory-form-container">
+                        <div className="add-menu-item" style={{"padding-bottom": "5px"}}>
+                            <h2 style={{display: "inline"}} >Menu Management</h2>
+                            <button onClick={() => toggleModal()} className="btn-modal"> + </button>
+                        </div> 
                         <table className="management-table">
                             <thead> 
                                 <tr className="item-info">

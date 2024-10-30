@@ -56,10 +56,7 @@ const serverBlock = (req, res) => {
             request_schedule_controller.request_schedule_create_post(req, res);
         }
         if (req.url === "/api/inventory") {
-            inventory_controller.index(req, res);
-        }
-        if (req.url.startsWith("/api/inventory/")) {
-            inventory_controller.inventory_detail(req, res);
+            inventory_controller.inventory_create_post(req, res);
         }
         if (req.url === "/api/inventory-logs") {
             inventory_controller.create_inventory_log(req, res);
@@ -135,6 +132,9 @@ const serverBlock = (req, res) => {
         }
         if (req.url.startsWith("/api/inventory/")) {
             inventory_controller.inventory_update_patch(req, res);
+        }
+        if (req.url.startsWith("/api/ingredient/")) {
+            inventory_controller.ingredient_update_patch(req, res);
         }
     }
     if (req.method === "DELETE") {
