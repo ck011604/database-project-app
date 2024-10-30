@@ -19,8 +19,8 @@ const AddEmployeeForm = ({setModal, employee, callback}) => {
             }
 
             let method = (employee === null) ? 'POST' : 'PATCH';
-            let endpoint = (employee === null) ? `http://localhost:3001/api/employees` :
-                `http://localhost:3001/api/employees/${employee.id}`;
+            let endpoint = (employee === null) ? `${process.env.REACT_APP_API_URL}/api/employees` :
+                `${process.env.REACT_APP_API_URL}/api/employees/${employee.id}`;
 
             let res = await fetch(endpoint, {
                 method: method,
@@ -41,7 +41,7 @@ const AddEmployeeForm = ({setModal, employee, callback}) => {
     useEffect(() => {
         const fetchAllEmployees = async ()=>{
             try{
-                let res = await axios.get("http://localhost:3001/api/employees")
+                let res = await axios.get(`${process.env.REACT_APP_API_URL}/api/employees`)
                 let roleOptions = res.data.employees;
                 let uniqueTypes = new Set();
                 let new_roles = [];

@@ -39,29 +39,20 @@ module.exports = {
     getSalesReport: async (req, res) => {
         console.log("Reached sales report query endpoint");
         const parsedUrl = url.parse(req.url, true);
-        const { reportType, startDate, endDate } = parsedUrl.query;
-        let query = '';
+        const { startDate, endDate } = parsedUrl.query;
+        console.log(startDate, endDate);
         let params = [];
-        if (reportType === 'Daily') {
-            query = `
-            SELECT sales_date, total_sales, total_cash, total_discounts
-            FROM restaurant_sales
-            WHERE sales_date = ${startDate};
-            `;
-            params = [startDate];
-        } else if (reportType === 'Monthly' || reportType === 'Yearly') {
-            query = `
-            SELECT sales_date, total_sales, total_cash, total_taxes, total_discounts
-            FROM restaurant_sales
-            WHERE sales_date BETWEEN ${startDate} AND ${endDate};
-            `;
+        if (startDate && endDate) {
+            whereClause = 'WHERE sales_date BETWEEN ? AND ?';
             params = [startDate, endDate];
-        } else {
-            return res.end(JSON.stringify({
-                success: false,
-                message: "Error in executing the sales report query, please check the dates selected and try again."
-            }));
         }
+
+        const query = `
+        SELECT DATE(sales_date) AS sales_date, total_sales, total_cash, total_taxes, total_discounts
+        FROM restaurant_sales
+        ${whereClause};
+        `;
+        
         const bestEmployees = `
         SELECT employee_id, last_name, first_name, role, (SELECT SUM(total)
                                                           FROM orders
@@ -71,24 +62,43 @@ module.exports = {
         FROM orders
         WHERE waiter_id = e.employee_id) IS NOT NULL
         ORDER BY total_sales DESC
-        LIMIT 3;
+        LIMIT 5;
         `;
         
-        try {
-            const [rows] = pool.query(query, params);
-            pool.query(bestEmployees);
-            console.log("Query executed successfully!")
-            res.end(JSON.stringify({
-                success: true,
-                salesData: rows,
-                message: "SUCCESS."
+        pool.query(query, params, (error, salesData) => {
+            if (error) {
+                console.error('Error in report query:', error);
+                res.writeHead(500, { "Content-Type": "application/json" });
+                res.end(JSON.stringify({ 
+                    success: false, 
+                    message: "Server Error fetching sales report data"
+                }));
+                return;
+            }
+    
+            res.writeHead(200, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ 
+                success: true, 
+                salesData: salesData || []
             }));
-        } catch (error) {
-            console.log("Error fetching report");
-            res.end(JSON.stringify({
-                success: false,
-                message: "Failed to fetch the report."
+        });
+        pool.query(bestEmployees, (error, topEmployees) => {
+            if (error) {
+                console.error('Error in logs query:', error);
+                res.writeHead(500, { "Content-Type": "application/json" });
+                res.end(JSON.stringify({ 
+                    success: false, 
+                    message: "Server Error getting the top 5 employees"
+                }));
+                return;
+            }
+    
+            res.end(JSON.stringify({ 
+                success: true, 
+                topEmployees: topEmployees || []
+                
             }));
-        }
+        });
+        console.log("Query executed");
     }
 };

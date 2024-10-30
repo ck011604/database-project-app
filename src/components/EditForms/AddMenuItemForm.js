@@ -31,8 +31,8 @@ const AddMenuItemForm = ({setModal, item, callback}) => {
             }
 
             let method = (item === null) ? 'POST' : 'PATCH';
-            let endpoint = (item === null) ? `http://localhost:3001/api/menu_management` :
-                `http://localhost:3001/api/menu_management/${item.id}`;
+            let endpoint = (item === null) ? `${process.env.REACT_APP_API_URL}/api/menu_management` :
+                `${process.env.REACT_APP_API_URL}/api/menu_management/${item.id}`;
 
             let res = await fetch(endpoint, {
                 method: method,
@@ -53,7 +53,7 @@ const AddMenuItemForm = ({setModal, item, callback}) => {
     useEffect(() => {
         const fetchIngredients = async () => {
             try {
-                let res = await axios.get("http://localhost:3001/api/inventory")
+                let res = await axios.get(`${process.env.REACT_APP_API_URL}/api/inventory`)
                 let ingredientsOptions = res.data.inventory;
                 let new_ingredients = []
                 for (let ingredient of ingredientsOptions) {
@@ -73,7 +73,7 @@ const AddMenuItemForm = ({setModal, item, callback}) => {
     useEffect(() => {
         const fetchAllItems = async ()=>{
             try{
-                let res = await axios.get("http://localhost:3001/api/menu_management")
+                let res = await axios.get(`${process.env.REACT_APP_API_URL}/api/menu_management`)
                 let typeOptions = res.data.menu;
                 let uniqueTypes = new Set();
                 let new_items = [];

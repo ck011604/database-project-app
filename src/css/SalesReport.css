@@ -1,80 +1,127 @@
 .report-container {
-    text-align: center;
-    margin-top: 50px;
-  }
+  text-align: center;
+  margin-top: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
   
-  h1 {
+.report-container h1 {
     font-size: 24px;
     color: #333;
-  }
+}
   
-  .button-group {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-  }
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
   
-  .report-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
+.report-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
   
-  .report-button:hover {
-    background-color: #45a049;
-  }
+.report-button:hover {
+  background-color: #45a049;
+}
   
-  .report-button:active {
-    background-color: #388e3c;
-  }
+.report-button:active {
+  background-color: #388e3c;
+}
   
-  .sales-options {
-    margin-top: 20px;
-  }
+.sales-options {
+  margin-top: 20px;
+}
   
-  .option-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-  }
+.option-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
   
-  .option-button {
-    padding: 10px 15px;
-    background-color: #2196F3; /* Blue color */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
+.option-button {
+  padding: 10px 15px;
+  background-color: #2196F3; /* Blue color */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
   
-  .option-button:hover {
-    background-color: #1976D2;
-  }
+.option-button:hover {
+  background-color: #1976D2;
+}
   
-  .date-prompt {
-    margin-top: 20px;
-  }
+.date-prompt {
+  margin-top: 20px;
+}
   
-  .date-input {
-    padding: 8px;
-    font-size: 16px;
-  }
+.date-input {
+  padding: 8px;
+  font-size: 16px;
+}
   
-  .submit-button {
-    margin-left: 10px;
-    padding: 10px 15px;
-    background-color: #FF5722; /* Orange color */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
+.submit-button {
+  margin-left: 10px;
+  padding: 10px 15px;
+  background-color: #FF5722; /* Orange color */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
   
-  .submit-button:hover {
-    background-color: #E64A19;
-  }
+.submit-button:hover {
+  background-color: #E64A19;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+tr:hover {
+  background-color: #f1f1f1;
+}
+
+.section-heading {
+  font-size: 1.5em;
+  margin: 20px 0 10px;
+  color: #333;
+}
+
+.sales-data, .employee-data {
+  margin-top: 20px auto;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.report-container table {
+  width: 100%;
+  overflow-x: auto;
+  display: block;
+}
+
+.batch-message, .error-message, .loading-message {
+  margin-top: 10px;
+  color: #3db818; 
+}

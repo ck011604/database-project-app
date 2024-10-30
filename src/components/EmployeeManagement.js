@@ -13,7 +13,7 @@ const EmployeeManagement = () => {
 
     const fetchAllEmployees = async () => {
         try{
-            let res = await axios.get("http://localhost:3001/api/employees")
+            let res = await axios.get(`${process.env.REACT_APP_API_URL}/api/employees`)
             let employees = res.data.employees;
             let new_employees = []
             for(let employee of employees){
@@ -62,7 +62,7 @@ const EmployeeManagement = () => {
 
     const handleDelete = async(id) => {
         try {
-            await axios.delete(`http://localhost:3001/api/employees/${id}`);
+            await axios.delete(`${process.env.REACT_APP_API_URL}/api/employees/${id}`);
             fetchAllEmployees();
         } catch (err) {
             console.error(`Error deleting item: ${err}`);
@@ -71,7 +71,7 @@ const EmployeeManagement = () => {
 
     const handleReactivate = async(id) => {
         try {
-            await fetch(`http://localhost:3001/api/employees/${id}`, {
+            await fetch(`${process.env.REACT_APP_API_URL}/api/employees/${id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'
@@ -85,51 +85,52 @@ const EmployeeManagement = () => {
     }
 
     return(
-        <div className="employee_management">
+        <div className="add-menu-item">
             <Modal modal={modal} setModal={setModal}>
                 <AddEmployeeForm setModal={setModal} employee={employee} callback={fetchAllEmployees}/>
             </Modal>
-            <div className="add-employee">
-                <h2 style={{display: "inline"}} >List of Employees</h2>
-                <button onClick={() => toggleModal()} className="btn-modal"> + </button>
+            <div className="add-employee" style={{"padding-bottom": "5px"}}>
+                <h2 style={{display: "inline"}} >Employee Management</h2>
             </div>
-            <table className="management-table">
-                <thead> 
-                    <tr className="item-info">
-                        <th>ID</th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Is Active</th>
-                    </tr>
-                </thead>
-                    <tbody id="items-table">
-                        {employees.map((employee) => (
-                            <tr key={employee.id}>
-                                <td>{employee.id}</td>
-                                <td>{employee.first_name}</td>
-                                <td>{employee.last_name}</td>
-                                <td>{employee.email}</td>
-                                <td>{employee.role}</td>
-                                <td>
-                                    <div>
-                                        <span className={`status-label ${employee.isActive ? 'status-label-active' : 'status-label-inactive'}`}>
-                                            {employee.isActive ? "Active" : "Inactive"}
-                                        </span>
-                                        {employee.isActive ? 
-                                            <span className='item-actions'>
-                                                <BsFillPencilFill onClick={() => toggleModal(employee)}/>                       
-                                                <BsFillTrashFill className='delete-btn' onClick={() => handleDelete(employee.id)}/>
-                                            </span> :
-                                            <button className="reactivate-btn" onClick={() => handleReactivate(employee.id)}> Reactivate </button>
-                                        }
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-            </table>
+            <div className="inventory-form-container">
+                <table className="management-table">
+                    <thead> 
+                        <tr className="item-info">
+                            <th>ID</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Is Active</th>
+                        </tr>
+                    </thead>
+                        <tbody id="items-table">
+                            {employees.map((employee) => (
+                                <tr key={employee.id}>
+                                    <td>{employee.id}</td>
+                                    <td>{employee.first_name}</td>
+                                    <td>{employee.last_name}</td>
+                                    <td>{employee.email}</td>
+                                    <td>{employee.role}</td>
+                                    <td>
+                                        <div>
+                                            <span className={`status-label ${employee.isActive ? 'status-label-active' : 'status-label-inactive'}`}>
+                                                {employee.isActive ? "Active" : "Inactive"}
+                                            </span>
+                                            {employee.isActive ? 
+                                                <span className='item-actions'>
+                                                    <BsFillPencilFill onClick={() => toggleModal(employee)}/>                       
+                                                    <BsFillTrashFill className='delete-btn' onClick={() => handleDelete(employee.id)}/>
+                                                </span> :
+                                                <button className="reactivate-btn" onClick={() => handleReactivate(employee.id)}> Reactivate </button>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                </table>
+            </div>
         </div>
     );
 

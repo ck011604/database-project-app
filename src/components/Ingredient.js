@@ -6,7 +6,7 @@ const Ingredient = ({ ingredient_id }) => {
     useEffect(() => {
         const fetchIngredient = async ()=>{
             try{
-                let res = await axios.get(`http://localhost:3001/api/inventory/${ingredient_id}`)
+                let res = await axios.get(`${process.env.REACT_APP_API_URL}/api/inventory/${ingredient_id}`)
                 setIngredient(res.data.ingredient);
             } catch (err) {
                 console.log(`Error fetching Ingredient: ${err}`)
