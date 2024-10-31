@@ -12,7 +12,8 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
   const [changeAmount, setChangeAmount] = useState(0.00); // total - received amount
   const [error, setError] = useState("");
   const [confirmOrderButton, setConfirmOrderButton] = useState("Confrim Order");
-  const [waiterID, setWaiterID,] = useState(1); //For testing, needs to be passed along from login
+  //const [waiterID, setWaiterID,] = useState(1); //For testing, needs to be passed along from login
+  const [loginToken, setLoginToken] = useState("");
   const [customerID, setCustomerID] = useState(null);
   const [customerEmail, setCustomerEmail] = useState(""); // From the form
   const [customerEmailLock, setCustomerEmailLock] = useState(false);
@@ -236,6 +237,17 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
         );
         return;
       }
+      // const token = sessionStorage.getItem("token");
+      // let waiterID = ''
+      // if (token) {
+      //   try {
+      //     const decodedToken = jwtDecode(token);
+      //     waiterID =decodedToken.employee_id;
+      //   } catch (error) {
+      //     console.error("Failed to decode token", error);
+      //     setError("Unable to verify waiter ID")
+      //   }
+      // }
       // Passed checks, order can continue...
       const itemsJSON = JSON.stringify(selectedItems);
       setError("");
@@ -245,7 +257,8 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
           `${process.env.REACT_APP_API_URL}/confirm-order`,
           {
             selectedItems: itemsJSON,
-            waiterID,
+            //waiterID,
+            loginToken: sessionStorage.getItem("token"),
             tableNumber,
             customerID,
             subtotal,
