@@ -327,10 +327,11 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
             onClick={() => setDiscountMenuOpen((prev) => !prev)}
             type ="button"
           >
-            Discounts
+            Discount Options
+            <span className={`discount-menu-caret ${discountMenuOpen ? 'up' : 'down'}`}></span>
           </button>
           {discountMenuOpen && (
-            <div className={`discount-menu ${discountMenuOpen ? 'open' : ''}`}>
+            <div className={"discount-menu"}>
               <div className="checkout-label">
                 <label>Customer Account: </label>
                 <input
