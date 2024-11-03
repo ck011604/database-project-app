@@ -4,7 +4,7 @@ import Select from "react-select";
 import axios from "axios";
 
 // Reusable Form Component
-function Form({ template, onSubmit, watchFields, validate, preloadedValues }) {
+function Form({ template, onSubmit, watchFields, validate, preloadedValues, autocomplete}) {
     const { register, handleSubmit, formState: { errors }, watch, setError, clearErrors, control } = useForm({
         defaultValues: preloadedValues
     });
@@ -64,7 +64,7 @@ function Form({ template, onSubmit, watchFields, validate, preloadedValues }) {
                     return(
                         <div key={name}>
                             <label htmlFor={name} style={{ marginTop: '10px' }}>{title}</label>
-                            <input type='email' name={name} id={name} {...register(name, validationProps)}></input>
+                            <input type='email' name={name} id={name} autocomplete={autocomplete} {...register(name, validationProps)}></input>
                             { errors[name] && <span className='red-text'>{errors[name]['message']}</span>}
                         </div>
                     )
@@ -88,6 +88,15 @@ function Form({ template, onSubmit, watchFields, validate, preloadedValues }) {
                             <input type='file' {...register('image', { onChange: handleChange, required: rules.required, accept: 'image/jpeg'})}></input>
                         </div>
                     );
+                    case 'password':
+                        return (
+                            <div key={name}>
+                                <label htmlFor={name} style={{ marginTop: '10px' }}>{title}</label>
+                                <input type="text" style={{"display": "none"}}></input>
+                                <input type='password' name={name} id={name} autocomplete={autocomplete} {...register(name, validationProps)}></input>
+                                { errors[name] && <span className='red-text'>{errors[name]['message']}</span>}
+                            </div>
+                        )
                 default:
                     return(
                         <div key={name} style={{ marginTop: '10px' }}>
@@ -100,7 +109,7 @@ function Form({ template, onSubmit, watchFields, validate, preloadedValues }) {
 
     return (
         <div className = 'form-details'>
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form autoComplete={autocomplete} onSubmit={handleSubmit(onSubmit)}>
                 <h2>{title}</h2>
                 {renderFields(fields)}
                 <br/>
