@@ -67,16 +67,16 @@ exports.employee_create_post = (req, res) => { // Add an employee to database
     req.on('end', () => {
         // Check for missing fields
         console.log("Body received:", body);
-        const{first_name, last_name, email, role} = JSON.parse(body);
-        if (!first_name || !last_name || !email || !role === undefined) {
+        const{first_name, last_name, email, role, password} = JSON.parse(body);
+        if (!first_name || !last_name || !email || !role || !password === undefined) {
             res.writeHead(400, {'Content-Type': 'application/json'});
             res.end(JSON.stringify({success: false, message: "Missing required fields"}));
             return;
         }
         pool.query(
             // Insert employee into database
-            "INSERT INTO employees (first_name, last_name, email, role) VALUES(?, ?, ?, ?)",
-            [first_name, last_name, email, role],
+            "INSERT INTO employees (first_name, last_name, email, role, password) VALUES(?, ?, ?, ?, ?)",
+            [first_name, last_name, email, role, password],
             (error, result) => {
                 if (error) {
                     res.writeHead(500, {'Content-Type': 'application/json'});

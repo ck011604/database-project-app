@@ -92,6 +92,7 @@ const EmployeeManagement = () => {
             <div className="inventory-form-container">
                 <div className="add-employee" style={{"padding-bottom": "5px"}}>
                     <h2 style={{display: "inline"}} >Employee Management</h2>
+                    <button onClick={() => toggleModal()} className="btn-modal"> + </button>
                 </div>
                 <table className="management-table">
                     <thead> 
