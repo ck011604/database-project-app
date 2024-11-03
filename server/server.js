@@ -12,6 +12,7 @@ const menu_management_controller = require("./controllers/menu_management_contro
 const request_schedule_controller = require("./controllers/request_schedule_controller")
 const inventory_report_controller = require("./controllers/inventory_report_controller");
 const sales_report_controller = require('./controllers/sales_report_controller');
+const staticController = require('./controllers/static_controller');
 const pool = require("./pool") // put const pool = require("../pool") into controller files
 const fs = require("fs")
 const https_mode = fs.existsSync(process.env.PATH_TO_CERT) && fs.existsSync(process.env.PATH_TO_KEY)
@@ -69,6 +70,9 @@ const serverBlock = (req, res) => {
         }
     }
     if(req.method === "GET") {
+        if (req.url.startsWith("/static")) {
+            staticController.serve(req, res)
+        }
         if (req.url === "/menu") {
             virtualRegisterController.menu(req, res);
         }
