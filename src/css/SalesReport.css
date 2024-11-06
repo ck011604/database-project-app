@@ -68,7 +68,7 @@
   font-size: 16px;
 }
   
-.submit-button {
+.submit-button, .submit2-button {
   margin-left: 10px;
   padding: 10px 15px;
   background-color: #FF5722; /* Orange color */

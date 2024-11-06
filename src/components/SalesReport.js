@@ -17,6 +17,9 @@ const handleOptionClick = (option) => {
 
 const handleStartDateChange = (e) => {
   setStartDate(e.target.value);
+  if (selectedOption === 'Daily') {
+    setEndDate(e.target.value);
+  }
 };
 
 const handleEndDateChange = (e) => {
@@ -100,28 +103,43 @@ return (
     )}
     {selectedOption && (
       <div className = "date-prompt">
-          <h4>{`Select a date range for ${ selectedOption } sales`}</h4>
-          <label> Start Date: </label>
-          <input
-          type="date"
-          value={startDate}
-          onChange={handleStartDateChange}
-          className="data-input"
+          <h4>{`Select a date ${selectedOption === 'Daily' ? '' : ' range'} for ${ selectedOption } sales`}</h4>
+
+          {selectedOption === 'Daily' ? (
+            <>
+              <label> Date: </label>
+              <input
+              type="date"
+              value={startDate}
+              onChange={handleStartDateChange}
+              className="data-input"
+              />
+            </>
+          ) : (
+            <>
+            <label> Start Date: </label>
+            <input
+            type="date"
+            value={startDate}
+            onChange={handleStartDateChange}
+            className="data-input"
+            />
+            <label> End Date: </label>
+            <input
+            type="date"
+            value={endDate}
+            onChange={handleEndDateChange}
+            className="data-input"
           />
-          <label> End Date: </label>
-          <input
-          type="date"
-          value={endDate}
-          onChange={handleEndDateChange}
-          className="data-input"
-          />
-          <button className="submit-button" onClick={submitReport}>
-              Generate {selectedOption} Report
-          </button>
-          <button className="submit2-button" onClick={submitBestEmployees}>
-              Generate Top Employees Report
-          </button>
-          </div>
+        </>
+        )}
+        <button className="submit-button" onClick={submitReport}>
+            Generate {selectedOption} Report
+        </button>
+        <button className="submit2-button" onClick={submitBestEmployees}>
+            Generate Top Employees Report
+        </button>
+      </div>
     )}
     {salesData && (
       <div className="sales-data">
