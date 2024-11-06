@@ -46,7 +46,6 @@ const submitReport = async () => {
 
     if (response.data.success) {
       setSalesData(response.data.salesData);
-      setTopEmployees(response.data.topEmployees);
     } else {
       console.error(response.data.message);
       alert(response.data.message);
@@ -59,6 +58,23 @@ const submitReport = async () => {
 
 const formatDate = (dateString) => {
   return new Date(dateString).toISOString().split('T')[0];
+};
+
+const submitBestEmployees = async () => {
+  try {
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/empsales-report`, {
+    });
+
+    if (response.data.success) {
+      setTopEmployees(response.data.topEmployees);
+    } else {
+      console.error(response.data.message);
+      alert(response.data.message);
+    }
+  } catch (error) {
+    console.error("Error generating report", error);
+    alert("There was an error generating the Top Employees report.");
+  }
 };
 
 return (
@@ -101,6 +117,9 @@ return (
           />
           <button className="submit-button" onClick={submitReport}>
               Generate {selectedOption} Report
+          </button>
+          <button className="submit2-button" onClick={submitBestEmployees}>
+              Generate Top Employees Report
           </button>
           </div>
     )}
