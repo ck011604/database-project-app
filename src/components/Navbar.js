@@ -35,7 +35,7 @@ const Navbar = () => {
         <div className="user-dropdown">
           <span className="employee-name">{role}: {firstName}</span>
           <div className="user-dropdown-content">
-            <a href="">Settings</a>
+            <a href="/employee-settings">Settings</a>
             <a href="/login" onClick={handleLogout}>Logout</a>
           </div>
         </div>
