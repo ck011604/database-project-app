@@ -124,6 +124,9 @@ const serverBlock = (req, res) => {
         if (req.url.startsWith("/api/sales-report")) {
             sales_report_controller.getSalesReport(req, res);
         }
+        if (req.url.startsWith("/api/empsales-report")) {
+            sales_report_controller.getTopEmployees(req, res);
+        }
         if (req.url === "/api/promotions") {
             promotions_controller.index(req, res);
         }

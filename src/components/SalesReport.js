@@ -17,6 +17,9 @@ const handleOptionClick = (option) => {
 
 const handleStartDateChange = (e) => {
   setStartDate(e.target.value);
+  if (selectedOption === 'Daily') {
+    setEndDate(e.target.value);
+  }
 };
 
 const handleEndDateChange = (e) => {
@@ -46,7 +49,6 @@ const submitReport = async () => {
 
     if (response.data.success) {
       setSalesData(response.data.salesData);
-      setTopEmployees(response.data.topEmployees);
     } else {
       console.error(response.data.message);
       alert(response.data.message);
@@ -59,6 +61,23 @@ const submitReport = async () => {
 
 const formatDate = (dateString) => {
   return new Date(dateString).toISOString().split('T')[0];
+};
+
+const submitBestEmployees = async () => {
+  try {
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/empsales-report`, {
+    });
+
+    if (response.data.success) {
+      setTopEmployees(response.data.topEmployees);
+    } else {
+      console.error(response.data.message);
+      alert(response.data.message);
+    }
+  } catch (error) {
+    console.error("Error generating report", error);
+    alert("There was an error generating the Top Employees report.");
+  }
 };
 
 return (
@@ -84,25 +103,43 @@ return (
     )}
     {selectedOption && (
       <div className = "date-prompt">
-          <h4>{`Select a date range for ${ selectedOption } sales`}</h4>
-          <label> Start Date: </label>
-          <input
-          type="date"
-          value={startDate}
-          onChange={handleStartDateChange}
-          className="data-input"
+          <h4>{`Select a date ${selectedOption === 'Daily' ? '' : ' range'} for ${ selectedOption } sales`}</h4>
+
+          {selectedOption === 'Daily' ? (
+            <>
+              <label> Date: </label>
+              <input
+              type="date"
+              value={startDate}
+              onChange={handleStartDateChange}
+              className="data-input"
+              />
+            </>
+          ) : (
+            <>
+            <label> Start Date: </label>
+            <input
+            type="date"
+            value={startDate}
+            onChange={handleStartDateChange}
+            className="data-input"
+            />
+            <label> End Date: </label>
+            <input
+            type="date"
+            value={endDate}
+            onChange={handleEndDateChange}
+            className="data-input"
           />
-          <label> End Date: </label>
-          <input
-          type="date"
-          value={endDate}
-          onChange={handleEndDateChange}
-          className="data-input"
-          />
-          <button className="submit-button" onClick={submitReport}>
-              Generate {selectedOption} Report
-          </button>
-          </div>
+        </>
+        )}
+        <button className="submit-button" onClick={submitReport}>
+            Generate {selectedOption} Report
+        </button>
+        <button className="submit2-button" onClick={submitBestEmployees}>
+            Generate Top Employees Report
+        </button>
+      </div>
     )}
     {salesData && (
       <div className="sales-data">
