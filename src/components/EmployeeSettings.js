@@ -68,7 +68,7 @@ const EmployeeSettings = () => {
                 if (newFirstName !== "") {data['first_name'] = newFirstName}
                 if (newLastName !== "") {data['last_name'] = newLastName}
                 if (newEmail !== "") {data['email'] = newEmail}
-                if (newPassword !== "") {data['password'] = newPassword}
+                // if (newPassword !== "") {data['password'] = newPassword}
 
                 let employeeResponse = await axios.patch(`${process.env.REACT_APP_API_URL}/api/employees/${employeeID}`, data, {
                     headers: {
