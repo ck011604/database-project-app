@@ -29,8 +29,6 @@ const LoginPage = () => {
           if (response.data.success) {
             const token = response.data.token;
             const role = response.data.role;
-            // localStorage.setItem('token', token);
-            // localStorage.setItem('role', role);
             sessionStorage.setItem("token", token);
             navigate("/home");
           }

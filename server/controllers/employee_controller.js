@@ -106,9 +106,9 @@ exports.employee_update_patch = (req, res) => { // Update employee details
         body += chunk.toString();
     });
     req.on('end', () => {
-        const {first_name, last_name, email, role, is_active } = JSON.parse(body);
+        const {first_name, last_name, email, role, is_active, password } = JSON.parse(body);
         // Check if there are fields to update
-        if (!first_name && !last_name && !email && !role && is_active === undefined) {
+        if (!first_name && !last_name && !email && !role && !password && is_active === undefined) {
             res.writeHead(400, { 'Content-Type': 'application/json'});
             res.end(JSON.stringify({ success: false, message: "No fields to update"}));
             return;
@@ -121,6 +121,7 @@ exports.employee_update_patch = (req, res) => { // Update employee details
         if (last_name) { query_string += "last_name = ?, "; params.push(last_name); }
         if (email) { query_string += "email = ?, "; params.push(email); }
         if (role) { query_string += "role = ?, "; params.push(role); }
+        if (password) { query_string += "password = ?, "; params.push(password);}
         if (is_active !== undefined) { query_string += "is_active = ?, "; params.push(is_active); }
         // Remove trailing comma and spaces in array
         // Specify which employee
