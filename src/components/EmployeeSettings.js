@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from 'axios';
 import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 import "../css/EmployeeSettings.css";
 
 const EmployeeSettings = () => {
@@ -8,6 +9,7 @@ const EmployeeSettings = () => {
     const [oldFirstName, setOldFirstName] = useState("");
     const [oldLastName, setOldLastName] = useState("");
     const [oldPassword, setOldPassword] = useState("");
+    const [inputOldPassword, setInputOldPassword] = useState("");
     const [newEmail, setNewEmail] = useState("");
     const [newFirstName, setNewFirstName] = useState("");
     const [newLastName, setNewLastName] = useState("");
@@ -15,6 +17,8 @@ const EmployeeSettings = () => {
     const [newPassword2, setNewPassword2] = useState("");
     const [error, setError] = useState("");
     const [lockEmpSetting, setLockEmpSetting] = useState(false);
+
+    const navigate = useNavigate();
 
     const token = sessionStorage.getItem("token");
     let employeeID = null;
@@ -56,8 +60,36 @@ const EmployeeSettings = () => {
             setError("New Password doesn't match")
             return;
         }
-        setLockEmpSetting(true);
-        console.log("form is locked");
+        else if (oldPassword === inputOldPassword) {
+            setLockEmpSetting(true);
+            try {
+                // Convert new information into JSON
+                let data = {}
+                if (newFirstName !== "") {data['first_name'] = newFirstName}
+                if (newLastName !== "") {data['last_name'] = newLastName}
+                if (newEmail !== "") {data['email'] = newEmail}
+                if (newPassword !== "") {data['password'] = newPassword}
+
+                let employeeResponse = await axios.patch(`${process.env.REACT_APP_API_URL}/api/employees/${employeeID}`, data, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                
+                if (employeeResponse.data.success) {
+                    console.log("Updated user info")
+                    sessionStorage.removeItem("token");
+                    navigate("/login", { replace: true, state: { 
+                        email: newEmail !== "" ? newEmail : oldEmail , 
+                        message: 'Updated Account Info!' } });
+                }
+            } catch (err) {
+                if (err.response && err.response.data && err.response.data.message)
+                    setError(err.response.data.message);
+                else
+                    setError('An error has updating employee data');
+            }
+        }
         
     }
 
@@ -97,7 +129,7 @@ const EmployeeSettings = () => {
                         />
                     </div>
                     <div className="input-field">
-                        <label>Password: </label>
+                        <label>New Password: </label>
                         <input
                             type="password"
                             value={newPassword}
@@ -107,7 +139,7 @@ const EmployeeSettings = () => {
                         />
                     </div>
                     {newPassword.length > 0 && (<div className="input-field">
-                        <label>Confirm Password: </label>
+                        <label>Confirm New Password: </label>
                         <input
                             type="password"
                             value={newPassword2}
@@ -116,6 +148,19 @@ const EmployeeSettings = () => {
                             disabled={lockEmpSetting}
                         />
                     </div>)}
+                    {(newFirstName !== "" || newLastName !== "" || newPassword !== "" || newEmail !== "") && 
+                        <div className="input-field">
+                            <label>Old Password: </label>
+                            <input
+                                type="password"
+                                value={inputOldPassword}
+                                onChange={(e) => { setInputOldPassword(e.target.value) }}
+                                placeholder="Password Verification"
+                                disabled={lockEmpSetting}
+                                required
+                            />
+                        </div>
+                    }
                     <button 
                         className="edit-employee-button" 
                         disabled={lockEmpSetting || 
@@ -125,7 +170,6 @@ const EmployeeSettings = () => {
                 </form>
             </div>
         </div>
-        {} 
      );
 }
  
