@@ -10,6 +10,7 @@ const [endDate, setEndDate] = useState('');
 const [salesData, setSalesData] = useState(null);
 const [topEmployees, setTopEmployees] = useState(null);
 const [batchMessage, setBatchMessage] = useState('');
+const [errorMessage, setErrorMessage] = useState('');
 
 const handleOptionClick = (option) => {
   setSelectedOption(option);
@@ -17,6 +18,7 @@ const handleOptionClick = (option) => {
 
 const handleStartDateChange = (e) => {
   setStartDate(e.target.value);
+  setErrorMessage('');
   if (selectedOption === 'Daily') {
     setEndDate(e.target.value);
   }
@@ -24,6 +26,7 @@ const handleStartDateChange = (e) => {
 
 const handleEndDateChange = (e) => {
   setEndDate(e.target.value);
+  setErrorMessage('');
 };
 
 const handleBatchSales = async () => {
@@ -39,6 +42,10 @@ const handleBatchSales = async () => {
 };
 
 const submitReport = async () => {
+  if (!startDate || !endDate) {
+    setErrorMessage('Please select valid date(s)')
+    return;
+  }
   try {
     const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/sales-report`, {
       params: {
@@ -133,6 +140,9 @@ return (
           />
         </>
         )}
+
+        {errorMessage && <p style={{ color: 'red'}} > {errorMessage} </p>}
+
         <button className="submit-button" onClick={submitReport}>
             Generate {selectedOption} Report
         </button>
