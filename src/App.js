@@ -12,7 +12,11 @@ import Management from './components/Management';
 import InventoryReport from "./components/InventoryReport";
 import NotFoundPage from "./components/NotFoundPage";
 import SalesReport from "./components/SalesReport";
+<<<<<<< HEAD
 import OrdersReport from "./components/OrdersReport";
+=======
+import EmployeeSettings from "./components/EmployeeSettings";
+>>>>>>> 90b91127d9e3e529a969c5054b6682e99445480a
 
 function App() {
   const location = useLocation(); // Get current location
@@ -55,7 +59,11 @@ function App() {
 
           <Route
             path="/sales-report"
-            element={ <ProtectedRoute element={<SalesReport />} allowedRoles={['Manager']} /> }
+            element={ <ProtectedRoute element={<SalesReport />} allowedRoles={['Manager', 'Accountant']} /> }
+          />
+          <Route
+            path="/employee-settings"
+            element={ <ProtectedRoute element={<EmployeeSettings />} allowedRoles={['Waiter', 'Manager', 'Accountant']} /> }
           />
           <Route path="*" element={<Navigate to="/404-Page-Not-Found" />} />
           <Route

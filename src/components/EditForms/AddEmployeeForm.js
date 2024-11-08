@@ -7,7 +7,7 @@ import Select from "react-select";
 const AddEmployeeForm = ({setModal, employee, callback}) => {
     const onSubmit = async(values, event) => {
         try{
-            let props = ["first_name", "last_name", "email", "role"]
+            let props = ["first_name", "last_name", "email", "role", "password"]
             let data = {}
             for(let key of props){
                 if(key === "role"){
@@ -62,7 +62,7 @@ const AddEmployeeForm = ({setModal, employee, callback}) => {
         fetchAllEmployees()
     }, [])
 
-    const template =  {
+    let template =  {
         title: 'Add a New Employee',
         fields: [
             {
@@ -105,12 +105,27 @@ const AddEmployeeForm = ({setModal, employee, callback}) => {
         ]
     }
 
+    if(employee === null) {
+        const passwordField = {
+            title: 'Password',
+            name: 'password',
+            type: 'password',
+            rules: { required: true },
+                validationProps: {
+                required: 'A password is mandatory',
+                minlength:'5'
+            }
+        }
+        template.fields.push(passwordField)
+    }
+
     return ( 
-        <Form 
+        <Form
         template={template}
         watchFields={['First Name']}
         onSubmit={onSubmit}
         preloadedValues={employee}
+        autocomplete="new-password"
         />
     );
 }

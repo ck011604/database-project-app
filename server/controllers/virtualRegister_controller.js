@@ -1,3 +1,4 @@
+const { jwtDecode } = require("jwt-decode");
 const pool = require("../pool");
 
 exports.menu = (req, res) => { // Get menu
@@ -52,7 +53,8 @@ exports.confirm_order = (req, res) => {
   req.on("end", () => {
     const {
       selectedItems,
-      waiterID,
+      //waiterID,
+      loginToken,
       tableNumber,
       customerID,
       subtotal,
@@ -88,6 +90,16 @@ exports.confirm_order = (req, res) => {
           res.writeHead(500, { "Content-Type": "application/json" });
           res.end(JSON.stringify({ success: false, message: "Server Error: Unable to start transaction." }));
           return;
+        }
+        // Decode token to get waiterID
+        let waiterID = ''
+        try {
+          const decodedToken = jwtDecode(loginToken);
+          waiterID = decodedToken.employee_id;
+        } catch (error) {
+          console.error("Failed to decode token from VR", error);
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ success: false, message: "Invalid login token. Can't verify waiter ID" }));
         }
         // Subtract uses left for the promotion code
         if (discountType == "PromoCode") { // A discount was applied

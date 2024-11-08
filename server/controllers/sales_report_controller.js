@@ -53,18 +53,6 @@ module.exports = {
         ${whereClause};
         `;
         
-        const bestEmployees = `
-        SELECT employee_id, last_name, first_name, role, (SELECT SUM(total)
-                                                          FROM orders
-                                                          WHERE waiter_id = e.employee_id) AS total_sales
-        FROM employees e
-        WHERE (SELECT SUM(total)
-        FROM orders
-        WHERE waiter_id = e.employee_id) IS NOT NULL
-        ORDER BY total_sales DESC
-        LIMIT 5;
-        `;
-        
         pool.query(query, params, (error, salesData) => {
             if (error) {
                 console.error('Error in report query:', error);
@@ -82,6 +70,23 @@ module.exports = {
                 salesData: salesData || []
             }));
         });
+        console.log("Query executed");
+    },
+
+    getTopEmployees: async (req, res) => {
+        console.log("Reached Top Employees query");
+        const bestEmployees = `
+        SELECT employee_id, last_name, first_name, role, (SELECT SUM(total)
+                                                          FROM orders
+                                                          WHERE waiter_id = e.employee_id) AS total_sales
+        FROM employees e
+        WHERE (SELECT SUM(total)
+        FROM orders
+        WHERE waiter_id = e.employee_id) IS NOT NULL
+        ORDER BY total_sales DESC
+        LIMIT 5;
+        `;
+        
         pool.query(bestEmployees, (error, topEmployees) => {
             if (error) {
                 console.error('Error in logs query:', error);
@@ -99,6 +104,6 @@ module.exports = {
                 
             }));
         });
-        console.log("Query executed");
+        console.log("Top Employees query reported");
     }
 };
