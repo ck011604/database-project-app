@@ -13,11 +13,8 @@ const promotions_controller = require("./controllers/promotions_controller.js");
 const request_schedule_controller = require("./controllers/request_schedule_controller");
 const inventory_report_controller = require("./controllers/inventory_report_controller");
 const sales_report_controller = require('./controllers/sales_report_controller');
-<<<<<<< HEAD
 const orders_report_controller = require('./controllers/orders_report_controller');
-=======
 const staticController = require('./controllers/static_controller');
->>>>>>> 90b91127d9e3e529a969c5054b6682e99445480a
 const pool = require("./pool") // put const pool = require("../pool") into controller files
 const fs = require("fs")
 const https_mode = fs.existsSync(process.env.PATH_TO_CERT) && fs.existsSync(process.env.PATH_TO_KEY)
@@ -128,10 +125,9 @@ const serverBlock = (req, res) => {
         if (req.url.startsWith("/api/sales-report")) {
             sales_report_controller.getSalesReport(req, res);
         }
-<<<<<<< HEAD
         if (req.url.startsWith("/api/orders_report")) {
             orders_report_controller.getOrders(req, res);
-=======
+        }
         if (req.url.startsWith("/api/empsales-report")) {
             sales_report_controller.getTopEmployees(req, res);
         }
@@ -140,7 +136,6 @@ const serverBlock = (req, res) => {
         }
         if (req.url.startsWith("/api/promotions/")) {
             promotions_controller.promotion_detail(req, res);
->>>>>>> 90b91127d9e3e529a969c5054b6682e99445480a
         }
     }
     if (req.method === "PATCH") {

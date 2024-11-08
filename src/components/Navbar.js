@@ -27,18 +27,10 @@ const Navbar = () => {
       </a>
       <nav className="navbar">
         <div className="navbar-pages">
-<<<<<<< HEAD
-            <a href="/virtual-register">Virtual Register</a>
-            <a href="/management">Management</a>
-            <a href="/inventory-report">Inventory Report</a>
-            <a href="/sales-report">Sales Report</a>
-            <a href="/orders-report">Orders Report</a>
-=======
             {(role == "Waiter" || role == "Manager") && <a href="/virtual-register">Virtual Register</a>}
             {role == "Manager" && <a href="/management">Management</a>}
             {role == "Manager" && <a href="/inventory-report">Inventory Report</a>}
           {(role == "Accountant" || role == "Manager") && <a href="/sales-report">Sales Report</a>}
->>>>>>> 90b91127d9e3e529a969c5054b6682e99445480a
         </div>
         <div className="user-dropdown">
           <span className="employee-name">{role}: {firstName}</span>
