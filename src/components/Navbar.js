@@ -31,6 +31,7 @@ const Navbar = () => {
             <a href="/management">Management</a>
             <a href="/inventory-report">Inventory Report</a>
             <a href="/sales-report">Sales Report</a>
+            <a href="/orders-report">Orders Report</a>
         </div>
         <div className="user-dropdown">
           <span className="employee-name">{role}: {firstName}</span>

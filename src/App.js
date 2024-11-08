@@ -12,6 +12,7 @@ import Management from './components/Management';
 import InventoryReport from "./components/InventoryReport";
 import NotFoundPage from "./components/NotFoundPage";
 import SalesReport from "./components/SalesReport";
+import OrdersReport from "./components/OrdersReport";
 
 function App() {
   const location = useLocation(); // Get current location
@@ -57,6 +58,10 @@ function App() {
             element={ <ProtectedRoute element={<SalesReport />} allowedRoles={['Manager']} /> }
           />
           <Route path="*" element={<Navigate to="/404-Page-Not-Found" />} />
+          <Route
+            path="/orders-report"
+            element={ <ProtectedRoute element={<OrdersReport />} allowedRoles={['Manager']} /> }
+          />
         </Routes>
       </div>
       {!hideFooterRoutes.includes(location.pathname) && <Footer />}
