@@ -174,7 +174,11 @@ const VirtualRegister = () => {
                 {selectedItems.length > 0 && <button className="clear-list-button" onClick={resetSelectedItems}>Clear All</button>}
                 <div className="finish-order">
                     <p>Subtotal: ${subtotal}</p>
-                    <button className="checkout-button" onClick={() => setIsCheckoutVisible(true)}>Checkout</button>
+                    <button 
+                        className="checkout-button" 
+                        onClick={() => setIsCheckoutVisible(true)}
+                        disabled={selectedItems.length <= 0}
+                    >Checkout</button>
                 </div>
             </div>
             {isCheckoutVisible && <CheckoutPopup 

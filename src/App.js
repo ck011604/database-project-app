@@ -62,11 +62,11 @@ function App() {
             path="/employee-settings"
             element={ <ProtectedRoute element={<EmployeeSettings />} allowedRoles={['Waiter', 'Manager', 'Accountant']} /> }
           />
-          <Route path="*" element={<Navigate to="/404-Page-Not-Found" />} />
           <Route
             path="/orders-report"
             element={ <ProtectedRoute element={<OrdersReport />} allowedRoles={['Manager']} /> }
           />
+          <Route path="*" element={<Navigate to="/404-Page-Not-Found" />} />
         </Routes>
       </div>
       {!hideFooterRoutes.includes(location.pathname) && <Footer />}
