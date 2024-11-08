@@ -38,8 +38,8 @@ BEGIN
         CURRENT_TIME
     );
 
-    -- Check if restock is needed
-    IF NEW.amount <= NEW.restock_threshold THEN
+    -- Check if restock is needed (only if autoRestock is TRUE)
+    IF NEW.amount <= NEW.restock_threshold AND NEW.autoRestock = TRUE THEN
         SET NEW.amount = NEW.amount + NEW.restock_amount;
         
         -- Log the restock
@@ -61,14 +61,3 @@ BEGIN
 END;;
 
 DELIMITER ;
-SHOW TRIGGERS
-
-
--- Test reducing inventory
-UPDATE inventory SET amount = amount - 10 WHERE ingredient_id = 1;
-
--- Check the logs (should show both the reduction and restock if threshold was hit)
-SELECT * FROM inventory_logs WHERE ingredient_id = 1 ORDER BY log_id DESC;
-
--- Check final inventory amount
-SELECT * FROM inventory WHERE ingredient_id = 1;

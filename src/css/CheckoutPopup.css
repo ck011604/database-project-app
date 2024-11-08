@@ -53,7 +53,6 @@
 }
 .checkout-popup-content input[type="number"] {
     width: 15%;
-    
 }
 .checkout-header {
     display: flex;
@@ -97,7 +96,6 @@
     resize: none;
     font-family: inherit;
 }
-/* promo-code-apply-button */
 .checkout-label button { 
     margin-left: 10px;
     padding: 5px 10px;
@@ -107,13 +105,39 @@
     border-radius: 5px;
     cursor: pointer;
 }
-.promo-code-apply-button:hover {
+.promo-code-apply-button:hover, .customer-email-apply-button:hover {
     background-color: #0363ca;
 }
-.promo-code-apply-button:disabled {
+.promo-code-apply-button:disabled, .customer-email-apply-button:disabled {
     cursor: not-allowed;
     background-color: gray;
 }
 .promo-code-input {
     width: 20%;
+}
+.discount-menu-toggle {
+    margin: auto;
+    border-radius: 5px;
+    border: 1px solid #C3C8D1;
+}
+.discount-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    border-radius: 5px;
+    padding: 5px;
+    border: 1px solid #C3C8D1;
+}
+.discount-menu-caret {
+    display: inline-block;
+    margin-left: 5px;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid black;
+    /* Default: downward-pointing */
+    transition: transform 0.3s ease;
+}
+
+.discount-menu-caret.up {
+    transform: rotate(180deg);
 }

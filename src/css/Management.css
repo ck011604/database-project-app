@@ -64,6 +64,26 @@
     border-radius: 3px;
 }
 
+.management .restock-btn {
+    padding: 0.3rem;
+    border-radius: 4px;
+    border: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: rgba(45, 35, 66, .4) 0 2px 4px,rgba(45, 35, 66, .3) 0 7px 13px -3px,rgba(58, 65, 111, .5) 0 -3px 0 inset;
+}
+
+.management .restock-auto-btn {
+    background-color: #42a942;
+    color: white;
+}
+
+.management .restock-manual-btn {
+    background-color: #777;
+    color: white;
+}
+
 .management .item-actions {
     display: flex;
     float: right;

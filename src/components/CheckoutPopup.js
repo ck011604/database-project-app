@@ -12,7 +12,8 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
   const [changeAmount, setChangeAmount] = useState(0.00); // total - received amount
   const [error, setError] = useState("");
   const [confirmOrderButton, setConfirmOrderButton] = useState("Confrim Order");
-  const [waiterID, setWaiterID,] = useState(1); //For testing, needs to be passed along from login
+  //const [waiterID, setWaiterID,] = useState(1); //For testing, needs to be passed along from login
+  const [loginToken, setLoginToken] = useState("");
   const [customerID, setCustomerID] = useState(null);
   const [customerEmail, setCustomerEmail] = useState(""); // From the form
   const [customerEmailLock, setCustomerEmailLock] = useState(false);
@@ -32,6 +33,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
   const [discountAmount, setDiscountAmount] = useState(0.00);
   const [highestDiscountPercent, setHighestDiscountPercent] = useState(0);
   const [isMilitary, setIsMilitary] = useState('no');
+  const [discountMenuOpen, setDiscountMenuOpen] = useState(false)
 
   useEffect(() => {
     // Handle all of the calculations
@@ -86,6 +88,8 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
     }
     setFormLock(false);
     setPromoCodeLock(false);
+    setCustomerEmailLock(false);
+    setDiscountMenuOpen(false);
     setConfirmOrderButton("Confirm Order");
     setSuccessfulOrder(false);
     fetchInventory();
@@ -233,6 +237,17 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
         );
         return;
       }
+      // const token = sessionStorage.getItem("token");
+      // let waiterID = ''
+      // if (token) {
+      //   try {
+      //     const decodedToken = jwtDecode(token);
+      //     waiterID =decodedToken.employee_id;
+      //   } catch (error) {
+      //     console.error("Failed to decode token", error);
+      //     setError("Unable to verify waiter ID")
+      //   }
+      // }
       // Passed checks, order can continue...
       const itemsJSON = JSON.stringify(selectedItems);
       setError("");
@@ -242,7 +257,8 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
           `${process.env.REACT_APP_API_URL}/confirm-order`,
           {
             selectedItems: itemsJSON,
-            waiterID,
+            //waiterID,
+            loginToken: sessionStorage.getItem("token"),
             tableNumber,
             customerID,
             subtotal,
@@ -320,36 +336,60 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
               disabled={formLock}
             />
           </div>
-          <div className="checkout-label">
-            <label>Member of Military: </label>
-            <input
-              type="radio"
-              value="yes"
-              checked={isMilitary === "yes"}
-              onChange={() => setIsMilitary("yes")}
-              disabled={formLock}
-            /> Yes
-            <input
-              type="radio"
-              value="no"
-              checked={isMilitary === "no"}
-              onChange={() => setIsMilitary("no")}
-              disabled={formLock}
-            /> No
-          </div>
-          <div className="checkout-label">
-            <label>Promotional Code: </label>
-            <input className="promo-code-input"
-              type="text" 
-              value={promoCode}
-              onChange={(e) => setPromoCode(e.target.value)}
-              disabled={formLock || promoCodeLock}
-            />
-            <button className="promo-code-apply-button" type="button" onClick={handlePromoCode} disabled={formLock || promoCodeLock}>
-              {promoCodeLock == true ? "Applied" : "Apply"}
-            </button>
-          </div>
-          <small>Only the highest discount will be applied to your order.</small>
+          <button className="discount-menu-toggle" 
+            onClick={() => setDiscountMenuOpen((prev) => !prev)}
+            type ="button"
+          >
+            Discount Options
+            <span className={`discount-menu-caret ${discountMenuOpen ? 'up' : 'down'}`}></span>
+          </button>
+          {discountMenuOpen && (
+            <div className={"discount-menu"}>
+              <div className="checkout-label">
+                <label>Customer Account: </label>
+                <input
+                  type="text"
+                  value={customerEmail}
+                  onChange={(e) => setCustomerEmail(e.target.value)}
+                  placeholder="example@domain.com"
+                  disabled={formLock || customerEmailLock}
+                />
+                <button className="customer-email-apply-button" type="button" onClick={handleCustomerEmail} disabled={formLock || customerEmailLock}>
+                  {customerEmailLock == true ? "Applied" : "Apply"}
+                </button>
+              </div>
+              <div className="checkout-label">
+                <label>Member of Military: </label>
+                <input
+                  type="radio"
+                  value="yes"
+                  checked={isMilitary === "yes"}
+                  onChange={() => setIsMilitary("yes")}
+                  disabled={formLock}
+                /> Yes
+                <input
+                  type="radio"
+                  value="no"
+                  checked={isMilitary === "no"}
+                  onChange={() => setIsMilitary("no")}
+                  disabled={formLock}
+                /> No
+              </div>
+              <div className="checkout-label">
+                <label>Promotional Code: </label>
+                <input className="promo-code-input"
+                  type="text"
+                  value={promoCode}
+                  onChange={(e) => setPromoCode(e.target.value)}
+                  disabled={formLock || promoCodeLock}
+                />
+                <button className="promo-code-apply-button" type="button" onClick={handlePromoCode} disabled={formLock || promoCodeLock}>
+                  {promoCodeLock == true ? "Applied" : "Apply"}
+                </button>
+              </div>
+              <small>Only the highest discount will be applied to your order.</small>
+            </div>
+          )}
           <div className="checkout-label">
             <label>Total: </label>
             <p>${total}</p>
@@ -381,19 +421,6 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
               rows={3}
               disabled={formLock}
             />
-          </div>
-          <div className="checkout-label">
-            <label>Customer Account: </label>
-            <input
-              type="text"
-              value={customerEmail}
-              onChange={(e) => setCustomerEmail(e.target.value)}
-              placeholder="example@domain.com"
-              disabled={formLock || customerEmailLock}
-            />
-            <button className="customer-email-apply-button" type="button" onClick={handleCustomerEmail} disabled={formLock || customerEmailLock}>
-              {customerEmailLock == true ? "Applied" : "Apply"}
-            </button>
           </div>
           {error && <p className="confirm-order-error">{error}</p>}
           {itemsWithConIng.length > 0 && (

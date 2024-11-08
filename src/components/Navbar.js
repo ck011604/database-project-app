@@ -27,15 +27,15 @@ const Navbar = () => {
       </a>
       <nav className="navbar">
         <div className="navbar-pages">
-            <a href="/virtual-register">Virtual Register</a>
-            <a href="/management">Management</a>
-            <a href="/inventory-report">Inventory Report</a>
-            <a href="/sales-report">Sales Report</a>
+            {(role == "Waiter" || role == "Manager") && <a href="/virtual-register">Virtual Register</a>}
+            {role == "Manager" && <a href="/management">Management</a>}
+            {role == "Manager" && <a href="/inventory-report">Inventory Report</a>}
+          {(role == "Accountant" || role == "Manager") && <a href="/sales-report">Sales Report</a>}
         </div>
         <div className="user-dropdown">
           <span className="employee-name">{role}: {firstName}</span>
           <div className="user-dropdown-content">
-            <a href="">Settings</a>
+            <a href="/employee-settings">Settings</a>
             <a href="/login" onClick={handleLogout}>Logout</a>
           </div>
         </div>

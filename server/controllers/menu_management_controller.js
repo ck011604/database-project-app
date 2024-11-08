@@ -68,7 +68,7 @@ exports.menu_create_post = (req, res) => {
     });
     req.on('end', () => {
         // Ensure required fields
-        const{name, ingredients, price, type, image } = JSON.parse(body);
+        let {name, ingredients, price, type, image } = JSON.parse(body);
         if (!name || !ingredients || !price || !type || !image) {
             res.writeHead(400, {'Content-Type': 'application/json'});
             res.end(
@@ -80,6 +80,7 @@ exports.menu_create_post = (req, res) => {
             return;
         }
         const ingredientsJson = JSON.stringify(ingredients);
+        image = image.replace(/[^A-Z0-9\.]/ig, "")
         pool.query(
             // Insert menu item into database
             "INSERT INTO menu (name, ingredients, price, type, image) VALUES (?, ?, ?, ?, ?)",
@@ -114,7 +115,7 @@ exports.menu_update_patch = (req, res) => {
         body += chunk.toString();
     });
     req.on('end', () => {
-        const {recipe_id, name, ingredients, price, image, type, is_active} = JSON.parse(body);
+        let {recipe_id, name, ingredients, price, image, type, is_active} = JSON.parse(body);
         // Check if there are fields to update
         if (!recipe_id && !name && !ingredients && !price && !image && !type && is_active === undefined) {
             res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -129,7 +130,7 @@ exports.menu_update_patch = (req, res) => {
         if (name) { query_string += "name = ?, "; params.push(name); }
         if (ingredients) { query_string += "ingredients = ?, "; params.push(JSON.stringify(ingredients)); }
         if (price) { query_string += "price = ?, "; params.push(price); }
-        if (image) { query_string += "image = ?, "; params.push(image); }
+        if (image) { query_string += "image = ?, "; params.push(image.replace(/[^A-Z0-9\.]/ig, "")) }
         if (type) { query_string += "type = ?, "; params.push(type); }
         if (is_active !== undefined) { query_string += "is_active = ?, "; params.push(is_active); }
         // Remove trailing comma and spaces in array
@@ -187,13 +188,14 @@ exports.menu_image_upload = (req, res) => {
         const bb = busboy({ headers: req.headers });
         bb.on('file', (name, file, info) => {
             filename = info.filename;
+            filename = filename.replace(/[^A-Z0-9\.]/ig, "")
             const saveTo =  path.join(__dirname+ `../../../public/menu_images/${filename}`)
             if(fs.existsSync(saveTo))
                 fs.unlinkSync(saveTo)
             fileTmpPromise = new Promise((resolve, reject) => {
                 const writeStream = fs.createWriteStream(saveTo)
                     .on('error', reject)
-                    .on('finish', resolve);
+                    .on('finish', resolve);4
                 file.on('error', reject);
                 file.pipe(writeStream);
             });
