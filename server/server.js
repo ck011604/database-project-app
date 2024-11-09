@@ -150,6 +150,9 @@ const serverBlock = (req, res) => {
         if (req.url.startsWith("/api/employees/")) {
             employee_controller.employee_update_patch(req, res);
         }
+        if (req.url.startsWith("/api/user/")) {
+          users_controller.user_update_patch(req, res);
+        }
         if (req.url.startsWith("/api/shifts/")) {
             shift_controller.shift_update_patch(req, res);
         }

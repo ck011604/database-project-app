@@ -46,7 +46,8 @@ const Navbar = () => {
           {role !== "user" && <span className="employee-name">{role}: {firstName}</span>}
           {role === "user" && <span className="customer-name">Welcome, {firstName}</span>}
           <div className="user-dropdown-content">
-            <a href="/employee-settings">Settings</a>
+            {role !== "user" && <a href="/employee-settings">Settings</a>}
+            {role === "user" && <a href="/customer-settings">Settings</a>}
             <a href="/login" onClick={handleLogout}>Logout</a>
           </div>
         </div>

@@ -13,6 +13,7 @@ import NotFoundPage from "./components/NotFoundPage";
 import SalesReport from "./components/SalesReport";
 import OrdersReport from "./components/OrdersReport";
 import EmployeeSettings from "./components/EmployeeSettings";
+import CustomerSettings from "./components/CustomerSettings";
 import CustomerPortalMenu from "./components/CustomerPortalMenu";
 import CustomerPortalView from "./components/CustomerPortalView";
 
@@ -62,6 +63,11 @@ function App() {
           <Route
             path="/employee-settings"
             element={ <ProtectedRoute element={<EmployeeSettings />} allowedRoles={['Waiter', 'Manager', 'Accountant']} /> }
+          />
+
+          <Route
+            path="/customer-settings"
+            element={ <ProtectedRoute element={<CustomerSettings />} allowedRoles={['user']} /> }
           />
 
           <Route
