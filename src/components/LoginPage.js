@@ -43,7 +43,7 @@ const LoginPage = () => {
             }
 
             if (role === "user") {
-              navigate("/customer-portal")
+              navigate("/customer-portal-menu")
             }
             else {
               navigate("/home");

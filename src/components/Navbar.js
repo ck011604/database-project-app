@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import "../css/Navbar.css";
 
@@ -23,7 +24,7 @@ const Navbar = () => {
   return (
     <header className="header">
       {role !== "user" && <a href="/home" className="logo">POS System</a>}
-      {role === "user" && <a href="/customer-portal" className="logo">Customer Portal</a>}
+      {role === "user" && <a href="/customer-portal-menu" className="logo">Customer Portal</a>}
       <nav className="navbar">
         <div className="navbar-pages">
           {(role == "Waiter" || role == "Manager") && <a href="/virtual-register">Virtual Register</a>}
@@ -31,7 +32,8 @@ const Navbar = () => {
           {role == "Manager" && <a href="/inventory-report">Inventory Report</a>}
           {(role == "Accountant" || role == "Manager") && <a href="/sales-report">Sales Report</a>}
           {(role == "Manager") && <a href="/orders-report">Orders Report</a>}
-          {(role == "user") && <a href="/customer-view">Customer View</a>}
+          {(role == "user") && <Link to="/customer-portal-menu">Our Menu</Link>}
+          {(role == "user") && <Link to="/customer-portal-view">Order History</Link>}
         </div>
         <div className="user-dropdown">
           {role !== "user" && <span className="employee-name">{role}: {firstName}</span>}
