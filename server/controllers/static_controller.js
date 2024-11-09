@@ -4,7 +4,7 @@ const path = require("path")
 exports.serve = (req, res) => {
     // "/static/menu_images/cheeseburger.jpg"
     let filePath = req.url.split("/static/")[1]
-    console.log('Request for image ', filePath);
+    //console.log('Request for image ', filePath);
     filePath =  path.join(__dirname + `../../../public/${filePath}`)
 
     let extname = String(path.extname(filePath)).toLowerCase();
@@ -29,7 +29,7 @@ exports.serve = (req, res) => {
 
     let contentType = mimeTypes[extname] || 'application/octet-stream';
     
-    console.log(filePath)
+    //console.log(filePath)
     fs.readFile(filePath, function(error, content) {
         if (error) {
             res.writeHead(500);
