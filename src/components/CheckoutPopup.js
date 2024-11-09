@@ -12,7 +12,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
   const [changeAmount, setChangeAmount] = useState(0.00); // total - received amount
   const [error, setError] = useState("");
   const [confirmOrderButton, setConfirmOrderButton] = useState("Confrim Order");
-  const [waiterID, setWaiterID,] = useState(1); //For testing, needs to be passed along from login
+  const [loginToken, setLoginToken] = useState("");
   const [customerID, setCustomerID] = useState(null);
   const [customerEmail, setCustomerEmail] = useState(""); // From the form
   const [customerEmailLock, setCustomerEmailLock] = useState(false);
@@ -32,9 +32,9 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
   const [discountAmount, setDiscountAmount] = useState(0.00);
   const [highestDiscountPercent, setHighestDiscountPercent] = useState(0);
   const [isMilitary, setIsMilitary] = useState('no');
+  const [discountMenuOpen, setDiscountMenuOpen] = useState(false)
 
-  useEffect(() => {
-    // Handle all of the calculations
+  useEffect(() => { // Handle all of the calculations
     const numericSubtotal = parseFloat(subtotal); // Treat as number, not string
 
     // Find the highest discount
@@ -51,14 +51,20 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
       }
     );
     setDiscountAmount(parseFloat(bestDiscount[1]).toFixed(2)); // Set the discount amount from the best option
-    setDiscountType(bestDiscount[0]); // Set the best discount type
-    // Depending on the discount type, set the best discount percentage
-    if (bestDiscount[0] === "Military")
-      setHighestDiscountPercent(10);
-    else if (bestDiscount[0] === "PromoCode")
-      setHighestDiscountPercent(promoCodePercent);
-    else if (bestDiscount[0] === "LoyaltyPoints")
-      setHighestDiscountPercent(0);
+
+    if (bestDiscount[1] == 0.00) { // Handles when no discount is selected
+      setDiscountType("");
+    }
+    else {
+      setDiscountType(bestDiscount[0]); // Set the best discount type
+      // Depending on the discount type, set the best discount percentage
+      if (bestDiscount[0] === "Military")
+        setHighestDiscountPercent(10);
+      else if (bestDiscount[0] === "PromoCode")
+        setHighestDiscountPercent(promoCodePercent);
+      else if (bestDiscount[0] === "LoyaltyPoints")
+        setHighestDiscountPercent(0);
+    }
     const afterDiscount = numericSubtotal - bestDiscount[1];
 
     const taxRate = 0.0825; // 8.25% tax rate
@@ -86,6 +92,8 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
     }
     setFormLock(false);
     setPromoCodeLock(false);
+    setCustomerEmailLock(false);
+    setDiscountMenuOpen(false);
     setConfirmOrderButton("Confirm Order");
     setSuccessfulOrder(false);
     fetchInventory();
@@ -242,7 +250,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
           `${process.env.REACT_APP_API_URL}/confirm-order`,
           {
             selectedItems: itemsJSON,
-            waiterID,
+            loginToken: sessionStorage.getItem("token"),
             tableNumber,
             customerID,
             subtotal,
@@ -320,36 +328,60 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
               disabled={formLock}
             />
           </div>
-          <div className="checkout-label">
-            <label>Member of Military: </label>
-            <input
-              type="radio"
-              value="yes"
-              checked={isMilitary === "yes"}
-              onChange={() => setIsMilitary("yes")}
-              disabled={formLock}
-            /> Yes
-            <input
-              type="radio"
-              value="no"
-              checked={isMilitary === "no"}
-              onChange={() => setIsMilitary("no")}
-              disabled={formLock}
-            /> No
-          </div>
-          <div className="checkout-label">
-            <label>Promotional Code: </label>
-            <input className="promo-code-input"
-              type="text" 
-              value={promoCode}
-              onChange={(e) => setPromoCode(e.target.value)}
-              disabled={formLock || promoCodeLock}
-            />
-            <button className="promo-code-apply-button" type="button" onClick={handlePromoCode} disabled={formLock || promoCodeLock}>
-              {promoCodeLock == true ? "Applied" : "Apply"}
-            </button>
-          </div>
-          <small>Only the highest discount will be applied to your order.</small>
+          <button className="discount-menu-toggle" 
+            onClick={() => setDiscountMenuOpen((prev) => !prev)}
+            type ="button"
+          >
+            Discount Options
+            <span className={`discount-menu-caret ${discountMenuOpen ? 'up' : 'down'}`}></span>
+          </button>
+          {discountMenuOpen && (
+            <div className={"discount-menu"}>
+              <div className="checkout-label">
+                <label>Customer Account: </label>
+                <input
+                  type="text"
+                  value={customerEmail}
+                  onChange={(e) => setCustomerEmail(e.target.value)}
+                  placeholder="example@domain.com"
+                  disabled={formLock || customerEmailLock}
+                />
+                <button className="customer-email-apply-button" type="button" onClick={handleCustomerEmail} disabled={formLock || customerEmailLock}>
+                  {customerEmailLock == true ? "Applied" : "Apply"}
+                </button>
+              </div>
+              <div className="checkout-label">
+                <label>Member of Military: </label>
+                <input
+                  type="radio"
+                  value="yes"
+                  checked={isMilitary === "yes"}
+                  onChange={() => setIsMilitary("yes")}
+                  disabled={formLock}
+                /> Yes
+                <input
+                  type="radio"
+                  value="no"
+                  checked={isMilitary === "no"}
+                  onChange={() => setIsMilitary("no")}
+                  disabled={formLock}
+                /> No
+              </div>
+              <div className="checkout-label">
+                <label>Promotional Code: </label>
+                <input className="promo-code-input"
+                  type="text"
+                  value={promoCode}
+                  onChange={(e) => setPromoCode(e.target.value)}
+                  disabled={formLock || promoCodeLock}
+                />
+                <button className="promo-code-apply-button" type="button" onClick={handlePromoCode} disabled={formLock || promoCodeLock}>
+                  {promoCodeLock == true ? "Applied" : "Apply"}
+                </button>
+              </div>
+              <small>Only the highest discount will be applied to your order.</small>
+            </div>
+          )}
           <div className="checkout-label">
             <label>Total: </label>
             <p>${total}</p>
@@ -381,19 +413,6 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
               rows={3}
               disabled={formLock}
             />
-          </div>
-          <div className="checkout-label">
-            <label>Customer Account: </label>
-            <input
-              type="text"
-              value={customerEmail}
-              onChange={(e) => setCustomerEmail(e.target.value)}
-              placeholder="example@domain.com"
-              disabled={formLock || customerEmailLock}
-            />
-            <button className="customer-email-apply-button" type="button" onClick={handleCustomerEmail} disabled={formLock || customerEmailLock}>
-              {customerEmailLock == true ? "Applied" : "Apply"}
-            </button>
           </div>
           {error && <p className="confirm-order-error">{error}</p>}
           {itemsWithConIng.length > 0 && (

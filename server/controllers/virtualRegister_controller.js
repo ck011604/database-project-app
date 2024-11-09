@@ -1,3 +1,4 @@
+const { jwtDecode } = require("jwt-decode");
 const pool = require("../pool");
 
 exports.menu = (req, res) => { // Get menu
@@ -52,7 +53,7 @@ exports.confirm_order = (req, res) => {
   req.on("end", () => {
     const {
       selectedItems,
-      waiterID,
+      loginToken,
       tableNumber,
       customerID,
       subtotal,
@@ -66,13 +67,11 @@ exports.confirm_order = (req, res) => {
       promoCode_id,
       discountType,
       discountAmount,
-      //isMilitaryString,
       discountPercentage,
     } = JSON.parse(body);
-    //const isMilitary = isMilitaryString == "no" ? 0 : 1; // Convert to binary (0 or 1)
-    const checkedPromoCodeID = promoCode_id == "" || discountType !== "PromoCode" ? null : promoCode_id // If no code was given, set it to null
-    const checkedDiscountPercent = discountType == "LoyaltyPoints" ? null : discountPercentage // If the discount type is loyalty points, set it to null
-    const addedPoints = Math.floor(total);
+    const checkedDiscountType = (discountType === "") ? null : discountType // set discount type to null
+    const checkedPromoCodeID = (promoCode_id == "" || discountType !== "PromoCode") ? null : promoCode_id // If no code was given, set it to null
+    const addedPoints = Math.floor(subtotal - discountAmount);
 
     pool.getConnection((err, connection) => {
       if (err) {
@@ -88,6 +87,16 @@ exports.confirm_order = (req, res) => {
           res.writeHead(500, { "Content-Type": "application/json" });
           res.end(JSON.stringify({ success: false, message: "Server Error: Unable to start transaction." }));
           return;
+        }
+        // Decode token to get waiterID
+        let waiterID = ''
+        try {
+          const decodedToken = jwtDecode(loginToken);
+          waiterID = decodedToken.employee_id;
+        } catch (error) {
+          console.error("Failed to decode token from VR", error);
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ success: false, message: "Invalid login token. Can't verify waiter ID" }));
         }
         // Subtract uses left for the promotion code
         if (discountType == "PromoCode") { // A discount was applied
@@ -163,7 +172,7 @@ exports.confirm_order = (req, res) => {
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [selectedItems, waiterID, tableNumber, customerID, subtotal, tipPercent, tipAmount, 
           total, receivedAmount, changeAmount, tax, specialRequest,
-          addedPoints, checkedPromoCodeID, discountType, discountAmount, checkedDiscountPercent],
+          addedPoints, checkedPromoCodeID, checkedDiscountType, discountAmount, discountPercentage],
           (error, result) => {
             if (error) {
               return connection.rollback(() => {

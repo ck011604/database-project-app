@@ -134,3 +134,6 @@
   text-decoration: line-through;
   transform: scale(1.05);
 }
+.finish-order button:disabled {
+  background-color: gray;
+}

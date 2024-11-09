@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import "../css/LoginPage.css";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import axios from 'axios';
+import { jwtDecode } from "jwt-decode";
 
 const LoginPage = () => {
 
@@ -28,11 +29,25 @@ const LoginPage = () => {
           const response = await axios.post(`${process.env.REACT_APP_API_URL}/login`, {email, password});
           if (response.data.success) {
             const token = response.data.token;
-            const role = response.data.role;
-            // localStorage.setItem('token', token);
-            // localStorage.setItem('role', role);
-            sessionStorage.setItem("token", token);
-            navigate("/home");
+            sessionStorage.setItem("token", token); // add token to session storage
+
+            let role = null;
+            if (token) { // get role from token
+              try {
+                const decodedToken = jwtDecode(token);
+                role = decodedToken.role;
+              } catch (error) {
+                console.error("Failed to decode token", error);
+                setError('Error decoding token')
+              }
+            }
+
+            if (role === "user") {
+              navigate("/customer-portal-menu")
+            }
+            else {
+              navigate("/home");
+            }
           }
         }
         catch(err){

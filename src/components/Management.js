@@ -5,6 +5,7 @@ import Modal from "./Reusable/Modal";
 import AddMenuItemForm from "./EditForms/AddMenuItemForm";
 import InventoryManagement from "./InventoryManagement";
 import EmployeeManagement from "./EmployeeManagement";
+import PromotionManagement from "./PromotionManagement";
 import { BsFillTrashFill, BsFillPencilFill } from "react-icons/bs";
 import '../css/Management.css';  // We'll rename this CSS file too
 
@@ -102,16 +103,16 @@ const Management = () => {
                 <button onClick={() => setProductFilter("MENU_ITEMS")}>Menu Items</button>
                 <button onClick={() => setProductFilter("INVENTORY")}>Inventory</button>
                 <button onClick={() => setProductFilter("EMPLOYEES")}>Employees</button>
-                <button onClick={() => setProductFilter("EVENTS")}>Events</button>
+                <button onClick={() => setProductFilter("PROMOTIONS")}>Promotions</button>
             </div>
             
             {productFilter === "MENU_ITEMS" && (
                 <div>
-                    <div className="add-menu-item" style={{"padding-bottom": "5px"}}>
-                        <h2 style={{display: "inline"}} >Menu Management</h2>
-                        <button onClick={() => toggleModal()} className="btn-modal"> + </button>
-                    </div> 
                     <div className="inventory-form-container">
+                        <div className="add-menu-item" style={{"padding-bottom": "5px"}}>
+                            <h2 style={{display: "inline"}} >Menu Management</h2>
+                            <button onClick={() => toggleModal()} className="btn-modal"> + </button>
+                        </div> 
                         <table className="management-table">
                             <thead> 
                                 <tr className="item-info">
@@ -156,9 +157,7 @@ const Management = () => {
             )}
             {productFilter === "INVENTORY" && <InventoryManagement />}
             {productFilter === "EMPLOYEES" && <EmployeeManagement/> }
-            {productFilter === "EVENTS" && (
-                <div>Events Content Coming Soon</div>
-            )}
+            {productFilter === "PROMOTIONS" && <PromotionManagement/>}
         </div>
     );
 }

@@ -1,0 +1,83 @@
+.customer-orders-title {
+    font-size: 20px;
+}
+
+.Collapsible {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.Collapsible-container {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+.Collapsible__contentInner {
+    border-radius: 5px;
+    border-width: 1px;
+    padding-bottom: 25px;
+    padding-top: 0px;
+    background: #fff;
+    box-shadow: 0 5px 11px 0 rgba(0, 0, 0, .1), 0 4px 11px 0 rgba(0, 0, 0, .08);
+}
+  
+.Collapsible__contentInner h2 {
+    margin-bottom: 15px;
+    padding: 15px 15px 0;
+    font-size: 20px;
+    line-height: 20px;
+    border-radius: 4px;
+}
+  
+.Collapsible__contentInner .Order-Label {
+    padding: 8px 30px 0;
+    border-radius: 4px;
+    display: grid;
+    grid-template-columns: 1fr 5fr;
+}
+
+.Collapsible__contentInner .Item-Label {
+    padding: 6px 30px 0;
+    border-radius: 4px;
+    display: grid;
+    grid-template-columns: 3fr 1fr 2fr;
+}
+
+.Collapsible__contentInner .Totals-Label {
+    padding: 6px 30px 0;
+    border-radius: 4px;
+    display: grid;
+    grid-template-columns: 3fr 1fr 2fr;
+}
+
+.Collapsible__contentInner .Order-Label .Order-Info {
+    text-align: center
+}
+  
+.Collapsible__trigger {
+    display: block;
+    font-weight: 400;
+    text-decoration: none;
+    position: relative;
+    border: 1px solid white;
+    padding: 10px;
+    background: whitesmoke;
+    color: darkslategrey;
+}
+
+.Collapsible__trigger .chevron {
+    transition: transform 300ms;
+}
+
+.Collapsible__trigger.is-open .chevron {
+    transform: rotateZ(180deg);
+}
+
+.line {
+    border-bottom: 1px solid #888;
+    padding-top: 20px;
+    margin-left: 100px;
+    margin-right: 100px;
+}
+  

@@ -37,7 +37,7 @@
     font-weight: 500;
     margin-left: 40px;
 }
-.employee-name {
+.employee-name, .customer-name {
     font-size: 18px;
     color: white;
     font-weight: 500;
