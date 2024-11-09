@@ -14,8 +14,8 @@ import NotFoundPage from "./components/NotFoundPage";
 import SalesReport from "./components/SalesReport";
 import OrdersReport from "./components/OrdersReport";
 import EmployeeSettings from "./components/EmployeeSettings";
-import CustomerPortal from "./components/CustomerPortal";
-import CustomerView from "./components/CustomerView";
+import CustomerPortalMenu from "./components/CustomerPortalMenu";
+import CustomerPortalView from "./components/CustomerPortalView";
 
 function App() {
   const location = useLocation(); // Get current location
@@ -60,22 +60,27 @@ function App() {
             path="/sales-report"
             element={ <ProtectedRoute element={<SalesReport />} allowedRoles={['Manager', 'Accountant']} /> }
           />
+
           <Route
             path="/employee-settings"
             element={ <ProtectedRoute element={<EmployeeSettings />} allowedRoles={['Waiter', 'Manager', 'Accountant']} /> }
           />
-          
-          {/* Switch to Customer Portal and remove this */}
-          <Route path="/customer-view" element={<CustomerView />} />
 
           <Route
             path="/orders-report"
             element={ <ProtectedRoute element={<OrdersReport />} allowedRoles={['Manager']} /> }
           />
+
           <Route
-            path="/customer-portal"
-            element={ <ProtectedRoute element={<CustomerPortal />} allowedRoles={['user']} /> }
+            path="/customer-portal-menu"
+            element={ <ProtectedRoute element={<CustomerPortalMenu />} allowedRoles={['user']} /> }
           />
+
+          <Route
+            path="/customer-portal-view"
+            element={ <ProtectedRoute element={<CustomerPortalView />} allowedRoles={['user']} /> }
+          />
+
           <Route path="*" element={<Navigate to="/404-Page-Not-Found" />} />
         </Routes>
       </div>
