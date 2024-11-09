@@ -14,7 +14,9 @@ const request_schedule_controller = require("./controllers/request_schedule_cont
 const inventory_report_controller = require("./controllers/inventory_report_controller");
 const sales_report_controller = require('./controllers/sales_report_controller');
 const orders_report_controller = require('./controllers/orders_report_controller');
+const order_controller = require('./controllers/order_controller');
 const staticController = require('./controllers/static_controller');
+const users_controller = require('./controllers/users_controller');
 const pool = require("./pool") // put const pool = require("../pool") into controller files
 const fs = require("fs")
 const https_mode = fs.existsSync(process.env.PATH_TO_CERT) && fs.existsSync(process.env.PATH_TO_KEY)
@@ -136,6 +138,12 @@ const serverBlock = (req, res) => {
         }
         if (req.url.startsWith("/api/promotions/")) {
             promotions_controller.promotion_detail(req, res);
+        }
+        if (req.url.startsWith("/api/order/")) {
+            order_controller.order_detail(req, res);
+        }
+        if (req.url.startsWith("/api/user/")) {
+            users_controller.user_detail(req, res);
         }
     }
     if (req.method === "PATCH") {
