@@ -61,9 +61,9 @@ exports.user_update_patch = (req, res) => { // Update user details
         if (email) { query_string += "email = ?, "; params.push(email); }
         if (password) { query_string += "password = ?, "; params.push(password);}
         // Remove trailing comma and spaces in array
-        // Specify which employee
+        // Specify which customer
         query_string = query_string.replace(/, $/, ' WHERE user_id = ?');
-        // Include employee_ID to array for WHERE
+        // Include customer_ID to array for WHERE
         params.push(customerId);
         // Query the string and params array
         pool.query(query_string, params, (error, result) => {
