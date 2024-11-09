@@ -5,13 +5,12 @@ import "../css/Management.css";
 
 const CustomerView= () => {
     const [points, setPoints] = useState([]);
-
+    let userID;
     const token = sessionStorage.getItem("token")
-    let user_id = 1
     if (token) {
         try {
             const decodedToken = jwtDecode(token);
-            // user_id = decodedToken.user_id
+            userID = decodedToken.user_id;
         } catch (error) {
             console.error("Failed to decode token", error);
         }
@@ -19,7 +18,9 @@ const CustomerView= () => {
 
     const fetchPoints = async () => {
         try{
-            let res = await axios.get(`${process.env.REACT_APP_API_URL}/api/user/${user_id}`)
+            console.log("fetching points")
+            console.log(userID)
+            let res = await axios.get(`${process.env.REACT_APP_API_URL}/api/user/${userID}`)
             let totalPoints = res.data.user.points;
             console.log(res.data)
             setPoints(totalPoints);
