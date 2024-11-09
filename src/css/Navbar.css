@@ -26,7 +26,7 @@
     align-items: center;
     width: 100%;
 }
-.navbar-pages {
+.navbar-pages{
     display: flex;
     align-items: center;
     margin-left: auto;
@@ -37,18 +37,18 @@
     font-weight: 500;
     margin-left: 40px;
 }
-.employee-name, .customer-name {
+.employee-name, .customer-name, .finance-tab {
     font-size: 18px;
     color: white;
     font-weight: 500;
 }
-.user-dropdown {
+.user-dropdown, .finance-dropdown{
     position: relative;
     display: inline-block;
     margin-left: 40px;
     cursor: pointer;
 }
-.user-dropdown-content {
+.user-dropdown-content, .finance-dropdown-content {
     display: none;
     position: absolute;
     top: 100%;
@@ -57,18 +57,19 @@
     background-color: white;
     box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
     z-index: 1;
-    width: 150%;
+    width: auto;
+    white-space: nowrap;
 }
-.user-dropdown-content a {
+.user-dropdown-content a, .finance-dropdown-content a {
     color: black;
-    padding: 10px;
+    padding: 10px 30px;
     text-decoration: none;
     display: block;
     text-align: center;
 }
-.user-dropdown-content a:hover {
+.user-dropdown-content a:hover, .finance-dropdown-content a:hover {
     background-color: #ddd;
 }
-.user-dropdown:hover .user-dropdown-content {
+.user-dropdown:hover .user-dropdown-content, .finance-dropdown:hover .finance-dropdown-content {
     display: block;
 }
