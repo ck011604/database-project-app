@@ -35,10 +35,10 @@ const Navbar = () => {
         </div>
         {(role == "Accountant" || role == "Manager") && 
             (<div className="finance-dropdown">
-              <div className="finance-tab">Finance</div>
+              <div className="finance-tab">Finance Reports</div>
               <div className="finance-dropdown-content">
-                <a href="/sales-report">Sales Report</a>
-                <a href="/orders-report">Orders Report</a>
+                <a href="/sales-report">Sales</a>
+                <a href="/orders-report">Orders</a>
               </div>
             </div>)
         }
