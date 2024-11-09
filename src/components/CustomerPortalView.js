@@ -10,12 +10,12 @@ import CustomerView from "../components/CustomerView";
 const CustomerOrdersView= () => {
     const [orders, setOrders] = useState([]);
 
+    let userID;
     const token = sessionStorage.getItem("token")
-    let user_id = 1
     if (token) {
         try {
             const decodedToken = jwtDecode(token);
-            // user_id = decodedToken.user_id
+            userID = decodedToken.user_id;
         } catch (error) {
             console.error("Failed to decode token", error);
         }
@@ -28,7 +28,7 @@ const CustomerOrdersView= () => {
 
     const fetchAllOrders = async () => {
         try{
-            let res = await axios.get(`${process.env.REACT_APP_API_URL}/api/order/${user_id}`)
+            let res = await axios.get(`${process.env.REACT_APP_API_URL}/api/order/${userID}`)
             let orders = res.data.orders;
             console.log(res.data)
             let new_orders = []
@@ -56,7 +56,7 @@ const CustomerOrdersView= () => {
     }
 
     useEffect(() => {
-        fetchAllOrders();
+        fetchAllOrders()
     }, []);
 
     return (
