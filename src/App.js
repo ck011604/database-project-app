@@ -7,7 +7,6 @@ import ProtectedRoute from "./components/ProtectedRoutes";
 import CreateAccount from "./components/CreateAccount";
 import Navbar from "./components/Navbar";
 import VirtualRegister from "./components/VirtualRegister";
-import Footer from "./components/Footer";
 import Management from './components/Management';
 import InventoryReport from "./components/InventoryReport";
 import NotFoundPage from "./components/NotFoundPage";
@@ -21,7 +20,6 @@ function App() {
   const location = useLocation(); // Get current location
 
   const hideNavbarRoutes = ["/login", "/create-account", "/404-Page-Not-Found"];
-  const hideFooterRoutes = ["/login", "/create-account", "/404-Page-Not-Found"];
 
   return (
     <div className="App">
@@ -84,7 +82,6 @@ function App() {
           <Route path="*" element={<Navigate to="/404-Page-Not-Found" />} />
         </Routes>
       </div>
-      {/* {!hideFooterRoutes.includes(location.pathname) && <Footer />} */}
     </div>
   );
 }
