@@ -30,11 +30,18 @@ const Navbar = () => {
           {(role == "Waiter" || role == "Manager") && <a href="/virtual-register">Virtual Register</a>}
           {role == "Manager" && <a href="/management">Management</a>}
           {role == "Manager" && <a href="/inventory-report">Inventory Report</a>}
-          {(role == "Accountant" || role == "Manager") && <a href="/sales-report">Sales Report</a>}
-          {(role == "Manager") && <a href="/orders-report">Orders Report</a>}
           {(role == "user") && <Link to="/customer-portal-menu">Our Menu</Link>}
           {(role == "user") && <Link to="/customer-portal-view">Order History</Link>}
         </div>
+        {(role == "Accountant" || role == "Manager") && 
+            (<div className="finance-dropdown">
+              <div className="finance-tab">Finance</div>
+              <div className="finance-dropdown-content">
+                <a href="/sales-report">Sales Report</a>
+                <a href="/orders-report">Orders Report</a>
+              </div>
+            </div>)
+        }
         <div className="user-dropdown">
           {role !== "user" && <span className="employee-name">{role}: {firstName}</span>}
           {role === "user" && <span className="customer-name">Welcome, {firstName}</span>}

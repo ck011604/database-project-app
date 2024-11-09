@@ -159,6 +159,7 @@ exports.confirm_order = (req, res) => {
                     }
                   }
                 )
+                console.log("Deleting from NextVisitTable")
               }
             }
           )

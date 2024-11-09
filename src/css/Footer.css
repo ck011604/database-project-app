@@ -1,8 +1,0 @@
-footer {
-    background-color: #003366;
-    color: white;
-    text-align: center;
-}
-body:has(.inventory-report-container) footer {
-    display: none !important;
-}
