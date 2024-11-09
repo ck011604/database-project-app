@@ -65,6 +65,7 @@ function App() {
             element={ <ProtectedRoute element={<EmployeeSettings />} allowedRoles={['Waiter', 'Manager', 'Accountant']} /> }
           />
           
+          {/* Switch to Customer Portal and remove this */}
           <Route path="/customer-view" element={<CustomerView />} />
 
           <Route
@@ -78,7 +79,7 @@ function App() {
           <Route path="*" element={<Navigate to="/404-Page-Not-Found" />} />
         </Routes>
       </div>
-      {!hideFooterRoutes.includes(location.pathname) && <Footer />}
+      {/* {!hideFooterRoutes.includes(location.pathname) && <Footer />} */}
     </div>
   );
 }
