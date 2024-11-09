@@ -12,7 +12,6 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
   const [changeAmount, setChangeAmount] = useState(0.00); // total - received amount
   const [error, setError] = useState("");
   const [confirmOrderButton, setConfirmOrderButton] = useState("Confrim Order");
-  //const [waiterID, setWaiterID,] = useState(1); //For testing, needs to be passed along from login
   const [loginToken, setLoginToken] = useState("");
   const [customerID, setCustomerID] = useState(null);
   const [customerEmail, setCustomerEmail] = useState(""); // From the form
@@ -35,8 +34,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
   const [isMilitary, setIsMilitary] = useState('no');
   const [discountMenuOpen, setDiscountMenuOpen] = useState(false)
 
-  useEffect(() => {
-    // Handle all of the calculations
+  useEffect(() => { // Handle all of the calculations
     const numericSubtotal = parseFloat(subtotal); // Treat as number, not string
 
     // Find the highest discount
@@ -53,14 +51,20 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
       }
     );
     setDiscountAmount(parseFloat(bestDiscount[1]).toFixed(2)); // Set the discount amount from the best option
-    setDiscountType(bestDiscount[0]); // Set the best discount type
-    // Depending on the discount type, set the best discount percentage
-    if (bestDiscount[0] === "Military")
-      setHighestDiscountPercent(10);
-    else if (bestDiscount[0] === "PromoCode")
-      setHighestDiscountPercent(promoCodePercent);
-    else if (bestDiscount[0] === "LoyaltyPoints")
-      setHighestDiscountPercent(0);
+
+    if (bestDiscount[1] == 0.00) { // Handles when no discount is selected
+      setDiscountType("");
+    }
+    else {
+      setDiscountType(bestDiscount[0]); // Set the best discount type
+      // Depending on the discount type, set the best discount percentage
+      if (bestDiscount[0] === "Military")
+        setHighestDiscountPercent(10);
+      else if (bestDiscount[0] === "PromoCode")
+        setHighestDiscountPercent(promoCodePercent);
+      else if (bestDiscount[0] === "LoyaltyPoints")
+        setHighestDiscountPercent(0);
+    }
     const afterDiscount = numericSubtotal - bestDiscount[1];
 
     const taxRate = 0.0825; // 8.25% tax rate
@@ -237,17 +241,6 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
         );
         return;
       }
-      // const token = sessionStorage.getItem("token");
-      // let waiterID = ''
-      // if (token) {
-      //   try {
-      //     const decodedToken = jwtDecode(token);
-      //     waiterID =decodedToken.employee_id;
-      //   } catch (error) {
-      //     console.error("Failed to decode token", error);
-      //     setError("Unable to verify waiter ID")
-      //   }
-      // }
       // Passed checks, order can continue...
       const itemsJSON = JSON.stringify(selectedItems);
       setError("");
@@ -257,7 +250,6 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
           `${process.env.REACT_APP_API_URL}/confirm-order`,
           {
             selectedItems: itemsJSON,
-            //waiterID,
             loginToken: sessionStorage.getItem("token"),
             tableNumber,
             customerID,

@@ -53,7 +53,6 @@ exports.confirm_order = (req, res) => {
   req.on("end", () => {
     const {
       selectedItems,
-      //waiterID,
       loginToken,
       tableNumber,
       customerID,
@@ -68,13 +67,11 @@ exports.confirm_order = (req, res) => {
       promoCode_id,
       discountType,
       discountAmount,
-      //isMilitaryString,
       discountPercentage,
     } = JSON.parse(body);
-    //const isMilitary = isMilitaryString == "no" ? 0 : 1; // Convert to binary (0 or 1)
-    const checkedPromoCodeID = promoCode_id == "" || discountType !== "PromoCode" ? null : promoCode_id // If no code was given, set it to null
-    const checkedDiscountPercent = discountType == "LoyaltyPoints" ? null : discountPercentage // If the discount type is loyalty points, set it to null
-    const addedPoints = Math.floor(total);
+    const checkedDiscountType = (discountType === "") ? null : discountType // set discount type to null
+    const checkedPromoCodeID = (promoCode_id == "" || discountType !== "PromoCode") ? null : promoCode_id // If no code was given, set it to null
+    const addedPoints = Math.floor(subtotal - discountAmount);
 
     pool.getConnection((err, connection) => {
       if (err) {
@@ -175,7 +172,7 @@ exports.confirm_order = (req, res) => {
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [selectedItems, waiterID, tableNumber, customerID, subtotal, tipPercent, tipAmount, 
           total, receivedAmount, changeAmount, tax, specialRequest,
-          addedPoints, checkedPromoCodeID, discountType, discountAmount, checkedDiscountPercent],
+          addedPoints, checkedPromoCodeID, checkedDiscountType, discountAmount, discountPercentage],
           (error, result) => {
             if (error) {
               return connection.rollback(() => {
