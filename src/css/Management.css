@@ -251,3 +251,12 @@
 .management table td {
     padding: 12px 8px;
 }
+
+.management .loyalty-header {
+    display: inline-flex;
+    float: right;
+    padding: 12px 8px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #363636;
+}

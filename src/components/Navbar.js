@@ -31,6 +31,7 @@ const Navbar = () => {
           {role == "Manager" && <a href="/inventory-report">Inventory Report</a>}
           {(role == "Accountant" || role == "Manager") && <a href="/sales-report">Sales Report</a>}
           {(role == "Manager") && <a href="/orders-report">Orders Report</a>}
+          <a href="/customer-view">Customer View</a>
         </div>
         <div className="user-dropdown">
           {role !== "user" && <span className="employee-name">{role}: {firstName}</span>}

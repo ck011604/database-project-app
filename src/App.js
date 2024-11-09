@@ -15,6 +15,7 @@ import SalesReport from "./components/SalesReport";
 import OrdersReport from "./components/OrdersReport";
 import EmployeeSettings from "./components/EmployeeSettings";
 import CustomerPortal from "./components/CustomerPortal";
+import CustomerView from "./components/CustomerView";
 
 function App() {
   const location = useLocation(); // Get current location
@@ -63,6 +64,9 @@ function App() {
             path="/employee-settings"
             element={ <ProtectedRoute element={<EmployeeSettings />} allowedRoles={['Waiter', 'Manager', 'Accountant']} /> }
           />
+          
+          <Route path="/customer-view" element={<CustomerView />} />
+
           <Route
             path="/orders-report"
             element={ <ProtectedRoute element={<OrdersReport />} allowedRoles={['Manager']} /> }
