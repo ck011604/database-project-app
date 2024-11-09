@@ -14,6 +14,7 @@ import NotFoundPage from "./components/NotFoundPage";
 import SalesReport from "./components/SalesReport";
 import OrdersReport from "./components/OrdersReport";
 import EmployeeSettings from "./components/EmployeeSettings";
+import CustomerPortal from "./components/CustomerPortal";
 
 function App() {
   const location = useLocation(); // Get current location
@@ -65,6 +66,10 @@ function App() {
           <Route
             path="/orders-report"
             element={ <ProtectedRoute element={<OrdersReport />} allowedRoles={['Manager']} /> }
+          />
+          <Route
+            path="/customer-portal"
+            element={ <ProtectedRoute element={<CustomerPortal />} allowedRoles={['user']} /> }
           />
           <Route path="*" element={<Navigate to="/404-Page-Not-Found" />} />
         </Routes>

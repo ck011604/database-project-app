@@ -22,19 +22,19 @@ const Navbar = () => {
 
   return (
     <header className="header">
-      <a href="/home" className="logo">
-        POS System
-      </a>
+      {role !== "user" && <a href="/home" className="logo">POS System</a>}
+      {role === "user" && <a href="/customer-portal" className="logo">Customer Portal</a>}
       <nav className="navbar">
         <div className="navbar-pages">
-            {(role == "Waiter" || role == "Manager") && <a href="/virtual-register">Virtual Register</a>}
-            {role == "Manager" && <a href="/management">Management</a>}
-            {role == "Manager" && <a href="/inventory-report">Inventory Report</a>}
+          {(role == "Waiter" || role == "Manager") && <a href="/virtual-register">Virtual Register</a>}
+          {role == "Manager" && <a href="/management">Management</a>}
+          {role == "Manager" && <a href="/inventory-report">Inventory Report</a>}
           {(role == "Accountant" || role == "Manager") && <a href="/sales-report">Sales Report</a>}
           {(role == "Manager") && <a href="/orders-report">Orders Report</a>}
         </div>
         <div className="user-dropdown">
-          <span className="employee-name">{role}: {firstName}</span>
+          {role !== "user" && <span className="employee-name">{role}: {firstName}</span>}
+          {role === "user" && <span className="customer-name">Welcome, {firstName}</span>}
           <div className="user-dropdown-content">
             <a href="/employee-settings">Settings</a>
             <a href="/login" onClick={handleLogout}>Logout</a>
