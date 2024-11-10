@@ -25,7 +25,7 @@ module.exports = {
             pool.query(batchQuery);
             res.end(JSON.stringify({ 
                 success: true, 
-                message: "The query has been executed and sales reports are now ready to be ran."
+                message: "Sales overview report is now ready to be ran."
             }));
         } catch (error) {
             console.error("Error executing the batch sales", error);
@@ -50,7 +50,8 @@ module.exports = {
         const query = `
         SELECT DATE(sales_date) AS sales_date, total_sales, total_cash, total_taxes, total_discounts
         FROM restaurant_sales
-        ${whereClause};
+        ${whereClause}
+        LIMIT 366;
         `;
         
         pool.query(query, params, (error, salesData) => {
@@ -84,7 +85,6 @@ module.exports = {
         FROM orders
         WHERE waiter_id = e.employee_id) IS NOT NULL
         ORDER BY total_sales DESC
-        LIMIT 5;
         `;
         
         pool.query(bestEmployees, (error, topEmployees) => {

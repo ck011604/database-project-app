@@ -140,9 +140,6 @@ const VirtualRegister = () => {
         }
     }, [menuFilter])
 
-    // useEffect(() => { // For testing purposes
-    //     console.log(inventoryStock)
-    // }, [inventoryStock])
     return ( 
         <div className="virtual-register">
             <div className="menu-container">
