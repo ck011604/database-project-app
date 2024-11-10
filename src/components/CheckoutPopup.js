@@ -301,13 +301,15 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
             <label>Subtotal: </label>
             <p>${subtotal}</p>
           </div>
-          {discountAmount > 0 &&
+          {discountAmount > 0 && (
             <div className="checkout-label">
-              {discountType != "LoyaltyPoints" && <label>Discount {highestDiscountPercent}%: </label>}
+              {discountType != "LoyaltyPoints" && (
+                <label>Discount {highestDiscountPercent}%: </label>
+              )}
               {discountType === "LoyaltyPoints" && <label>Discount: </label>}
               <p>-${discountAmount}</p>
             </div>
-          }
+          )}
           <div className="checkout-label">
             <label>Tax: </label>
             <p>${tax}</p>
@@ -328,12 +330,17 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
               disabled={formLock}
             />
           </div>
-          <button className="discount-menu-toggle" 
+          <button
+            className="discount-menu-toggle"
             onClick={() => setDiscountMenuOpen((prev) => !prev)}
-            type ="button"
+            type="button"
           >
             Discount Options
-            <span className={`discount-menu-caret ${discountMenuOpen ? 'up' : 'down'}`}></span>
+            <span
+              className={`discount-menu-caret ${
+                discountMenuOpen ? "up" : "down"
+              }`}
+            ></span>
           </button>
           {discountMenuOpen && (
             <div className={"discount-menu"}>
@@ -346,7 +353,12 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
                   placeholder="example@domain.com"
                   disabled={formLock || customerEmailLock}
                 />
-                <button className="customer-email-apply-button" type="button" onClick={handleCustomerEmail} disabled={formLock || customerEmailLock}>
+                <button
+                  className="customer-email-apply-button"
+                  type="button"
+                  onClick={handleCustomerEmail}
+                  disabled={formLock || customerEmailLock}
+                >
                   {customerEmailLock == true ? "Applied" : "Apply"}
                 </button>
               </div>
@@ -358,28 +370,38 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
                   checked={isMilitary === "yes"}
                   onChange={() => setIsMilitary("yes")}
                   disabled={formLock}
-                /> Yes
+                />{" "}
+                Yes
                 <input
                   type="radio"
                   value="no"
                   checked={isMilitary === "no"}
                   onChange={() => setIsMilitary("no")}
                   disabled={formLock}
-                /> No
+                />{" "}
+                No
               </div>
               <div className="checkout-label">
                 <label>Promotional Code: </label>
-                <input className="promo-code-input"
+                <input
+                  className="promo-code-input"
                   type="text"
                   value={promoCode}
                   onChange={(e) => setPromoCode(e.target.value)}
                   disabled={formLock || promoCodeLock}
                 />
-                <button className="promo-code-apply-button" type="button" onClick={handlePromoCode} disabled={formLock || promoCodeLock}>
+                <button
+                  className="promo-code-apply-button"
+                  type="button"
+                  onClick={handlePromoCode}
+                  disabled={formLock || promoCodeLock}
+                >
                   {promoCodeLock == true ? "Applied" : "Apply"}
                 </button>
               </div>
-              <small>Only the highest discount will be applied to your order.</small>
+              <small>
+                Only the highest discount will be applied to your order.
+              </small>
             </div>
           )}
           <div className="checkout-label">
@@ -421,9 +443,17 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
               {itemsWithConIng.map((item) => item.name).join(", ")}
             </p>
           )}
-          <button className="confirm-order-button" disabled={formLock}>
-            {confirmOrderButton}
-          </button>
+          {!successfulOrder && (
+            <button className="confirm-order-button" disabled={formLock}>
+              {confirmOrderButton}
+            </button>
+          )}
+          {successfulOrder && (
+            <>
+              <p className="success-order-msg">Order placed successfully</p>
+              <button className="print-receipt-button">Print Receipt</button>
+            </>
+          )}
         </form>
       </div>
     </div>

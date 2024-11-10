@@ -141,3 +141,18 @@
 .discount-menu-caret.up {
     transform: rotate(180deg);
 }
+.success-order-msg {
+    color:#25a547;
+    font-weight: bold;
+}
+.print-receipt-button {
+    width: 30%;
+    margin: 0 35%; /* 100 - 30 / 2 */
+    align-items: center;
+    background-color: grey;
+    color: white;
+    border-radius: 5px;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
