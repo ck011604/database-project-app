@@ -12,7 +12,6 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
   const [changeAmount, setChangeAmount] = useState(0.00); // total - received amount
   const [error, setError] = useState("");
   const [confirmOrderButton, setConfirmOrderButton] = useState("Confrim Order");
-  const [loginToken, setLoginToken] = useState("");
   const [customerID, setCustomerID] = useState(null);
   const [customerEmail, setCustomerEmail] = useState(""); // From the form
   const [customerEmailLock, setCustomerEmailLock] = useState(false);
