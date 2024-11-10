@@ -107,7 +107,9 @@ const serverBlock = (req, res) => {
         if (req.url.startsWith ("/api/request_schedule/")) {
             request_schedule_controller.request_schedule_detail(req, res);
         }
-        if (req.url.startsWith("/api/inventory-report/logs")) {
+        if (req.url.startsWith("/api/inventory-report/suggestions")) {
+            inventory_report_controller.getIngredientSuggestions(req, res);
+        } else if (req.url.startsWith("/api/inventory-report/logs")) {
             inventory_report_controller.getInventoryLogs(req, res);
         } else if (req.url.startsWith("/api/inventory-report/stats")) {
             inventory_report_controller.getStats(req, res);
