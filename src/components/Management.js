@@ -109,7 +109,7 @@ const Management = () => {
             {productFilter === "MENU_ITEMS" && (
                 <div>
                     <div className="inventory-form-container">
-                        <div className="add-menu-item" style={{"padding-bottom": "5px"}}>
+                        <div className="add-menu-item" style={{"paddingBottom": "5px"}}>
                             <h2 style={{display: "inline"}} >Menu Management</h2>
                             <button onClick={() => toggleModal()} className="btn-modal"> + </button>
                         </div> 
@@ -135,7 +135,7 @@ const Management = () => {
                                         <td>{item.type}</td>
                                         <td>{item.price}</td>
                                         <td>
-                                            <div>
+                                            <div className='actions-container'>
                                                 <span className={`status-label ${item.isActive ? 'status-label-active' : 'status-label-inactive'}`}>
                                                     {item.isActive ? "Active" : "Disabled"}
                                                 </span>

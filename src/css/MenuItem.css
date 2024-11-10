@@ -18,6 +18,7 @@
     height: auto;
     max-height: 100px;
     object-fit: cover;
+    border-radius: 5px
 }
 .item-box img.loaded {
     display: block;

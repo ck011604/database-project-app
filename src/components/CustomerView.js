@@ -18,11 +18,8 @@ const CustomerView= () => {
 
     const fetchPoints = async () => {
         try{
-            console.log("fetching points")
-            console.log(userID)
             let res = await axios.get(`${process.env.REACT_APP_API_URL}/api/user/${userID}`)
             let totalPoints = res.data.user.points;
-            console.log(res.data)
             setPoints(totalPoints);
         } catch (err) {
             console.log(`Error fetching points: ${err}`)
