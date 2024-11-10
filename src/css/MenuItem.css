@@ -16,6 +16,8 @@
 .item-image {
     width: 100px;
     height: auto;
+    max-height: 100px;
+    object-fit: cover;
 }
 .item-box img.loaded {
     display: block;

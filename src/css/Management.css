@@ -161,8 +161,8 @@
     background: #f1f1f1;
     padding: 15px 30px;
     border-radius: 5px;
-    max-width: 600px;
-    min-width: 300px;
+    max-width: 350px;
+    min-width: 350px;
 }
 
 .management .close-modal {

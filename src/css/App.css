@@ -10,6 +10,7 @@ html, body {
 .content {
   flex: 1;
   overflow-y: auto;
+  background-color: #E6ECF5;
 }
 button {
   font-family: inherit;
