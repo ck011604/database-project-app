@@ -85,7 +85,7 @@ const PromotionManagement = () => {
                 <AddPromotionForm setModal={setModal} promotion={promotion} callback={fetchAllPromotions}/>
             </Modal>
             <div className="inventory-form-container">
-                <div className="add-employee" style={{"padding-bottom": "5px"}}>
+                <div className="add-employee" style={{"paddingBottom": "5px"}}>
                     <h2 style={{display: "inline"}} >Promotion Management</h2>
                     <button onClick={() => toggleModal()} className="btn-modal"> + </button>
                 </div>
@@ -111,7 +111,7 @@ const PromotionManagement = () => {
                                         </div>
                                     </td>
                                     <td>
-                                        <div>
+                                        <div className='actions-container'>
                                             <span className={`status-label ${promotion.isActive ? 'status-label-active' : 'status-label-inactive'}`}>
                                                 {promotion.isActive ? "Active" : "Inactive"}
                                             </span>
@@ -135,3 +135,4 @@ const PromotionManagement = () => {
 };
 
 export default PromotionManagement;
+

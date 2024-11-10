@@ -190,6 +190,9 @@ const serverBlock = (req, res) => {
         if (req.url.startsWith("/api/promotions/")) {
             promotions_controller.promotion_delete(req, res);
         }
+        if (req.url.startsWith("/api/ingredient/")) {
+            inventory_controller.ingredient_delete(req, res);
+        }
     }
 }
 

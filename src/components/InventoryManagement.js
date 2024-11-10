@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { BsFillPencilFill } from "react-icons/bs";
+import { BsFillTrashFill, BsFillPencilFill } from "react-icons/bs";
 import '../css/Management.css';
 import Modal from "./Reusable/Modal";
 import AddIngredientForm from "./EditForms/AddIngredientForm";
@@ -13,6 +13,7 @@ const InventoryManagement = () => {
     const [message, setMessage] = useState(null);
     const [loading, setLoading] = useState(false);
     const [modal, setModal] = useState(false);
+    const [items, setItems] = useState([])
 
     useEffect(() => {
         fetchIngredients();
@@ -128,6 +129,30 @@ const InventoryManagement = () => {
         }
     }
 
+    const handleDelete = async(id) => {
+        try {
+            await axios.delete(`${process.env.REACT_APP_API_URL}/api/ingredient/${id}`);
+            fetchIngredients();
+        } catch (err) {
+            console.error(`Error deleting item: ${err}`);
+        }
+    };
+
+    const handleReactivate = async(id) => {
+        try {
+            await fetch(`${process.env.REACT_APP_API_URL}/api/ingredient/${id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ is_active: true })
+            });
+            fetchIngredients();
+        } catch (err) {
+            console.error(`Error reactivating item: ${err}`);
+        }
+    }
+
     return (
         <div>
             <div className="add-menu-item">
@@ -197,7 +222,7 @@ const InventoryManagement = () => {
                         {loading ? 'Processing...' : `${action === 'restock' ? 'Restock' : 'Discard'} Inventory`}
                     </button>
                 </form>
-                <div className="add-menu-item" style={{"padding-bottom": "5px"}}>
+                <div className="add-menu-item" style={{"paddingBottom": "5px"}}>
                         <h2 style={{display: "inline"}} >List of Ingredients</h2>
                         <button onClick={() => toggleModal()} className="btn-modal"> + </button>
                     </div> 
@@ -221,15 +246,20 @@ const InventoryManagement = () => {
                                 <td>{ingredient.restock_threshold}</td>
                                 <td>{ingredient.restock_amount}</td>
                                 <td>
-                                    <div>
+                                    <div className='actions-container'>
                                         {ingredient.autoRestock ?
                                                 <button className='restock-btn restock-auto-btn' onClick={() => handleManual(ingredient.ingredient_id)}>Automatic</button> :
                                                 <button className='restock-btn restock-manual-btn' onClick={() => handleAutomatic(ingredient.ingredient_id)}>Manual</button>
                                         }
-                                        <span className='item-actions'>
-                                            <BsFillPencilFill onClick={() => toggleModal(ingredient)}/>                    
-                                            {/* <BsFillTrashFill className='delete-btn' onClick={() => handleDelete(ingredient.ingredient_id)}/> */}
-                                            </span>
+                                        {ingredient.is_active ? 
+                                            <span className='item-actions'>
+                                                <BsFillPencilFill onClick={() => toggleModal(ingredient)}/>
+                                                {ingredient.can_delete ? 
+                                                 <BsFillTrashFill className='delete-btn' onClick={() => handleDelete(ingredient.ingredient_id)}/>:
+                                                 <BsFillTrashFill className='delete-disabled-btn' title="This ingredient is in use for a menu item."/>}        
+                                            </span> :
+                                            <button className="reactivate-btn" onClick={() => handleReactivate(ingredient.ingredient_id)}> Reactivate </button>
+                                        }
                                     </div>
                                 </td>
                             </tr>

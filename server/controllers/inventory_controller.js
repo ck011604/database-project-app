@@ -1,35 +1,58 @@
 const pool = require("../pool")
 
-exports.index = (req, res) => {
+exports.index = async (req, res) => {
     console.log("Received request to get all inventory");
-   
-    pool.query("SELECT * FROM inventory", (error, results) => {
-        if (error) {
-            res.writeHead(500, {"Content-Type": "application/json"});
-            res.end(
-                JSON.stringify({
-                    success: false, 
-                    message: "Server Error fetching inventory",
-                })
-            );
-            console.log("Error fetching inventory", error);
-            return;
+    const promisePool = pool.promise();
+    let results;
+    try{
+        const [rows, fields] = await promisePool.query("SELECT * FROM inventory")
+        results = rows
+    }catch(error){
+        res.writeHead(500, {"Content-Type": "application/json"});
+        res.end(
+            JSON.stringify({
+                success: false, 
+                message: "Server Error fetching inventory",
+            })
+        );
+        console.log("Error fetching inventory", error);
+        return;
+    }
+    let ingredients = []
+    try{
+        for(let ingredient of results){
+            let param = `%"ingredient_id": ${ingredient.ingredient_id}}%`
+            const [rows, fields] = await promisePool.query("select 1 from menu where ingredients like ?", param)
+            ingredients.push({
+                ingredient_id: ingredient.ingredient_id,
+                name: ingredient.name,
+                amount: ingredient.amount,
+                quantity: ingredient.amount,
+                restock_threshold: ingredient.restock_threshold,
+                restock_amount: ingredient.restock_amount,
+                autoRestock: ingredient.autoRestock,
+                is_active: ingredient.is_active,
+                can_delete: rows.length == 0
+            })
         }
-        console.log("Successfully fetched inventory");
-        res.writeHead(200, {"Content-Type": "application/json"});
-        res.end(JSON.stringify({
-            success: true, 
-            inventory: results.map(item => ({
-                ingredient_id: item.ingredient_id,
-                name: item.name,
-                amount: item.amount,
-                quantity: item.amount,
-                restock_threshold: item.restock_threshold,
-                restock_amount: item.restock_amount,
-                autoRestock: item.autoRestock
-            }))
-        }));
-    });
+    }catch(error){
+        res.writeHead(500, {"Content-Type": "application/json"});
+        res.end(
+            JSON.stringify({
+                success: false, 
+                message: "Server Error fetching inventory",
+            })
+        );
+        console.log("Error fetching inventory", error);
+        return;
+    }
+    
+    console.log("Successfully fetched inventory");
+    res.writeHead(200, {"Content-Type": "application/json"});
+    res.end(JSON.stringify({
+        success: true, 
+        inventory: ingredients
+    }))
 }
 
 exports.inventory_detail = (req, res) => {
@@ -123,9 +146,9 @@ exports.ingredient_update_patch = (req, res) => { // Update ingredient details
         body += chunk.toString();
     });
     req.on('end', () => {
-        const { name, amount, restock_threshold, restock_amount, autoRestock } = JSON.parse(body);
+        const { name, amount, restock_threshold, restock_amount, autoRestock, is_active} = JSON.parse(body);
         // Check if there are fields to update
-        if (!name && !amount && !restock_threshold && !restock_amount && autoRestock === undefined) {
+        if (!name && !amount && !restock_threshold && !restock_amount && autoRestock === undefined && is_active === undefined) {
             res.writeHead(400, { 'Content-Type': 'application/json'});
             res.end(JSON.stringify({ success: false, message: "No fields to update"}));
             return;
@@ -139,6 +162,7 @@ exports.ingredient_update_patch = (req, res) => { // Update ingredient details
         if (restock_threshold) { query_string += "restock_threshold = ?, "; params.push(restock_threshold); }
         if (restock_amount) { query_string += "restock_amount = ?, "; params.push(restock_amount); }
         if (autoRestock !== undefined) { query_string += "autoRestock = ?, "; params.push(autoRestock); }
+        if (is_active !== undefined) { query_string += "is_active = ?, "; params.push(is_active); }
         // Remove trailing comma and spaces in array
         // Specify which ingredient
         query_string = query_string.replace(/, $/, ' WHERE ingredient_id = ?');
@@ -155,6 +179,31 @@ exports.ingredient_update_patch = (req, res) => { // Update ingredient details
             res.end(JSON.stringify({ success: true }));
             console.log("Successfully updated inventory");
         });
+    });
+}
+
+exports.ingredient_delete = (req, res) => {
+    const ingredientID = req.url.split("/")[3];
+    if (!ingredientID) {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: false, message: "ingredient ID is required" }));
+        return;
+    }
+    pool.query("UPDATE inventory SET is_active = false WHERE ingredient_id = ?", [ingredientID], (error, result) => {
+        if (error) {
+            res.writeHead(500, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ success: false, message: "Server Error deleting ingredient" }));
+            console.error("Error deleting ingredient:", error);
+            return;
+        }
+        if (result.affectedRows === 0) {
+            res.writeHead(404, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ success: false, message: "ingredient not found" }));
+            return;
+        }
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: true, message: "ingredient deleted successfully" }));
+        console.log("Successfully deleted ingredient");
     });
 }
 
