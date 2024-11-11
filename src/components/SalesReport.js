@@ -4,6 +4,7 @@ import axios from 'axios';
 
 const SalesReports = () => {
 const [showSalesOptions, setShowSalesOptions] = useState(false);
+const [isOptionSelected, setIsOptionSelected] = useState(false);
 const [selectedOption, setSelectedOption] = useState('');
 const [startDate, setStartDate] = useState('');
 const [endDate, setEndDate] = useState('');
@@ -11,6 +12,8 @@ const [salesData, setSalesData] = useState(null);
 const [topEmployees, setTopEmployees] = useState(null);
 const [batchMessage, setBatchMessage] = useState('');
 const [errorMessage, setErrorMessage] = useState('');
+const [employeeFilter, setEmployeeFilter] = useState('');
+const [salesThreshold, setSalesThreshold] = useState('');
 
 const handleOptionClick = (option) => {
   setSelectedOption(option);
@@ -31,6 +34,7 @@ const handleEndDateChange = (e) => {
 
 const handleBatchSales = async () => {
   console.log("Batched sales button clicked");
+  setIsOptionSelected(true);
   try{
     const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/batch-sales`);
     setBatchMessage(response.data.message);
@@ -71,6 +75,7 @@ const formatDate = (dateString) => {
 };
 
 const submitBestEmployees = async () => {
+  setIsOptionSelected(true);
   try {
     const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/empsales-report`, {
     });
@@ -87,30 +92,66 @@ const submitBestEmployees = async () => {
   }
 };
 
+const filteredEmployees = topEmployees?.filter((employee) => {
+  const matchesName = employee.first_name.toLowerCase().includes(employeeFilter.toLowerCase()) ||
+                      employee.last_name.toLowerCase().includes(employeeFilter.toLowerCase());
+  const matchesSales = salesThreshold === '' || employee.total_sales >= Number(salesThreshold);
+  return matchesName && matchesSales;
+});
+
+const calculateTotals = (data) => {
+  if (!data || data.lenght === 0) return null;
+
+  const totals = data.reduce(
+    (acc, row) => {
+      acc.totalSales += parseFloat(row.total_sales);
+      acc.totalCash += parseFloat(row.total_cash);
+      acc.totalTaxes += parseFloat(row.total_taxes);
+      acc.totalDiscounts += parseFloat(row.total_discounts);
+      return acc;
+    },
+    {totalSales: 0, totalCash: 0, totalTaxes: 0, totalDiscounts: 0 }
+  );
+  return totals;
+}
+
+const totals = calculateTotals(salesData);
+
 return (
+  <div>
+    <header className="app-header">
+      <h1 className="app-title">Resturant Sales Reports</h1>
+    </header>
+
   <div className="report-container">
-    <h1>Generate Sales Report:</h1>
-    <div className="button-group">
-      <button className="report-button" onClick={handleBatchSales}>
-          Batch Sales
-      </button>
-    </div>
+    {!isOptionSelected && (
+      <>
+      <h1>Please select an option:</h1>
+      <div className="button-group">
+        <button className="report-button" onClick={handleBatchSales}>
+          Sales Overview
+        </button>
+        <button className="submit2-button" onClick={submitBestEmployees}>
+          Employee Performance
+        </button>
+       </div>
+      </>
+    )}
     {batchMessage && (
       <p className="batch-message">{batchMessage}</p>
     )} 
     {showSalesOptions && (
       <div className="sales-options">
-          <h3>please select a type of report:</h3>
+          <h3>Single Day or Time Frame:</h3>
           <div className="option-buttons">
               <button onClick={() => handleOptionClick('Daily')} className='option-button'>Daily</button>
-              <button onClick={() => handleOptionClick('Monthly')} className='option-button'>Monthly</button>
-              <button onClick={() => handleOptionClick('Yearly')} className='option-button'>Yearly</button>
+              <button onClick={() => handleOptionClick('Time Frame')} className='option-button'>Time Range</button>
           </div>
       </div>
     )}
     {selectedOption && (
       <div className = "date-prompt">
-          <h4>{`Select a date ${selectedOption === 'Daily' ? '' : ' range'} for ${ selectedOption } sales`}</h4>
+          <h4>{`Select date${selectedOption === 'Daily' ? '' : 's'} for the sales overview`}</h4>
 
           {selectedOption === 'Daily' ? (
             <>
@@ -144,16 +185,13 @@ return (
         {errorMessage && <p style={{ color: 'red'}} > {errorMessage} </p>}
 
         <button className="submit-button" onClick={submitReport}>
-            Generate {selectedOption} Report
-        </button>
-        <button className="submit2-button" onClick={submitBestEmployees}>
-            Generate Top Employees Report
+            Generate Sales Overview
         </button>
       </div>
     )}
     {salesData && (
       <div className="sales-data">
-        <h2 className="section-heading"> {selectedOption} Sales Report starting {startDate} and ending {endDate} </h2>
+        <h2 className="section-heading"> Sales Overview From {startDate} to {endDate} </h2>
         <table>
           <thead>
             <tr>
@@ -174,13 +212,41 @@ return (
               <td>{row.total_discounts}</td>
             </tr>
           ))}
+          {totals && (
+            <tr className="totals-row">
+              <td><strong>Totals</strong></td>
+              <td>{totals.totalSales.toFixed(2)}</td>
+              <td>{totals.totalCash.toFixed(2)}</td>
+              <td>{totals.totalTaxes.toFixed(2)}</td>
+              <td>{totals.totalDiscounts.toFixed(2)}</td>
+            </tr>
+          )}
          </tbody>
         </table>
       </div>
     )}
     {topEmployees && (
       <div className="employee-data">
-        <h2 className="section-heading">Employees Performance:</h2>
+        <h2 className="section-heading">Employee Performance:</h2>
+        <div className="filters">
+          <label>Employee Name:</label>
+          <input
+            type="text"
+            value={employeeFilter}
+            onChange={(e) => setEmployeeFilter(e.target.value)}
+            placeholder="Search by name"
+            />
+          <label>Sales Threshold:          </label>
+          <input
+            type="text"
+            value={salesThreshold}
+            onChange={(e) => setSalesThreshold(e.target.value)}
+            placeholder="Enter minimum sales"
+            />
+            <button className="clear-filters-button" onClick={() => { setEmployeeFilter(''); setSalesThreshold(''); }}>
+              Clear Filters
+            </button>
+          </div>
         <table>
           <thead>
             <tr>
@@ -192,7 +258,7 @@ return (
             </tr>
           </thead>
           <tbody>
-            {topEmployees.map((employee, index) => (
+            {filteredEmployees.map((employee, index) => (
               <tr key={index}>
                 <td>{employee.employee_id}</td>
                 <td>{employee.last_name}</td>
@@ -205,6 +271,7 @@ return (
         </table>
       </div>
     )}
+  </div>
   </div>
   );
 };

@@ -6,7 +6,6 @@ const accountController = require('./controllers/account_controller');
 const virtualRegisterController = require('./controllers/virtualRegister_controller');
 const promotionalCodeController = require('./controllers/promotional_code_controller');
 const employee_controller = require("./controllers/employee_controller");
-const shift_controller = require("./controllers/shift_controller");
 const inventory_controller = require("./controllers/inventory_controller");
 const menu_management_controller = require("./controllers/menu_management_controller");
 const promotions_controller = require("./controllers/promotions_controller.js");
@@ -51,9 +50,6 @@ const serverBlock = (req, res) => {
         if (req.url === "/api/employees") {
             employee_controller.employee_create_post(req, res);
         }
-        if (req.url === "/api/shifts") {
-            shift_controller.shift_create_post(req, res);
-        }
         if (req.url === "/api/menu_management") {
             menu_management_controller.menu_create_post(req, res);
         }
@@ -97,12 +93,6 @@ const serverBlock = (req, res) => {
         }
         if (req.url.startsWith("/api/employees/")) {
             employee_controller.employee_detail(req, res);
-        }
-        if (req.url === ("/api/shifts")) {
-            shift_controller.index(req, res);
-        }
-        if (req.url.startsWith ("/api/shifts/")) {
-            shift_controller.shift_detail(req, res);
         }
         if (req.url.startsWith ("/api/request_schedule/")) {
             request_schedule_controller.request_schedule_detail(req, res);
@@ -152,8 +142,8 @@ const serverBlock = (req, res) => {
         if (req.url.startsWith("/api/employees/")) {
             employee_controller.employee_update_patch(req, res);
         }
-        if (req.url.startsWith("/api/shifts/")) {
-            shift_controller.shift_update_patch(req, res);
+        if (req.url.startsWith("/api/user/")) {
+          users_controller.user_update_patch(req, res);
         }
         if (req.url.startsWith("/api/menu_management/")) {
             menu_management_controller.menu_update_patch(req, res);
@@ -175,9 +165,6 @@ const serverBlock = (req, res) => {
         if (req.url.startsWith("/api/employees/")) {
             employee_controller.employee_delete(req, res);
         }
-        if (req.url.startsWith("/api/shifts/")) {
-            shift_controller.shift_delete(req, res);
-        }
         if (req.url.startsWith("/api/menu_management/")) {
             menu_management_controller.menu_delete(req, res);
         }
@@ -186,6 +173,9 @@ const serverBlock = (req, res) => {
         }
         if (req.url.startsWith("/api/promotions/")) {
             promotions_controller.promotion_delete(req, res);
+        }
+        if (req.url.startsWith("/api/ingredient/")) {
+            inventory_controller.ingredient_delete(req, res);
         }
     }
 }

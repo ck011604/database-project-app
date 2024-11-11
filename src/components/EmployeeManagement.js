@@ -90,7 +90,7 @@ const EmployeeManagement = () => {
                 <AddEmployeeForm setModal={setModal} employee={employee} callback={fetchAllEmployees}/>
             </Modal>
             <div className="inventory-form-container">
-                <div className="add-employee" style={{"padding-bottom": "5px"}}>
+                <div className="add-employee" style={{"paddingBottom": "5px"}}>
                     <h2 style={{display: "inline"}} >Employee Management</h2>
                     <button onClick={() => toggleModal()} className="btn-modal"> + </button>
                 </div>
@@ -114,7 +114,7 @@ const EmployeeManagement = () => {
                                     <td>{employee.email}</td>
                                     <td>{employee.role}</td>
                                     <td>
-                                        <div>
+                                        <div className='actions-container'>
                                             <span className={`status-label ${employee.isActive ? 'status-label-active' : 'status-label-inactive'}`}>
                                                 {employee.isActive ? "Active" : "Inactive"}
                                             </span>

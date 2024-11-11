@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Bungee+Shade&display=swap');
+.not-found-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+
+}
+.code-404 {
+    font-family: 'Bungee Shade';
+    font-size: 15rem;
+    margin: 0;
+    animation: flash 1s infinite;
+}
+@keyframes flash {
+    0% {color:#003366;}
+    50% {color:#004181;}
+    100% {color:#003366;}
+}
+.page-not-found-text {
+    font-size: 1rem;
+}
+.page-not-found-back-button {
+    width: 20%;
+    margin: 10px;
+    align-items: center;
+    background-color: #003366;
+    color: white;
+    border-radius: 10px;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+.page-not-found-back-button:hover {
+    background-color: #0352a1;
+}
+.not-found-page-circle {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 650px;
+    height: 650px;
+    border-radius: 50%;
+    background-color: #A5C4D4;
+    margin: 10px 0;
+    padding: 20px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 1);
+}

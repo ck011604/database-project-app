@@ -19,35 +19,58 @@ const Navbar = () => {
 
   const handleLogout = () => {
     sessionStorage.removeItem("token");
-  }
+  };
 
   return (
     <header className="header">
-      {role !== "user" && <a href="/home" className="logo">POS System</a>}
-      {role === "user" && <a href="/customer-portal-menu" className="logo">Customer Portal</a>}
+      {role !== "user" && (
+        <a href="/home" className="logo">
+          POS System
+        </a>
+      )}
+      {role === "user" && (
+        <a href="/customer-portal-menu" className="logo">
+          Customer Portal
+        </a>
+      )}
       <nav className="navbar">
         <div className="navbar-pages">
-          {(role == "Waiter" || role == "Manager") && <a href="/virtual-register">Virtual Register</a>}
+          {(role == "Waiter" || role == "Manager") && (
+            <a href="/virtual-register">Virtual Register</a>
+          )}
           {role == "Manager" && <a href="/management">Management</a>}
-          {role == "Manager" && <a href="/inventory-report">Inventory Report</a>}
-          {(role == "user") && <Link to="/customer-portal-menu">Our Menu</Link>}
-          {(role == "user") && <Link to="/customer-portal-view">Order History</Link>}
+          {role == "Manager" && (
+            <a href="/inventory-report">Inventory Report</a>
+          )}
+          {role == "user" && <Link to="/customer-portal-menu">Our Menu</Link>}
+          {role == "user" && (
+            <Link to="/customer-portal-view">Order History</Link>
+          )}
         </div>
-        {(role == "Accountant" || role == "Manager") && 
-            (<div className="finance-dropdown">
-              <div className="finance-tab">Finance</div>
-              <div className="finance-dropdown-content">
-                <a href="/sales-report">Sales Report</a>
-                <a href="/orders-report">Orders Report</a>
-              </div>
-            </div>)
-        }
+        {(role == "Accountant" || role == "Manager") && (
+          <div className="finance-dropdown">
+            <div className="finance-tab">Finance Reports</div>
+            <div className="finance-dropdown-content">
+              <a href="/sales-report">Sales</a>
+              <a href="/orders-report">Orders</a>
+            </div>
+          </div>
+        )}
         <div className="user-dropdown">
-          {role !== "user" && <span className="employee-name">{role}: {firstName}</span>}
-          {role === "user" && <span className="customer-name">Welcome, {firstName}</span>}
+          {role !== "user" && (
+            <span className="employee-name">
+              {role}: {firstName}
+            </span>
+          )}
+          {role === "user" && (
+            <span className="customer-name">Welcome, {firstName}</span>
+          )}
           <div className="user-dropdown-content">
-            <a href="/employee-settings">Settings</a>
-            <a href="/login" onClick={handleLogout}>Logout</a>
+            {role !== "user" && <a href="/employee-settings">Settings</a>}
+            {role === "user" && <a href="/customer-settings">Settings</a>}
+            <a href="/login" onClick={handleLogout}>
+              Logout
+            </a>
           </div>
         </div>
       </nav>

@@ -2,7 +2,7 @@ import "./css/App.css";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import LoginPage from "./components/LoginPage";
-import Home from "./components/Home";
+import HomeRoute from "./components/HomeRoutes"
 import ProtectedRoute from "./components/ProtectedRoutes";
 import CreateAccount from "./components/CreateAccount";
 import Navbar from "./components/Navbar";
@@ -13,6 +13,7 @@ import NotFoundPage from "./components/NotFoundPage";
 import SalesReport from "./components/SalesReport";
 import OrdersReport from "./components/OrdersReport";
 import EmployeeSettings from "./components/EmployeeSettings";
+import CustomerSettings from "./components/CustomerSettings";
 import CustomerPortalMenu from "./components/CustomerPortalMenu";
 import CustomerPortalView from "./components/CustomerPortalView";
 
@@ -32,9 +33,9 @@ function App() {
 
           <Route path="/404-Page-Not-Found" element={<NotFoundPage />} />
 
-          <Route 
-            path="/home" 
-            element={ <ProtectedRoute element={<Home />} allowedRoles={['Waiter','Accountant', 'Manager']} /> }
+          <Route
+            path="/home"
+            element={<HomeRoute />}
           />
 
           <Route path="/create-account" element={<CreateAccount />} />
@@ -65,8 +66,13 @@ function App() {
           />
 
           <Route
+            path="/customer-settings"
+            element={ <ProtectedRoute element={<CustomerSettings />} allowedRoles={['user']} /> }
+          />
+
+          <Route
             path="/orders-report"
-            element={ <ProtectedRoute element={<OrdersReport />} allowedRoles={['Manager']} /> }
+            element={ <ProtectedRoute element={<OrdersReport />} allowedRoles={['Accountant', 'Manager']} /> }
           />
 
           <Route
