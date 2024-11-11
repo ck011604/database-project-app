@@ -22,7 +22,7 @@ exports.index = async (req, res) => {
     try{
         for(let ingredient of results){
             let param = `%"ingredient_id": ${ingredient.ingredient_id}}%`
-            const [rows, fields] = await promisePool.query("select 1 from menu where ingredients like ?", param)
+            const [rows, fields] = await promisePool.query("select 1 from menu where ingredients like ? AND is_active = true", param)
             ingredients.push({
                 ingredient_id: ingredient.ingredient_id,
                 name: ingredient.name,

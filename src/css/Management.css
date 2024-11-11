@@ -2,286 +2,301 @@
     max-width: 1000px;
     margin: 0 auto;
     padding: 20px;
-}
 
-.management .management-table {
-    width: 100%;
-    border-collapse: collapse;
-    border: centered;
-    margin-left: auto;
-    margin-right: auto;
-    font-size: 1em;
-    min-width: 400px;
-    border-radius: 8px 8px 8px 8px;
-    overflow: hidden;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-}
-
-.management .management-table thead tr {
-    background-color: #808080;
-    color: #ffffff;
-    text-align: left;
-    font-weight: bold;
-    min-width: 400px;
-}
-
-.management .item-info th {
-    height: 50px;
-    background-color: #808080;
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-}
-
-.management .items-table td {
-    padding: 12px 15px;
-}
-
-.management .item-info tbody tr {
-    border-bottom: 1px solid #ffffff
-}
-
-.management .item-info tbody tr:last-of-type {
-    border-bottom: 2x solid #808080
-}
-
-.management .status-label {
-    padding: .4rem 0;
-    border-radius: 2rem;
-    min-width: 67px;
-    text-align: center;
-}
-
-.management .status-label-active {
-    background-color: #42a942;
-    color: white;
-    padding: 0.3rem;
-    border-radius: 3px;
-}
-
-.management .status-label-inactive {
-    background-color: #777;
-    color: white;
-    padding: 0.3rem;
-    border-radius: 3px;
-}
-
-.management .restock-btn {
-    padding: 0.3rem;
-    border-radius: 4px;
-    border: none;
-    display: inline-block;
-    font-size: 16px;
-    cursor: pointer;
-    box-shadow: rgba(45, 35, 66, .4) 0 2px 4px,rgba(45, 35, 66, .3) 0 7px 13px -3px,rgba(58, 65, 111, .5) 0 -3px 0 inset;
-}
-
-.management .restock-auto-btn {
-    background-color: #42a942;
-    color: white;
-}
-
-.management .restock-manual-btn {
-    background-color: #777;
-    color: white;
-}
-
-.management .item-actions {
-    display: flex;
-    float: right;
-    gap: 10px;
-    min-width: 82px;
-    justify-content: end;
-}
-
-.management .item-actions svg {
-    cursor: pointer;
-}
-
-.management .item-actions .delete-disabled-btn {
-    color: grey;
-    cursor: not-allowed;
-}
-
-.management .delete-btn {
-    color: #e10d05
-}
-
-.management .actions-container{
-    display: flex;
-    gap: 20px;
-    justify-content: end;
-}
-
-.management .reactivate-btn {
-    display: flex;
-    text-align: right;
-    padding: 0.3rem;
-    border-radius: 4px;
-    border: none;
-    display: inline-block;
-    font-size: 16px;
-    cursor: pointer;
-    box-shadow: rgba(45, 35, 66, .4) 0 2px 4px,rgba(45, 35, 66, .3) 0 7px 13px -3px,rgba(58, 65, 111, .5) 0 -3px 0 inset;
-    background-color: #777;
-    color: white;
-}
-
-.management .management-navbar {
-    margin-bottom: 20px;
-}
-
-.management .management-navbar button {
-    margin-right: 10px;
-    padding: 8px 16px;
-    border: none;
-    background-color: #808080;
-    color: white;
-    cursor: pointer;
-    border-radius: 4px;
-}
-
-.management .management-navbar button:hover {
-    background-color: #666;
-}
-
-.management .btn-modal {
-    padding: 10px 20px;
-    float: right;
-    border-radius: 4px;
-    font-size: 18px;
-    margin-bottom: 3px;
-    background-color: #808080;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
-
-.management .btn-modal:hover {
-    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19)
-}
-
-.management .modal, .management .overlay {
-    width: 100vw;
-    height: 100vh;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    position: fixed;
-}
-
-.management .overlay {
-    background: rgba(49,49,49,0.8);
-}
-
-.management .modal-content {
-    position: absolute;
-    top: 40%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    line-height: 1.5;
-    background: #f1f1f1;
-    padding: 15px 30px;
-    border-radius: 5px;
-    max-width: 350px;
-    min-width: 350px;
-}
-
-.management .close-modal {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    padding: 5px 7px;
-}
-
-.management .add-menu-item {
-    margin-top: 10px;
-    padding-right: 20px;
-}
-
-.management .form-details label {
-    display: block;
-    margin-bottom: 1px;
-}
-
-/* Inventory Management Styles */
-.management .inventory-form-container {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-    border-radius: 10px;
-}
-
-.management .form-group {
-    margin-bottom: 15px;
-}
-
-.management .form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
-}
-
-.management .form-select, 
-.management .form-input {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-bottom: 10px;
-}
-
-.management .btn-submit {
-    width: 100%;
-    padding: 10px;
-    background-color: #808080;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-    margin-bottom: 20px;
-}
-
-.management .btn-submit:hover {
-    background-color: #666;
-}
-
-.management .btn-submit:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-}
-
-.management .message {
-    padding: 10px;
-    margin-bottom: 15px;
-    border-radius: 4px;
-}
-
-.management .message-success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-.management .message-error {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-.management table td {
-    padding: 12px 8px;
-}
-
-.management .loyalty-header {
-    display: inline-flex;
-    float: right;
-    padding: 12px 8px;
-    font-size: 20px;
-    font-weight: bold;
-    color: #363636;
+    .filter-table {
+        background-image: url('../../public/searchIcon.png');
+        background-size: 3%;
+        background-position: 10px 8px; /* Position the search icon */
+        background-repeat: no-repeat; /* Do not repeat the icon image */
+        width: 85%; /* Full-width */
+        font-size: 14px; /* Increase font-size */
+        padding: 10px 20px 10px 42px; /* Add some padding */
+        border: 1px solid #ddd; /* Add a grey border */
+        margin-bottom: 0px; /* Add some space below the input */
+        margin-top: 10px;
+      }
+    
+    .management-table {
+        width: 100%;
+        border-collapse: collapse;
+        border: centered;
+        margin-left: auto;
+        margin-right: auto;
+        font-size: 1em;
+        min-width: 400px;
+        border-radius: 8px 8px 8px 8px;
+        overflow: hidden;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+        margin-top: 10px;
+    }
+    
+    .management-table thead tr {
+        background-color: #808080;
+        color: #ffffff;
+        text-align: left;
+        font-weight: bold;
+        min-width: 400px;
+    }
+    
+    .item-info th {
+        height: 50px;
+        background-color: #808080;
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+        min-width: 100px;
+    }
+    
+    .items-table td {
+        padding: 12px 15px;
+    }
+    
+    .item-info tbody tr {
+        border-bottom: 1px solid #ffffff
+    }
+    
+    .item-info tbody tr:last-of-type {
+        border-bottom: 2x solid #808080
+    }
+    
+    .status-label {
+        padding: .4rem 0;
+        border-radius: 2rem;
+        min-width: 67px;
+        text-align: center;
+    }
+    
+    .status-label-active {
+        background-color: #42a942;
+        color: white;
+        padding: 0.3rem;
+        border-radius: 3px;
+    }
+    
+    .status-label-inactive {
+        background-color: #777;
+        color: white;
+        padding: 0.3rem;
+        border-radius: 3px;
+    }
+    
+    .restock-btn {
+        padding: 0.3rem;
+        border-radius: 4px;
+        border: none;
+        display: inline-block;
+        font-size: 16px;
+        cursor: pointer;
+        box-shadow: rgba(45, 35, 66, .4) 0 2px 4px,rgba(45, 35, 66, .3) 0 7px 13px -3px,rgba(58, 65, 111, .5) 0 -3px 0 inset;
+    }
+    
+    .restock-auto-btn {
+        background-color: #42a942;
+        color: white;
+    }
+    
+    .restock-manual-btn {
+        background-color: #777;
+        color: white;
+    }
+    
+    .item-actions {
+        display: flex;
+        float: right;
+        gap: 10px;
+        min-width: 82px;
+        justify-content: end;
+    }
+    
+    .item-actions svg {
+        cursor: pointer;
+    }
+    
+    .item-actions .delete-disabled-btn {
+        color: grey;
+        cursor: not-allowed;
+    }
+    
+    .delete-btn {
+        color: #e10d05
+    }
+    
+    .actions-container{
+        display: flex;
+        gap: 20px;
+        justify-content: end;
+    }
+    
+    .reactivate-btn {
+        display: flex;
+        text-align: right;
+        padding: 0.3rem;
+        border-radius: 4px;
+        border: none;
+        display: inline-block;
+        font-size: 16px;
+        cursor: pointer;
+        box-shadow: rgba(45, 35, 66, .4) 0 2px 4px,rgba(45, 35, 66, .3) 0 7px 13px -3px,rgba(58, 65, 111, .5) 0 -3px 0 inset;
+        background-color: #777;
+        color: white;
+    }
+    
+    .management-navbar {
+        margin-bottom: 20px;
+    }
+    
+    .management-navbar button {
+        margin-right: 10px;
+        padding: 8px 16px;
+        border: none;
+        background-color: #808080;
+        color: white;
+        cursor: pointer;
+        border-radius: 4px;
+    }
+    
+    .management-navbar button:hover {
+        background-color: #666;
+    }
+    
+    .btn-modal {
+        padding: 10px 20px;
+        float: right;
+        border-radius: 4px;
+        font-size: 18px;
+        background-color: #808080;
+        color: white;
+        border: none;
+        cursor: pointer;
+        margin-top: 10px
+    }
+    
+    .btn-modal:hover {
+        box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19)
+    }
+    
+    .modal .overlay {
+        width: 100vw;
+        height: 100vh;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        position: fixed;
+    }
+    
+    .overlay {
+        background: rgba(49,49,49,0.8);
+    }
+    
+    .modal-content {
+        position: absolute;
+        top: 40%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        line-height: 1.5;
+        background: #f1f1f1;
+        padding: 15px 30px;
+        border-radius: 5px;
+        max-width: 350px;
+        min-width: 350px;
+    }
+    
+    .close-modal {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 5px 7px;
+    }
+    
+    .add-menu-item {
+        margin-top: 10px;
+        padding-right: 20px;
+    }
+    
+    .form-details label {
+        display: block;
+        margin-bottom: 1px;
+    }
+    
+    /* Inventory Management Styles */
+    .inventory-form-container {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        border-radius: 10px;
+    }
+    
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
+    
+    .form-select, 
+    .form-input {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin-bottom: 10px;
+    }
+    
+    .btn-submit {
+        width: 100%;
+        padding: 10px;
+        background-color: #808080;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        margin-bottom: 20px;
+    }
+    
+    .btn-submit:hover {
+        background-color: #666;
+    }
+    
+    .btn-submit:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+    
+    .message {
+        padding: 10px;
+        margin-bottom: 15px;
+        border-radius: 4px;
+    }
+    
+    .message-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    
+    .message-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+    
+    table td {
+        padding: 12px 8px;
+    }
+    
+    .loyalty-header {
+        display: inline-flex;
+        float: right;
+        padding: 12px 8px;
+        font-size: 20px;
+        font-weight: bold;
+        color: #363636;
+    }
 }

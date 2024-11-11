@@ -79,6 +79,27 @@ const PromotionManagement = () => {
         }
     }
 
+    const filterTable = (e) => {
+        const searchValue = e.target.value.toUpperCase()
+        // Declare variables
+        let table, tr, td, i, txtValue;
+        table = document.getElementById("promotion-table");
+        tr = table.getElementsByTagName("tr");
+      
+        // Loop through all table rows, and hide those who don't match the search query
+        for (i = 0; i < tr.length; i++) {
+          td = tr[i].getElementsByTagName("td")[1];
+          if (td) {
+            txtValue = td.textContent || td.innerText;
+            if (txtValue.toUpperCase().indexOf(searchValue) > -1) {
+              tr[i].style.display = "";
+            } else {
+              tr[i].style.display = "none";
+            }
+          }
+        }
+      }
+
     return(
         <div className="add-menu-item">
             <Modal modal={modal} setModal={setModal}>
@@ -87,9 +108,12 @@ const PromotionManagement = () => {
             <div className="inventory-form-container">
                 <div className="add-employee" style={{"paddingBottom": "5px"}}>
                     <h2 style={{display: "inline"}} >Promotion Management</h2>
+                </div>
+                <div>
+                <input className="filter-table" type="text" onKeyUp={filterTable} placeholder="Search for items.."></input>
                     <button onClick={() => toggleModal()} className="btn-modal"> + </button>
                 </div>
-                <table className="management-table">
+                <table id="promotion-table" className="management-table">
                     <thead> 
                         <tr className="item-info">
                             <th>ID</th>

@@ -8,7 +8,12 @@ const AddPromotionForm = ({setModal, promotion, callback}) => {
             let props = ["code", "discount_percent", "uses_left"]
             let data = {}
             for(let key of props){
-                data[key] = values[key]
+                if (key === "uses_left" && values[key] == "") {
+                    data[key] = null
+                } 
+                else{
+                    data[key] = values[key]
+                }
             }
 
             let method = (promotion) ? 'PATCH' : 'POST';
@@ -58,10 +63,7 @@ const AddPromotionForm = ({setModal, promotion, callback}) => {
                 title: 'Remaining Uses',
                 type: 'number',
                 name: 'uses_left',
-                rules: { required: true },
-                validationProps: {
-                    required: 'Remaining Uses is mandatory'
-                }
+                rules: { required: false },
             },
         ]
     }

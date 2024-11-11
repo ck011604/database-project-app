@@ -4,7 +4,7 @@ const NotFoundPage = () => {
     const navigate = useNavigate();
 
     const handleGoBack = () => {
-        window.history.go(-2);
+        window.history.go(-3);
     };
     return ( 
         <div className="not-found-page">
