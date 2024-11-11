@@ -94,6 +94,27 @@ const Management = () => {
         }
     }
 
+    const filterTable = (e) => {
+        const searchValue = e.target.value.toUpperCase()
+        // Declare variables
+        let table, tr, td, i, txtValue;
+        table = document.getElementById("management-table");
+        tr = table.getElementsByTagName("tr");
+      
+        // Loop through all table rows, and hide those who don't match the search query
+        for (i = 0; i < tr.length; i++) {
+          td = tr[i].getElementsByTagName("td")[1];
+          if (td) {
+            txtValue = td.textContent || td.innerText;
+            if (txtValue.toUpperCase().indexOf(searchValue) > -1) {
+              tr[i].style.display = "";
+            } else {
+              tr[i].style.display = "none";
+            }
+          }
+        }
+      }
+
     return (
         <div className="management">
             <Modal modal={modal} setModal={setModal}>
@@ -113,7 +134,8 @@ const Management = () => {
                             <h2 style={{display: "inline"}} >Menu Management</h2>
                             <button onClick={() => toggleModal()} className="btn-modal"> + </button>
                         </div> 
-                        <table className="management-table">
+                        <input className="filter-table" type="text" onKeyUp={filterTable} placeholder="Search for items.."></input>
+                        <table id="management-table" className="management-table">
                             <thead> 
                                 <tr className="item-info">
                                     <th>Item Number</th>
