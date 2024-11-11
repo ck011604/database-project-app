@@ -113,9 +113,11 @@ const EmployeeManagement = () => {
             <div className="inventory-form-container">
                 <div className="add-employee" style={{"paddingBottom": "5px"}}>
                     <h2 style={{display: "inline"}} >Employee Management</h2>
+                </div>
+                <div>
+                <input className="filter-table" type="text" onKeyUp={filterTable} placeholder="Search for items.."></input>
                     <button onClick={() => toggleModal()} className="btn-modal"> + </button>
                 </div>
-                <input className="filter-table" type="text" onKeyUp={filterTable} placeholder="Search for names.."></input>
                 <table id="employee-table" className="management-table">
                     <thead> 
                         <tr className="item-info">

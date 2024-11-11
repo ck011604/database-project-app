@@ -246,9 +246,11 @@ const InventoryManagement = () => {
                 </form>
                 <div className="add-menu-item" style={{"paddingBottom": "5px"}}>
                         <h2 style={{display: "inline"}} >List of Ingredients</h2>
-                        <button onClick={() => toggleModal()} className="btn-modal"> + </button>
                 </div> 
-                <input className="filter-table" type="text" onKeyUp={filterTable} placeholder="Search for ingredients.."></input>
+                <div>
+                    <input className="filter-table" type="text" onKeyUp={filterTable} placeholder="Search for items.."></input>
+                    <button onClick={() => toggleModal()} className="btn-modal"> + </button>
+                </div>
                 <table id="inventory-table" className="management-table">
                     <thead>
                         <tr className="item-info">

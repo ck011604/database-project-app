@@ -8,7 +8,7 @@
         background-size: 3%;
         background-position: 10px 8px; /* Position the search icon */
         background-repeat: no-repeat; /* Do not repeat the icon image */
-        width: 75%; /* Full-width */
+        width: 85%; /* Full-width */
         font-size: 14px; /* Increase font-size */
         padding: 10px 20px 10px 42px; /* Add some padding */
         border: 1px solid #ddd; /* Add a grey border */
@@ -164,11 +164,11 @@
         float: right;
         border-radius: 4px;
         font-size: 18px;
-        margin-bottom: 3px;
         background-color: #808080;
         color: white;
         border: none;
         cursor: pointer;
+        margin-top: 10px
     }
     
     .btn-modal:hover {
