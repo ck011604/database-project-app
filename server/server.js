@@ -16,10 +16,12 @@ const orders_report_controller = require('./controllers/orders_report_controller
 const order_controller = require('./controllers/order_controller');
 const staticController = require('./controllers/static_controller');
 const users_controller = require('./controllers/users_controller');
+const receipt_controller = require('./controllers/receipt_controller');
 const pool = require("./pool") // put const pool = require("../pool") into controller files
 const fs = require("fs")
 const https_mode = fs.existsSync(process.env.PATH_TO_CERT) && fs.existsSync(process.env.PATH_TO_KEY)
 const port = https_mode ? 443 : 3001
+const mysql = require('mysql2/promise');
 
 const serverBlock = (req, res) => {
     // Set CORS headers
@@ -136,6 +138,16 @@ const serverBlock = (req, res) => {
         }
         if (req.url.startsWith("/api/user/")) {
             users_controller.user_detail(req, res);
+        }
+        if (req.url.startsWith("/api/receipt/")) {
+            console.log("Receipt route matched, URL:", req.url);
+            // Extract orderId from URL
+            const urlParts = req.url.split('/');
+            req.params = {
+                orderId: urlParts[urlParts.length - 1]
+            };
+            receipt_controller.getReceiptData(req, res);
+            return;
         }
     }
     if (req.method === "PATCH") {

@@ -1,62 +1,62 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { generateReceipt } from './Receipt';
 import "../css/CheckoutPopup.css";
 
 const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInventory, setSelectedItemsVR }) => {
-  const [tax, setTax] = useState(0.0); // Based off subtotal
-  const [total, setTotal] = useState(0.0); // Subtotal + tax + tip
+  const [tax, setTax] = useState(0.0);
+  const [total, setTotal] = useState(0.0);
   const [tableNumber, setTableNumber] = useState(0);
   const [receivedAmount, setReceivedAmount] = useState(0.00);
   const [tipPercent, setTipPercent] = useState(0);
   const [tipAmount, setTipAmount] = useState(0.00);
-  const [changeAmount, setChangeAmount] = useState(0.00); // total - received amount
+  const [changeAmount, setChangeAmount] = useState(0.00);
   const [error, setError] = useState("");
   const [confirmOrderButton, setConfirmOrderButton] = useState("Confrim Order");
   const [customerID, setCustomerID] = useState(null);
-  const [customerEmail, setCustomerEmail] = useState(""); // From the form
+  const [customerEmail, setCustomerEmail] = useState("");
   const [customerEmailLock, setCustomerEmailLock] = useState(false);
-  const [nextVisitDiscount, setNextVisitDiscount] = useState(0); // In dollars
+  const [nextVisitDiscount, setNextVisitDiscount] = useState(0);
   const [formLock, setFormLock] = useState(false);
-  const [successfulOrder, setSuccessfulOrder] = useState(false); // Needed for reseting selected items when closing
-  const [conflictingIngredients, setConflictingIngredients] = useState([]); // Name and ID of conIng
-  const [updatedSelectedItems, setUpdatedSelectiveItems] = useState([]); // New list after removing items with conIng
-  const [itemsWithConIng, setItemsWithConIng] = useState([]); // List of items containing a conIng
-  const [ingredientsNeeded, setIngredientsNeeded] = useState([]); // List of ingredients and quantity for the order
+  const [successfulOrder, setSuccessfulOrder] = useState(false);
+  const [conflictingIngredients, setConflictingIngredients] = useState([]);
+  const [updatedSelectedItems, setUpdatedSelectiveItems] = useState([]);
+  const [itemsWithConIng, setItemsWithConIng] = useState([]);
+  const [ingredientsNeeded, setIngredientsNeeded] = useState([]);
   const [specialRequest, setSpecialRequest] = useState("");
   const [promoCode, setPromoCode] = useState("");
   const [promoCodeID, setPromoCodeID] = useState("");
   const [promoCodePercent, setPromoCodePercent] = useState(0);
-  const [promoCodeLock, setPromoCodeLock] = useState(false); // Once the submit promo button is pressed, don't allow more
+  const [promoCodeLock, setPromoCodeLock] = useState(false);
   const [discountType, setDiscountType] = useState("");
   const [discountAmount, setDiscountAmount] = useState(0.00);
   const [highestDiscountPercent, setHighestDiscountPercent] = useState(0);
   const [isMilitary, setIsMilitary] = useState('no');
-  const [discountMenuOpen, setDiscountMenuOpen] = useState(false)
+  const [discountMenuOpen, setDiscountMenuOpen] = useState(false);
+  const [orderId, setOrderId] = useState(null);
 
-  useEffect(() => { // Handle all of the calculations
-    const numericSubtotal = parseFloat(subtotal); // Treat as number, not string
-
-    // Find the highest discount
-    const discountOptions = { // The different options and the discount in dollars
+  useEffect(() => {
+    const numericSubtotal = parseFloat(subtotal);
+ 
+    const discountOptions = {
       Military: (isMilitary === "yes" ? numericSubtotal * 0.1 : 0.00).toFixed(2),
       PromoCode: (numericSubtotal * (promoCodePercent / 100)).toFixed(2),
       LoyaltyPoints: (nextVisitDiscount <= subtotal ? nextVisitDiscount : 0.00).toFixed(2),
     };
-    const bestDiscount = Object.entries(discountOptions).reduce( // Get the best discount
+    const bestDiscount = Object.entries(discountOptions).reduce(
       (maxEntry, currentEntry) => {
-        const currentValue = parseFloat(currentEntry[1]); // Convert to number
+        const currentValue = parseFloat(currentEntry[1]);
         const maxValue = parseFloat(maxEntry[1]);
-        return currentValue > maxValue ? currentEntry : maxEntry; // Check if the current value is greater than the max value
+        return currentValue > maxValue ? currentEntry : maxEntry;
       }
     );
-    setDiscountAmount(parseFloat(bestDiscount[1]).toFixed(2)); // Set the discount amount from the best option
-
-    if (bestDiscount[1] == 0.00) { // Handles when no discount is selected
+    setDiscountAmount(parseFloat(bestDiscount[1]).toFixed(2));
+ 
+    if (bestDiscount[1] == 0.00) {
       setDiscountType("");
     }
     else {
-      setDiscountType(bestDiscount[0]); // Set the best discount type
-      // Depending on the discount type, set the best discount percentage
+      setDiscountType(bestDiscount[0]);
       if (bestDiscount[0] === "Military")
         setHighestDiscountPercent(10);
       else if (bestDiscount[0] === "PromoCode")
@@ -65,21 +65,25 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
         setHighestDiscountPercent(0);
     }
     const afterDiscount = numericSubtotal - bestDiscount[1];
-
-    const taxRate = 0.0825; // 8.25% tax rate
+ 
+    const taxRate = 0.0825;
     const calculatedTax = afterDiscount * taxRate;
     setTax(calculatedTax.toFixed(2));
-
+ 
     const calculateTip = afterDiscount * (tipPercent / 100);
     setTipAmount(calculateTip.toFixed(2));
-
+ 
     const total = calculateTip + calculatedTax + afterDiscount;
     setTotal(total.toFixed(2));
-
+ 
     const calculateChange = receivedAmount - total;
     setChangeAmount(calculateChange.toFixed(2));
   }, [subtotal, tipPercent, receivedAmount, promoCodePercent, isMilitary, nextVisitDiscount]);
-
+ 
+  useEffect(() => {
+    console.log("OrderId changed:", orderId);
+  }, [orderId]);
+ 
   const handleOnClose = () => {
     if (successfulOrder)
       onReset();
@@ -98,6 +102,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
     fetchInventory();
     onClose();
   }
+ 
   const handlePromoCode = async (e) => {
     if (promoCode.length > 0) {
       try {
@@ -122,7 +127,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
       }
     }
   }
-
+ 
   const handleCustomerEmail = async (e) => {
     if (customerEmail.length > 0) {
       try {
@@ -135,7 +140,6 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
           setCustomerID(userResponse.data.user_id);
           setNextVisitDiscount(userResponse.data.nextVisitDiscount)
           setCustomerEmailLock(true)
-          console.log(userResponse.data.nextVisitDiscount);
         }
       } catch (err) {
         if (err.response && err.response.data && err.response.data.message)
@@ -148,7 +152,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
       }
     }
   }
-
+ 
   const handleConfirmOrder = async (e) => {
     e.preventDefault();
     if (changeAmount < 0) {
@@ -157,21 +161,19 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
       return;
     }
     else {
-      if (tableNumber < 0 || tableNumber > 30) { // Check if its a valid table (1-30)
+      if (tableNumber < 0 || tableNumber > 30) {
         setError("Invalid table number")
         return;
       }
-
-      let requiredIngredients = []; // List of all the ingredients and the amount required for the order
+ 
+      let requiredIngredients = [];
       selectedItems.forEach((item) => {
         item.ingredients.forEach((ingredient) => {
           const inRequiredIngredients = requiredIngredients.find(
             (reqIng) => reqIng.ingredient_id === ingredient.ingredient_id
           );
           if (inRequiredIngredients)
-            // Increment quantity for that ingredient
             requiredIngredients.quantity += ingredient.quantity * item.quantity;
-          // Add to required ingredients list and its quantity
           else
             requiredIngredients.push({
               ingredient_id: ingredient.ingredient_id,
@@ -180,7 +182,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
         });
       });
       setIngredientsNeeded(requiredIngredients);
-      //Check inventory one last time in case another waiter ordered food
+      
       let inventoryStock = [];
       try {
         const inventoryResponse = await axios.get(
@@ -192,7 +194,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
           setError(err.response.data.message);
         else setError("An error has occured fetching the inventory");
       }
-
+ 
       requiredIngredients.forEach((reqIng) => {
         const ingredient = inventoryStock.find(
           (ing) => ing.ingredient_id === reqIng.ingredient_id
@@ -210,7 +212,6 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
         }
       });
       if (conflictingIngredients.length > 0) {
-        // There is an out of stock ingredient
         setError(
           `Out of stock ingredients: ${conflictingIngredients
             .map((conIng) => conIng.name)
@@ -218,7 +219,6 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
         );
         setConfirmOrderButton("Error");
         setFormLock(true);
-        // filters out items without a conflicting ingredient
         setUpdatedSelectiveItems(
           selectedItems.filter((item) => {
             return !item.ingredients.some((ingredient) =>
@@ -228,7 +228,6 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
             );
           })
         );
-        // filters out items with a conflicting ingredient
         setItemsWithConIng(
           selectedItems.filter((item) => {
             return item.ingredients.some((ingredient) =>
@@ -240,11 +239,13 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
         );
         return;
       }
-      // Passed checks, order can continue...
+ 
       const itemsJSON = JSON.stringify(selectedItems);
       setError("");
       setConfirmOrderButton("Loading...");
+      
       try {
+        console.log("Sending order confirmation request...");
         const response = await axios.post(
           `${process.env.REACT_APP_API_URL}/confirm-order`,
           {
@@ -266,17 +267,29 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
             discountPercentage: highestDiscountPercent
           }
         );
-        if (response.data.success) setFormLock(true);
-        setSuccessfulOrder(true);
-        setConfirmOrderButton("Success!");
+        console.log("Order confirmation response:", response.data);
+        
+        if (response.data.success) {
+          console.log("Order successful, order_id:", response.data.order_id);
+          setFormLock(true);
+          setSuccessfulOrder(true);
+          setConfirmOrderButton("Success!");
+          setOrderId(response.data.order_id);
+          console.log("OrderId state set to:", response.data.order_id);
+        } else {
+          console.error("Order response indicated failure:", response.data);
+          setError(response.data.message || "Order failed");
+        }
       } catch (err) {
+        console.error("Order confirmation error:", err);
+        console.error("Error response:", err.response?.data);
         if (err.response && err.response.data && err.response.data.message)
           setError(err.response.data.message);
-        else setError("An error has occured");
+        else setError("An error has occurred");
       }
     }
   }
-
+ 
   return (
     <div className="checkout-popup-overlay">
       <div className="checkout-popup-content">
@@ -342,7 +355,7 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
             ></span>
           </button>
           {discountMenuOpen && (
-            <div className={"discount-menu"}>
+            <div className="discount-menu">
               <div className="checkout-label">
                 <label>Customer Account: </label>
                 <input
@@ -448,15 +461,28 @@ const CheckoutPopup = ({ onClose, subtotal, selectedItems, onReset, fetchInvento
             </button>
           )}
           {successfulOrder && (
-            <>
-              <p className="success-order-msg">Order placed successfully</p>
-              <button className="print-receipt-button">Print Receipt</button>
-            </>
-          )}
-        </form>
-      </div>
-    </div>
-  );
-};
+                      <>
+                        <p className="success-order-msg">Order placed successfully</p>
+                        <button 
+                          className="print-receipt-button"
+                          onClick={() => {
+                            console.log("Print receipt clicked, orderId:", orderId);
+                            if (orderId) {
+                              generateReceipt(orderId);
+                            } else {
+                              alert('No order ID available');
+                            }
+                          }}
+                          type="button"
+                        >
+                          Print Receipt
+                        </button>
+                      </>
+                    )}
+                  </form>
+                </div>
+              </div>
+            );
+          };
 
-export default CheckoutPopup;
+          export default CheckoutPopup;

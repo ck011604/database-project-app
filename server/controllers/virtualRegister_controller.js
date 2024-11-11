@@ -1,7 +1,7 @@
 const { jwtDecode } = require("jwt-decode");
 const pool = require("../pool");
 
-exports.menu = (req, res) => { // Get menu
+exports.menu = (req, res) => {
     console.log("Received request to get menu");
     pool.query("SELECT * FROM menu WHERE is_active = 1 ORDER BY price DESC", (error, results) => {
       if (error) {
@@ -14,14 +14,14 @@ exports.menu = (req, res) => { // Get menu
         );
         console.log(`Error fetching menu ${error}`);
         return;
-      } // Else
+      }
       console.log("Successfully fetched menu");
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ success: true, menu: results }));
     });
 };
 
-exports.inventory_stock = (req, res) => { // Get inventory stock
+exports.inventory_stock = (req, res) => {
     console.log("Received request to get inventory stock");
     pool.query(
       "SELECT ingredient_id, name, amount FROM inventory",
@@ -36,7 +36,7 @@ exports.inventory_stock = (req, res) => { // Get inventory stock
           );
           console.log("Error fetching inventory");
           return;
-        } // Else
+        }
         console.log("Successfully fetched inventory");
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ success: true, inventory: results }));
@@ -69,8 +69,8 @@ exports.confirm_order = (req, res) => {
       discountAmount,
       discountPercentage,
     } = JSON.parse(body);
-    const checkedDiscountType = (discountType === "") ? null : discountType // set discount type to null
-    const checkedPromoCodeID = (promoCode_id == "" || discountType !== "PromoCode") ? null : promoCode_id // If no code was given, set it to null
+    const checkedDiscountType = (discountType === "") ? null : discountType
+    const checkedPromoCodeID = (promoCode_id == "" || discountType !== "PromoCode") ? null : promoCode_id
     const addedPoints = Math.floor(subtotal - discountAmount);
 
     pool.getConnection((err, connection) => {
@@ -88,7 +88,7 @@ exports.confirm_order = (req, res) => {
           res.end(JSON.stringify({ success: false, message: "Server Error: Unable to start transaction." }));
           return;
         }
-        // Decode token to get waiterID
+        
         let waiterID = ''
         try {
           const decodedToken = jwtDecode(loginToken);
@@ -98,8 +98,8 @@ exports.confirm_order = (req, res) => {
           res.writeHead(400, { "Content-Type": "application/json" });
           res.end(JSON.stringify({ success: false, message: "Invalid login token. Can't verify waiter ID" }));
         }
-        // Subtract uses left for the promotion code
-        if (discountType == "PromoCode") { // A discount was applied
+        
+        if (discountType == "PromoCode") {
           connection.query(`SELECT promoCode_id, uses_left
             FROM promotion_codes
             WHERE is_active = 1 AND promoCode_id = ? AND (uses_left > 0 OR uses_left IS null)`,
@@ -113,7 +113,6 @@ exports.confirm_order = (req, res) => {
                   res.end(JSON.stringify({ success: false, message: "Invalid promo code or there was an error" }));
                 });
               }
-              // The code was valid and has uses_left
               const updatedUsesLeft = results[0].uses_left == null ? null : results[0].uses_left - 1
               connection.query("UPDATE promotion_codes SET uses_left = ? WHERE promoCode_id = ?",
                 [updatedUsesLeft, checkedPromoCodeID],
@@ -133,10 +132,11 @@ exports.confirm_order = (req, res) => {
             }
           );
         }
-        if (customerID != null && discountType == "LoyaltyPoints") { // If the discount type is loyalty points (discountNextVisit)
+
+        if (customerID != null && discountType == "LoyaltyPoints") {
           connection.query("SELECT user_id, counter FROM discount_next_visit WHERE user_id = ?",
             [customerID],
-            (err, results) => { // If there is no customer or some error, rollback the changes
+            (err, results) => {
               if (err || results.length == 0) {
                 return connection.rollback(() => {
                   connection.release();
@@ -164,7 +164,7 @@ exports.confirm_order = (req, res) => {
             }
           )
         }
-        // If there was or wasn't a promocode used, continue
+
         connection.query(
           `INSERT INTO orders 
            (items, waiter_id, table_number, customer_id, subtotal, tip_percent, tip_amount, 
@@ -184,9 +184,9 @@ exports.confirm_order = (req, res) => {
               });
             }
 
-            // Update inventory for each item and ingredient
+            const orderId = result.insertId;
             let inventoryPromises = [];
-            const selectedItemsObject = JSON.parse(selectedItems); // Convert from string to objects
+            const selectedItemsObject = JSON.parse(selectedItems);
             const totalNumberItems = selectedItemsObject.length;
 
             for (let i = 0; i < totalNumberItems; i++) {
@@ -199,7 +199,6 @@ exports.confirm_order = (req, res) => {
                 const ingredientID = ingredient.ingredient_id;
                 const ingredientQuantity = ingredient.quantity; 
                 
-                // Subtract from the inventory
                 const promise = new Promise((resolve, reject) => {
                   connection.query(
                     `UPDATE inventory SET amount = amount - ? WHERE ingredient_id = ?`,
@@ -215,10 +214,9 @@ exports.confirm_order = (req, res) => {
                 inventoryPromises.push(promise);
               }
             }
-             // Run inventory updates in parallel
+
             Promise.all(inventoryPromises)
               .then(() => {
-                // Update customer points if their email was provided
                 if (customerID && addedPoints) {
                   connection.query(
                     `UPDATE users SET points = points + ? WHERE user_id = ?`,
@@ -232,7 +230,7 @@ exports.confirm_order = (req, res) => {
                           res.end(JSON.stringify({ success: false, message: "Server Error: Unable to update points." }));
                         });
                       }
-                      // Commit transaction if all operations are successful
+                      
                       connection.commit((err) => {
                         if (err) {
                           return connection.rollback(() => {
@@ -246,13 +244,14 @@ exports.confirm_order = (req, res) => {
                         connection.release();
                         console.log("Successfully added order, updated inventory, and customer points");
                         res.writeHead(200, { "Content-Type": "application/json" });
-                        res.end(JSON.stringify({ success: true }));
+                        res.end(JSON.stringify({ 
+                          success: true,
+                          order_id: orderId
+                        }));
                       });
                     }
                   );
-                  } 
-                  else {
-                  // Commit without updating points if no customer or points
+                } else {
                   connection.commit((err) => {
                     if (err) {
                       return connection.rollback(() => {
@@ -266,12 +265,14 @@ exports.confirm_order = (req, res) => {
                     connection.release();
                     console.log("Successfully added order and updated inventory");
                     res.writeHead(200, { "Content-Type": "application/json" });
-                    res.end(JSON.stringify({ success: true }));
+                    res.end(JSON.stringify({ 
+                      success: true,
+                      order_id: orderId
+                    }));
                   });
                 }
               })
               .catch((err) => {
-                // Rollback on inventory update failure
                 connection.rollback(() => {
                   connection.release();
                   console.error('Error updating inventory:', err);
