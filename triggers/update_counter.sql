@@ -1,30 +1,35 @@
 DELIMITER //
 
 DROP TRIGGER IF EXISTS update_counter;;
-
 CREATE TRIGGER update_counter 
 BEFORE UPDATE ON users 
 FOR EACH ROW 
 BEGIN
     DECLARE id INT;
+    DECLARE incrementCounter INT;
+    
     
     -- Get count of existing records
     SELECT COUNT(*) INTO id
     FROM discount_next_visit
     WHERE user_id = NEW.user_id;
      -- If no record exists, create new one '
-    IF id = 0 THEN
-        INSERT INTO discount_next_visit (user_id, counter)
-        VALUES (NEW.user_id, FLOOR(NEW.points / 100));
-
-    END IF;
+    
 
     -- If points increased, update counter
     IF NEW.points > OLD.points AND NEW.points >= 100 THEN
-        UPDATE discount_next_visit
-        SET counter = counter + FLOOR(NEW.points / 100)
-        WHERE user_id = NEW.user_id;
-         SET NEW.points = NEW.points - (FLOOR(NEW.points / 100) * 100);
+        SET incrementCounter = (FLOOR(NEW.points / 100));
+        SET NEW.points = NEW.points - (FLOOR(NEW.points / 100) * 100);
+        IF id > 0 THEN
+            UPDATE discount_next_visit
+            SET counter = counter + incrementCounter
+            WHERE user_id = NEW.user_id;
+        ELSE
+            INSERT INTO discount_next_visit (user_id, counter)
+            VALUES (NEW.user_id, incrementCounter);
+
+        END IF;
+         
         
     END IF;
     
@@ -67,3 +72,6 @@ UPDATE discount_next_visit
 SET counter = 0 
 WHERE user_id = 2;
 
+DELETE FROM discount_next_visit WHERE user_id = 2;
+
+ 
