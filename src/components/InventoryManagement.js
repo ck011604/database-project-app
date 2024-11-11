@@ -155,14 +155,14 @@ const InventoryManagement = () => {
 
     return (
         <div>
-            <div className="add-menu-item">
+            <div className="add-menu-item ">
                 <Modal modal={modal} setModal={setModal}>
                     <AddIngredientForm setModal={setModal} ingredient={selectedIngredient} callback={fetchIngredients}/>
                 </Modal>
-                <h2 style={{display: "inline"}}>Inventory Management</h2>
             </div>
 
             <div className="inventory-form-container">
+            <h2 style={{display: "inline"}}>Inventory Management</h2>
                 {message && (
                     <div className={`message ${message.type === 'success' ? 'message-success' : 'message-error'}`}>
                         {message.text}
@@ -171,7 +171,7 @@ const InventoryManagement = () => {
 
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
-                        <label>Action Type</label>
+                        <label style={{paddingTop: "20px"}}>Action Type</label>
                         <select
                             value={action}
                             onChange={(e) => setAction(e.target.value)}
