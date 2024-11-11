@@ -1,7 +1,6 @@
 .virtual-register {
   display: flex;
   justify-content: space-between;
-  background-color: #E6ECF5;
   padding: 10px;
   min-width: 1100px;
   box-sizing: border-box;
