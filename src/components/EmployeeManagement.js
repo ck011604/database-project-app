@@ -84,6 +84,27 @@ const EmployeeManagement = () => {
         }
     }
 
+    const filterTable = (e) => {
+        const searchValue = e.target.value.toUpperCase()
+        // Declare variables
+        let table, tr, td, i, txtValue;
+        table = document.getElementById("employee-table");
+        tr = table.getElementsByTagName("tr");
+      
+        // Loop through all table rows, and hide those who don't match the search query
+        for (i = 0; i < tr.length; i++) {
+          td = tr[i].getElementsByTagName("td")[1];
+          if (td) {
+            txtValue = td.textContent || td.innerText;
+            if (txtValue.toUpperCase().indexOf(searchValue) > -1) {
+              tr[i].style.display = "";
+            } else {
+              tr[i].style.display = "none";
+            }
+          }
+        }
+      }
+
     return(
         <div className="add-menu-item">
             <Modal modal={modal} setModal={setModal}>
@@ -94,12 +115,12 @@ const EmployeeManagement = () => {
                     <h2 style={{display: "inline"}} >Employee Management</h2>
                     <button onClick={() => toggleModal()} className="btn-modal"> + </button>
                 </div>
-                <table className="management-table">
+                <input className="filter-table" type="text" onKeyUp={filterTable} placeholder="Search for names.."></input>
+                <table id="employee-table" className="management-table">
                     <thead> 
                         <tr className="item-info">
                             <th>ID</th>
-                            <th>First Name</th>
-                            <th>Last Name</th>
+                            <th>Name</th>
                             <th>Email</th>
                             <th>Role</th>
                             <th>Is Active</th>
@@ -109,8 +130,7 @@ const EmployeeManagement = () => {
                             {employees.map((employee) => (
                                 <tr key={employee.id}>
                                     <td>{employee.id}</td>
-                                    <td>{employee.first_name}</td>
-                                    <td>{employee.last_name}</td>
+                                    <td>{`${employee.first_name} ${employee.last_name}`}</td>
                                     <td>{employee.email}</td>
                                     <td>{employee.role}</td>
                                     <td>
