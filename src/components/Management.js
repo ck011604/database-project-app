@@ -132,9 +132,11 @@ const Management = () => {
                     <div className="inventory-form-container">
                         <div className="add-menu-item" style={{"paddingBottom": "5px"}}>
                             <h2 style={{display: "inline"}} >Menu Management</h2>
+                        </div>
+                        <div>
+                            <input className="filter-table" type="text" onKeyUp={filterTable} placeholder="Search for items.."></input>
                             <button onClick={() => toggleModal()} className="btn-modal"> + </button>
-                        </div> 
-                        <input className="filter-table" type="text" onKeyUp={filterTable} placeholder="Search for items.."></input>
+                        </div>
                         <table id="management-table" className="management-table">
                             <thead> 
                                 <tr className="item-info">
