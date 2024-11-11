@@ -85,9 +85,10 @@ export const generateReceipt = async (orderId) => {
     yPos += 4;
 
     if (data.discount_amount > 0) {
-      doc.text(`Discount (${data.discount_type}):`, 40, yPos);
-      doc.text(`-$${data.discount_amount}`, 60, yPos);
-      yPos += 4;
+        // Adjust the x-position for longer discount text
+        doc.text(`Discount (${data.discount_type}):`, 25, yPos);
+        doc.text(`-$${data.discount_amount}`, 60, yPos);
+        yPos += 4;
     }
 
     doc.text('Tax:', 40, yPos);
