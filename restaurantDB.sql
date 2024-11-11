@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.4.3, for Linux (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.33, for Win64 (x86_64)
 --
--- Host: localhost    Database: restaurantdb
+-- Host: 127.0.0.1    Database: restaurantdb
 -- ------------------------------------------------------
--- Server version	8.4.3
+-- Server version	9.1.0
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -104,6 +104,7 @@ CREATE TABLE `inventory` (
   `restock_threshold` int unsigned NOT NULL,
   `restock_amount` int unsigned NOT NULL,
   `autoRestock` tinyint(1) NOT NULL DEFAULT '1',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`ingredient_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='inventory of ingredients';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -465,4 +466,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-11-10 15:53:50
+-- Dump completed on 2024-11-10 22:46:02
