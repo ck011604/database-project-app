@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
-//add a filter by price
+import { Search, ChevronUp, ChevronDown } from 'lucide-react';
+import "../css/OrdersReport.css"
+//add a filter by price check
 //add a way to see if column is sorted
 //expandable rows in the table
 //add form validator for total filter
+//add sort by columns only on page check
 const OrdersReport = () => {
 
     const [orders, setOrders] = useState([]);
@@ -21,7 +24,7 @@ const OrdersReport = () => {
     const [totalTips, setTotalTips] = useState('');
     const [sortColumn, setSortColumn] = useState('');   
     const [sortDirection, setSortDirection] = useState('asc');
-    const [currentPage, setCurrentPage] = useState(1);        // Tracks the current page
+    const [currentPage, setCurrentPage] = useState(1);        
     const [selectedItemsPerPage, setSelectedItemsPerPage]= useState('5');
     const [totalPages, setTotalPages] = useState('');
     const [paginatedOrders, setPaginatedOrders] = useState([]);
@@ -123,20 +126,24 @@ console.log(`Min: ${minTotal} Max: ${maxTotal}`)
     const handleSearch = (e) => {
         const query = e.target.value.toLowerCase();
         setSearchQuery(query);
+        setCurrentPage(1);
     };
 
     const handleWaiterChange = (e) => {
         setSelectedWaiter(e.target.value);
+        setCurrentPage(1);
     };
 
     const handleTableChange = (e)=> {
         setSelectedTable(e.target.value);
+        setCurrentPage(1);
     };
 
     const handleSort = (column) => {
         const direction = sortColumn === column && sortDirection === 'asc' ? 'desc' : 'asc';
         setSortColumn(column);
         setSortDirection(direction);
+        console.log("click");
     };
 
     const handlePageChange = (e) => {
@@ -180,6 +187,7 @@ console.log(`Min: ${minTotal} Max: ${maxTotal}`)
     }
 
 
+
     useEffect(()=>{
         let results = orders.filter(order=>{
         const query = searchQuery.toLowerCase();
@@ -202,12 +210,24 @@ console.log(`Min: ${minTotal} Max: ${maxTotal}`)
         setTotalOrders(results.length);
         setTotalSales(calculateSum(results.map(getSales)));
         setTotalTips(calculateSum(results.map(getTips)));
+        setTotalPages(Math.ceil(results.length / selectedItemsPerPage));
+        setFilteredOrders(results);
+       
         if (sortColumn) {
-            results = results.sort((a, b) => {
+            results = results.slice(
+                (currentPage-1) * selectedItemsPerPage,
+                currentPage * selectedItemsPerPage
+            ).sort((a, b) => {
                 let aVal = a[sortColumn] !== null && a[sortColumn] !== undefined ? a[sortColumn] : '';
                 let bVal = b[sortColumn] !== null && b[sortColumn] !== undefined ? b[sortColumn] : '';
-                
-                
+                let tA = parseFloat(aVal);
+                let tB = parseFloat(bVal);
+                if(tA){
+                    aVal = tA;
+                }
+                if(tB){
+                    bVal = tB;
+                }
                 if (typeof aVal === 'number' && typeof bVal === 'number') {
                     return sortDirection === 'asc' ? aVal - bVal : bVal - aVal;
                 }
@@ -217,24 +237,26 @@ console.log(`Min: ${minTotal} Max: ${maxTotal}`)
                         : bVal.toString().localeCompare(aVal.toString());
                 }
             });
+            setPaginatedOrders(results);
         }
-        setTotalPages(Math.ceil(results.length / selectedItemsPerPage));
-        setFilteredOrders(results);
-        setPaginatedOrders(results.slice(
-            (currentPage-1) * selectedItemsPerPage,
-            currentPage * selectedItemsPerPage
-        ));
+        else{
+            setPaginatedOrders(results.slice(
+                (currentPage-1) * selectedItemsPerPage,
+                currentPage * selectedItemsPerPage
+            ));
+        }
+        
         
         
     }, [searchQuery, selectedWaiter, selectedTable, orders, sortColumn, sortDirection, selectedItemsPerPage, minTotal, maxTotal]);
     
     useEffect(()=>{
         //putting filteredOrders in this might cause a logic error
+        setTotalPages(Math.ceil(filteredOrders.length / selectedItemsPerPage));
         setPaginatedOrders(filteredOrders.slice(
             (currentPage-1) * selectedItemsPerPage,
             currentPage * selectedItemsPerPage
         ));
-        setTotalPages(Math.ceil(filteredOrders.length / selectedItemsPerPage));
     },[selectedItemsPerPage, currentPage])
     
 
@@ -259,18 +281,22 @@ console.log(`Min: ${minTotal} Max: ${maxTotal}`)
     return (
         
         <div className="ordersGridContainer">
-            <h1>Customer Orders Report</h1>
+            <h1 className="title">Customer Orders Report</h1>
             <div className="dateFilter">
                 <div className="dateInputs">
+                    <label for="date">Date Range: </label>
                     <input 
                         type="date" 
                         value={startDate}
                         onChange={(e) => setStartDate(e.target.value)}
+                        placeholder="Start Date"
                     />
+                    <span> - </span>
                     <input 
                         type="date" 
                         value={endDate}
                         onChange={(e) => setEndDate(e.target.value)}
+                        placeholder="End Date"
                     />
                    
                 </div>
@@ -309,7 +335,7 @@ console.log(`Min: ${minTotal} Max: ${maxTotal}`)
                 
                 </select>
             </div>
-            <div className="filterByTotal">
+            <span className="filterByTotal">
                 <form>
                      
                     <span>
@@ -323,22 +349,55 @@ console.log(`Min: ${minTotal} Max: ${maxTotal}`)
                     </span>
                     
                 </form>
-            </div>
+            </span>
             <div className="orderDis">
                 <table>
                     <caption>Orders Table</caption>
                     <thead className = "orderInfo">
                         <tr>
-                            <th onClick ={()=>handleSort('order_id')}>Order ID</th>
-                            <th>Items Ordered</th>
-                            <th onClick ={()=>handleSort('first_name')}>Waiter's Name</th>
-                            <th onClick ={()=>handleSort('customer_id')}>Customer ID</th>
-                            <th onClick ={()=>handleSort('subtotal')}>Subtotal</th>
-                            <th onClick ={()=>handleSort('tip_percent')}>Tip (%)</th>
-                            <th onClick ={()=>handleSort('tip_amount')}>Tip Amount</th>
-                            <th onClick ={()=>handleSort('total')}>Total</th> 
-                            <th onClick={()=>handleSort('table_number')}>Table Number</th>
-                            <th>Time</th>
+                            <th >
+                            <button id="orderIDCol"onClick ={()=>handleSort('order_id')}>
+                            Order ID {(sortColumn === 'order_id' && sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />)}
+                                </button></th>
+                            <th id="itemsCol">Items Ordered</th>
+                            <th>
+                                <button id="firstNameCol"onClick ={()=>handleSort('first_name')}>
+                            Waiter's Name {(sortColumn === 'first_name' && sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />)}
+                                </button>
+                            </th>
+                            <th>
+                                <button id="customerIDCol" onClick ={()=>handleSort('customer_id')}>
+                                Customer ID {(sortColumn === 'customer_id' && sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />)}
+                                </button>
+                            </th>
+                            <th >
+                                <button id="subtotalCol" onClick ={()=>handleSort('subtotal')}>
+                                Subtotal {(sortColumn === 'subtotal' && sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />)}
+                                </button>
+                                </th>
+                            <th>
+                                <button id="tipPercentCol" onClick ={()=>handleSort('tip_percent')}>
+                                Tip (%) {(sortColumn === 'tip_percent' && sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />)}
+                                </button>
+                                </th>
+                            <th>
+                                <button id="tipAmountCol" onClick ={()=>handleSort('tip_amount')}>
+                                Tip Amount {(sortColumn === 'tip_amount' && sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />)}
+                                </button>
+                                </th>
+                            <th>
+                                
+                                <button id="totalCol" onClick ={()=>handleSort('total')}>
+                                Total {(sortColumn === 'total' && sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />)}
+                                </button>
+                                </th> 
+                                
+                            <th >
+                                <button id="tableNumberCol" onClick={()=>handleSort('table_number')}>
+                                Table Number {(sortColumn === 'table_number' && sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />)}
+                                </button>
+                                </th>
+                            <th id="timeCol">Time</th>
                             
                         </tr>
                     </thead>
@@ -378,6 +437,7 @@ console.log(`Min: ${minTotal} Max: ${maxTotal}`)
             </div>
 
             <div className="paginationControls">
+                <div id="rowsPerPage">
                 <label for="rowsPerPage">Rows Per Page</label>
                 <select className="rowsPerPage" value={selectedItemsPerPage} onChange={handleItemsPerPageChange}>
                     <option value="">Rows Per Page</option>
@@ -403,6 +463,8 @@ console.log(`Min: ${minTotal} Max: ${maxTotal}`)
                 <button onClick={goToLastPage} disabled={currentPage === totalPages}>
                     Last
                 </button>
+                </div>
+                
 
             </div>
 
