@@ -1,0 +1,115 @@
+.ordersGridContainer{
+    display: grid;
+    grid-template-columns: auto auto auto;
+  
+}
+.dateFilter{
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    position: relative;
+    top: 70%;
+    left: 5%;
+    
+}
+.orderSearch{
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    position: relative;
+    top:90%;
+    left: 5%;
+}
+.orderDis{
+    grid-row: 2 / 3;
+    grid-column:1 / 4;
+}
+.filterByWaiter{
+    grid-column: 3 / 4;
+    grid-row: 1 / 2;
+    position: relative;
+    top: 55%;
+    height:30%;
+
+}
+.filterByTotal{
+    grid-column: 3 / 4;
+    grid-row: 1 / 2;
+    position: relative;
+    top:105px;
+    height:30%;
+}
+.filterByTable{
+    grid-column: 3 / 4;
+    grid-row: 1 / 2;
+    position: relative;
+    top:75px;
+    height:30%;
+}
+.title{
+    grid-column: 2/3;
+    text-align: center;
+}
+#orderIDCol:hover, 
+#firstNameCol:hover,
+#customerIDCol:hover,
+#subtotalCol:hover,
+#tipPercentCol:hover,
+#tipAmountCol:hover,
+#totalCol:hover,
+#tableNumberCol:hover{
+    background-color: #ccc;
+    border-color:black;
+    border-style: solid;
+    border-radius: 5px;
+
+}
+
+#orderIDCol:focus, 
+#firstNameCol:focus,
+#customerIDCol:focus,
+#subtotalCol:focus,
+#tipPercentCol:focus,
+#tipAmountCol:focus,
+#totalCol:focus,
+#tableNumberCol:focus{
+    background-color: #ccc;
+    border-color:black;
+    border-style: solid;
+    border-radius: 5px;
+
+}
+
+#orderIDCol, 
+#firstNameCol,
+#customerIDCol,
+#subtotalCol,
+#tipPercentCol,
+#tipAmountCol,
+#totalCol,
+#tableNumberCol{
+    background: transparent;
+    outline: none;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    border: none;
+    font-weight: bold;
+    display: inline;
+    font-size: 100%;
+}
+
+.paginationControls{
+    grid-row: 3/4;
+    grid-column: 1/4;
+}
+
+.pageButtons{
+    display: relative;
+    text-align: left;
+    grid-column: 3/4;
+
+}
+
+
+
+
+
