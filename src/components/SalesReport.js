@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "../css/SalesReport.css";
 import axios from 'axios';
+import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Tooltip, Legend } from 'chart.js';
+import { Bar } from 'react-chartjs-2';
+ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 const SalesReports = () => {
 const [showSalesOptions, setShowSalesOptions] = useState(false);
@@ -117,6 +120,27 @@ const calculateTotals = (data) => {
 
 const totals = calculateTotals(salesData);
 
+const prepareHistogram = (data) => {
+  if (!data) return { labels: [], datasets: [] };
+  const labels = data.map(row => formatDate(row.sales_date));
+  const salesAmount = data.map(row => row.total_sales);
+
+  return {
+    labels,
+    datasets: [
+      {
+        label: 'Total Sales',
+        data: salesAmount,
+        backgroundColor: 'rgb(61, 184, 24, 0.75)',
+        borderColor: 'rgba(76, 175, 80)',
+        borderWidth: 1,
+      },
+    ],
+  };
+};
+
+const histogramData = prepareHistogram(salesData);
+
 return (
   <div>
     <header className="app-header">
@@ -126,7 +150,7 @@ return (
   <div className="report-container">
     {!isOptionSelected && (
       <>
-      <h1>Please select an option:</h1>
+      <h1>Choose the type of report to run:</h1>
       <div className="button-group">
         <button className="report-button" onClick={handleBatchSales}>
           Sales Overview
@@ -142,9 +166,9 @@ return (
     )} 
     {showSalesOptions && (
       <div className="sales-options">
-          <h3>Single Day or Time Frame:</h3>
+          <h3>Please select an option:</h3>
           <div className="option-buttons">
-              <button onClick={() => handleOptionClick('Daily')} className='option-button'>Daily</button>
+              <button onClick={() => handleOptionClick('Daily')} className='option-button'>Day of</button>
               <button onClick={() => handleOptionClick('Time Frame')} className='option-button'>Time Range</button>
           </div>
       </div>
@@ -191,7 +215,10 @@ return (
     )}
     {salesData && (
       <div className="sales-data">
-        <h2 className="section-heading"> Sales Overview From {startDate} to {endDate} </h2>
+        <h2 className="section-heading"> 
+          {selectedOption === 'Daily'
+            ? `Sales Overview for the day of ${startDate}`
+            : `Sales Overview for ${startDate} to ${endDate}`} </h2>
         <table>
           <thead>
             <tr>
@@ -223,6 +250,26 @@ return (
           )}
          </tbody>
         </table>
+        {selectedOption !== 'Daily' && (
+        <div className="histogram">
+          <h3>Sales Performance</h3>
+          <Bar 
+            key={JSON.stringify(salesData)}
+            data={histogramData} 
+            options={{ 
+              maintainAspectRatio: true,
+              scales: {
+                x: {
+                  title: { display: true, text: 'Date' }
+                },
+                y: {
+                  title: { display: true, text: 'Money $' }
+                }
+              }
+            }} 
+          />
+        </div>
+       )}
       </div>
     )}
     {topEmployees && (

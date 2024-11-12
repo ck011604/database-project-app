@@ -138,7 +138,7 @@ tr:hover {
 
 .batch-message, .error-message, .loading-message {
   margin-top: 10px;
-  color: #3db818; 
+  color: rgb(61, 184, 24); 
 }
 
 .sales-data table, .employee-data table {
@@ -164,7 +164,7 @@ tr:hover {
 }
 
 .sales-data table th, .employee-data table th {
-  background-color: #4CAF50;
+  background-color: rgb(76, 175, 80);
   color: white;
   font-weight: bold;
 }
@@ -196,7 +196,7 @@ tr:hover {
 }
 
 .filters input:focus {
-  border-color: #007bff; /* Highlight border on focus */
+  border-color: #007bff;
   outline: none;
 }
 
@@ -212,4 +212,18 @@ tr:hover {
 
 .clear-filters-button:hover {
   background-color: #0056b3;
+}
+
+.histogram {
+  background-color: white; 
+  padding: 20px;          
+  border-radius: 15px;    
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+
+.histogram canvas {
+  max-height: 400px;
 }
