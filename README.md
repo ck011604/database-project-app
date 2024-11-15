@@ -16,14 +16,15 @@ https://polite-sand-0f80b0a10.5.azurestaticapps.net/
 
 ## Setup Instructions
 
-1. **Configure Environment Variables**  
-   - Copy the environment variables from `localHost.txt`.  
-   - Replace the variables in the `.env` file.
 
-2. **Clone the Repository**
+1. **Clone the Repository**
    ```
    git clone https://github.com/ck011604/database-project-app.git
    ```
+
+2. **Configure Environment Variables**  
+   - Copy the environment variables from `localHost.txt`.  
+   - Replace the variables in the `.env` file.
      
 3. **Install Dependencies**
    ```
@@ -61,6 +62,6 @@ https://polite-sand-0f80b0a10.5.azurestaticapps.net/
 
 To run only the frontend locally with the hosted server/database:  
 
-   - Skip Steps 1, 4, 5, and 6.  
+   - Skip Steps 2, 4, 5, and 6.  
    - Follow the remaining steps.
 
