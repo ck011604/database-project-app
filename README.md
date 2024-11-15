@@ -54,3 +54,20 @@ https://polite-sand-0f80b0a10.5.azurestaticapps.net/
      npm start
      ```  
    - Open [http://localhost:3000](http://localhost:3000) to view the app.
+  
+---
+
+## User Credentials
+
+* Customer
+   - Username: mikeross@gmail.com
+   - Password: mike123
+* Waiter
+   - Username: bob@example.com
+   - Password: wpass
+* Accountant
+   - Username: john@example.com
+   - Password: apass
+* Manager
+   - Username: amy@example.com
+   - Password: mpass
