@@ -25,7 +25,7 @@
    git clone https://github.com/ck011604/database-project-app.git
    ```
      
-4. **Install Dependencies**
+3. **Install Dependencies**
    ```
    npm install
    ```
@@ -38,14 +38,15 @@
      ```
 
 5. **Import SQL File**  
-   - Open MySQL Workbench, connect to your local server, and import `restaurantDB.sql`.
+   - Open MySQL Workbench, connect to your local server, and import `restaurantDB.sql` (found in the root folder).
 
 6. **Start the Server**  
-   - Navigate to the server directory and run:  
+   - In a separate terminal, run: 
      ```
      cd server
      node server.js
      ```
+   - (Should be in the folder root/server)
 
 7. **Start the React App**  
    - In a separate terminal, run:  
@@ -53,6 +54,7 @@
      npm start
      ```  
    - Open [http://localhost:3000](http://localhost:3000) to view the app.
+   - Should be in the root folder
 ---
 
 ## Running Only the Frontend  
