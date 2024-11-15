@@ -1,7 +1,7 @@
 # Database Project App
 
 **Deployed via Microsoft Azure**  
-[Live Application](https://polite-sand-0f80b0a10.5.azurestaticapps.net/)
+https://polite-sand-0f80b0a10.5.azurestaticapps.net/
 
 ---
 
@@ -54,7 +54,7 @@
      npm start
      ```  
    - Open [http://localhost:3000](http://localhost:3000) to view the app.
-   - Should be in the root folder
+   - (Should be in the root folder)
 ---
 
 ## Running Only the Frontend  
