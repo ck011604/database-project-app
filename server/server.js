@@ -118,9 +118,6 @@ const serverBlock = (req, res) => {
         if (req.url.startsWith("/api/menu_management/")) {
             menu_management_controller.menu_detail(req, res);
         }
-        if (req.url.startsWith("/api/sales-report")) {
-            sales_report_controller.getSalesReport(req, res);
-        }
         if (req.url.startsWith("/api/orders_report")) {
             orders_report_controller.getOrders(req, res);
         }

@@ -13,32 +13,30 @@ const SalesReports = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 10;
 
-const [isOptionSelected, setIsOptionSelected] = useState(false);
-const [salesData, setSalesData] = useState(null);
-const [topEmployees, setTopEmployees] = useState(null);
-const [employeeFilter, setEmployeeFilter] = useState('');
-const [salesThreshold, setSalesThreshold] = useState('');
+  const [isOptionSelected, setIsOptionSelected] = useState(false);
+  const [topEmployees, setTopEmployees] = useState(null);
+  const [employeeFilter, setEmployeeFilter] = useState('');
+  const [salesThreshold, setSalesThreshold] = useState('');
 
 useEffect(() => {
+  const fetchEmployeeOrderData = async () => {
+    try {
+      console.log("fetch Employee data activated");
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/employee-performance`); // have to change the name
+      if (response.data.success) {
+        setEmployeeOrderData(response.data.tableData);
+        setFilteredData(response.data.tableData);
+      } else {
+        console.error(response.data.message);
+        alert(response.data.message);
+      }
+    } catch (error) {
+      console.error("Error getting employee - orders data table", error);
+      alert("There was an error generating table.");
+    }
+  };
   fetchEmployeeOrderData();
 }, []);
-
-const fetchEmployeeOrderData = async () => {
-  try {
-    console.log("fetch Employee data activated");
-    const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/employee-performance`); // have to change the name
-    if (response.data.success) {
-      setEmployeeOrderData(response.data.tableData);
-      setFilteredData(response.data.tableData);
-    } else {
-      console.error(response.data.message);
-      alert(response.data.message);
-    }
-  } catch (error) {
-    console.error("Error getting employee - orders data table", error);
-    alert("There was an error generating table.");
-  }
-};
 
 useEffect(() => {
   const filtered = employeeOrderData.filter(row => {
@@ -65,10 +63,6 @@ const handlePreviousPage = () => {
   if (currentPage > 1) setCurrentPage(currentPage - 1);
 };
 
-const formatDate = (dateString) => {
-  return new Date(dateString).toISOString().split('T')[0];
-};
-
 const submitBestEmployees = async () => {
   setIsOptionSelected(true);
   try {
@@ -90,7 +84,7 @@ const submitBestEmployees = async () => {
 const filteredEmployees = topEmployees?.filter((employee) => {
   const matchesName = employee.first_name.toLowerCase().includes(employeeFilter.toLowerCase()) ||
                       employee.last_name.toLowerCase().includes(employeeFilter.toLowerCase());
-  const matchesSales = salesThreshold === '' || employee.total_sales >= Number(salesThreshold);
+  const matchesSales = salesThreshold === '' || employee.total_tips >= Number(salesThreshold);
   return matchesName && matchesSales;
 });
 
@@ -182,12 +176,12 @@ return (
             onChange={(e) => setEmployeeFilter(e.target.value)}
             placeholder="Search by name"
             />
-          <label>Sales Threshold:          </label>
+          <label>Tips Threshold:          </label>
           <input
             type="text"
             value={salesThreshold}
             onChange={(e) => setSalesThreshold(e.target.value)}
-            placeholder="Enter minimum sales"
+            placeholder="Enter minimum tips"
             />
             <button className="clear-filters-button" onClick={() => { setEmployeeFilter(''); setSalesThreshold(''); }}>
               Clear Filters
@@ -208,8 +202,8 @@ return (
             {filteredEmployees.map((employee, index) => (
               <tr key={index}>
                 <td>{employee.employee_id}</td>
-                <td>{employee.last_name}</td>
                 <td>{employee.first_name}</td>
+                <td>{employee.last_name}</td>
                 <td>{employee.role}</td>
                 <td>{employee.orders_count}</td>
                 <td>{employee.total_tips}</td>
