@@ -42,7 +42,7 @@ https://polite-sand-0f80b0a10.5.azurestaticapps.net/
    ```
 
 6. **Start the Server**  
-   - In a separate terminal navigate to the server folder and run the server using the following command: 
+   - In a separate terminal, navigate to the server folder and run the server by using the following command: 
      ```
      cd server
      node server.js
