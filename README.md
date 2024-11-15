@@ -21,10 +21,14 @@
    - Replace the variables in the `.env` file.
 
 2. **Clone the Repository**
-   - ```git clone https://github.com/ck011604/database-project-app.git```
+   ```
+   git clone https://github.com/ck011604/database-project-app.git
+   ```
      
 4. **Install Dependencies**
-   - ```npm install```
+   ```
+   npm install
+   ```
 
 
 4. **Start the Local Database Server**  
