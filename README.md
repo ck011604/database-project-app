@@ -21,47 +21,36 @@ https://polite-sand-0f80b0a10.5.azurestaticapps.net/
    ```
    git clone https://github.com/ck011604/database-project-app.git
    ```
-
-2. **Configure Environment Variables**  
-   - Copy the environment variables from `localHost.txt`.  
-   - Replace the variables in the `.env` file.
-     
-3. **Install Dependencies**
-   ```
-   npm install
-   ```
-
-
-4. **Start the Local Database Server**  
-   - Run this command as administrator in the command prompt:  
+   
+2. **Start the Local Database Server**
+   - The following command might change depending on the version of MySQL and the OS you are on.
+   - Run this command as administrator in the command prompt (for windows MySQL 9):  
      ```
      net start mysql90
      ```
 
-5. **Import SQL File**  
-   - Open MySQL Workbench, connect to your local server, and import `restaurantDB.sql` (found in the root folder).
+3. **Import SQL File**  
+   - Open MySQL Workbench and connect to your local server. Create a database called `restaurantDB` and import `restaurantDB.sql` (found in the root folder).
+
+
+4. **Configure Environment Variables**   
+   - in the `.env` file, replace `DB_PASSWORD` with the same password as the locally hosted MySql Server
+     
+5. **Install Dependencies**
+   ```
+   npm install
+   ```
 
 6. **Start the Server**  
-   - In a separate terminal, run: 
+   - In a separate terminal navigate to the server folder and run the server using the following command: 
      ```
      cd server
      node server.js
      ```
-   - (Should be in the folder root/server)
 
 7. **Start the React App**  
-   - In a separate terminal, run:  
+   - In a separate terminal (should be in the root folder), run:  
      ```
      npm start
      ```  
    - Open [http://localhost:3000](http://localhost:3000) to view the app.
-   - (Should be in the root folder)
----
-
-## Running Only the Frontend  
-
-To run only the frontend locally with the hosted server/database:  
-
-   - Skip Steps 2, 4, 5, and 6.  
-   - Follow the remaining steps.
-
