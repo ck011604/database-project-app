@@ -67,14 +67,14 @@ const serverBlock = (req, res) => {
         if (req.url === "/api/menu_image") {
             menu_management_controller.menu_image_upload(req, res);
         }
-        if (req.url === "/api/batch-sales") {
-            sales_report_controller.runBatchSales(req, res);
-        }
         if (req.url === "/api/promotions") {
             promotions_controller.promotion_create_post(req, res);
         }
     }
     if(req.method === "GET") {
+        if (req.url.startsWith("/api/employee-performance")) {
+            sales_report_controller.getEmployeeOrderData(req, res);
+        }
         if (req.url.startsWith("/static")) {
             staticController.serve(req, res)
         }
