@@ -118,8 +118,18 @@ const serverBlock = (req, res) => {
         if (req.url.startsWith("/api/menu_management/")) {
             menu_management_controller.menu_detail(req, res);
         }
-        if (req.url.startsWith("/api/orders_report")) {
+        if (req.url.startsWith("/api/sales-report")) {
+            sales_report_controller.getSalesReport(req, res);
+        }
+        if (req.url.startsWith("/api/orders_report/data")) {
             orders_report_controller.getOrders(req, res);
+        }
+        else if (req.url.startsWith("/api/orders_report/hours")) {
+            orders_report_controller.getOrdersByHours(req, res);
+        } else if (req.url.startsWith("/api/orders_report/days")) {
+            orders_report_controller.getOrdersByDays(req, res);
+        } else if (req.url.startsWith("/api/orders_report/months")) {
+            orders_report_controller.getOrdersByMonths(req, res);
         }
         if (req.url.startsWith("/api/empsales-report")) {
             sales_report_controller.getTopEmployees(req, res);
@@ -216,3 +226,4 @@ process.on('SIGINT', () => {
         process.exit(err ? 1 : 0);
     });
 });
+
