@@ -4,9 +4,11 @@ import { BsFillTrashFill, BsFillPencilFill } from "react-icons/bs";
 import '../css/Management.css';
 import Modal from "./Reusable/Modal";
 import AddEmployeeForm from "./EditForms/AddEmployeeForm";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const EmployeeManagement = () => {
-    const [productFilter, setProductFilter] = useState("EMPLOYEES");
+    const [productFilter] = useState("EMPLOYEES");
     const [employees, setEmployees] = useState([]);
     const [modal, setModal] = useState(false);
     const [employee, setEmployee] = useState(null);
@@ -64,8 +66,10 @@ const EmployeeManagement = () => {
         try {
             await axios.delete(`${process.env.REACT_APP_API_URL}/api/employees/${id}`);
             fetchAllEmployees();
+            toast.success("Successfully deleted Employee!")
         } catch (err) {
             console.error(`Error deleting item: ${err}`);
+            toast.error("Error deleting Employee!")
         }
     };
 
@@ -80,7 +84,7 @@ const EmployeeManagement = () => {
             });
             fetchAllEmployees();
         } catch (err) {
-            console.error(`Error reactivating item: ${err}`);
+            console.error(`Error reactivated Employee: ${err}`);
         }
     }
 
@@ -107,6 +111,7 @@ const EmployeeManagement = () => {
 
     return(
         <div className="add-menu-item">
+            <ToastContainer position="bottom-right"/>
             <Modal modal={modal} setModal={setModal}>
                 <AddEmployeeForm setModal={setModal} employee={employee} callback={fetchAllEmployees}/>
             </Modal>
