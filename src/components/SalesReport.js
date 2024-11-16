@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../css/SalesReport.css";
 import axios from 'axios';
 import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Tooltip, Legend } from 'chart.js';
+import { Bar } from 'react-chartjs-2';
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 const SalesReports = () => {
@@ -13,10 +14,9 @@ const SalesReports = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 10;
 
+  const [orderTotalThresholdFilter, setOrderTotalThresholdFilter] = useState('');
   const [isOptionSelected, setIsOptionSelected] = useState(false);
   const [topEmployees, setTopEmployees] = useState(null);
-  const [employeeFilter, setEmployeeFilter] = useState('');
-  const [salesThreshold, setSalesThreshold] = useState('');
 
 useEffect(() => {
   const fetchEmployeeOrderData = async () => {
@@ -43,12 +43,19 @@ useEffect(() => {
     const matchesEmployeeName = `${row.first_name} ${row.last_name}`.toLowerCase().includes(employeeNameFilter.toLowerCase());
     const matchesEmployeeId = employeeIdFilter === '' || row.employee_id.toString().includes(employeeIdFilter);
     const matchesOrderId = orderIdFilter === '' || row.order_id.toString().includes(orderIdFilter);
-
-    return matchesEmployeeName && matchesEmployeeId && matchesOrderId;
+    const matchedTotalTheshold = orderTotalThresholdFilter === '' || row.order_total >= Number(orderTotalThresholdFilter);
+    return matchesEmployeeName && matchesEmployeeId && matchesOrderId && matchedTotalTheshold;
   });
   setFilteredData(filtered);
   setCurrentPage(1); // Reset to page 1 when filters change
-}, [employeeNameFilter, employeeIdFilter, orderIdFilter, employeeOrderData]);
+}, [employeeNameFilter, employeeIdFilter, orderIdFilter, orderTotalThresholdFilter, employeeOrderData]);
+
+const clearEmployeeOrderFilters = () => {
+  setEmployeeNameFilter('');
+  setEmployeeIdFilter('');
+  setOrderIdFilter('');
+  setOrderTotalThresholdFilter('');
+};
 
 const indexOfLastRow = currentPage * rowsPerPage;
 const indexOfFirstRow = indexOfLastRow - rowsPerPage;
@@ -82,11 +89,63 @@ const submitBestEmployees = async () => {
 };
 
 const filteredEmployees = topEmployees?.filter((employee) => {
-  const matchesName = employee.first_name.toLowerCase().includes(employeeFilter.toLowerCase()) ||
-                      employee.last_name.toLowerCase().includes(employeeFilter.toLowerCase());
-  const matchesSales = salesThreshold === '' || employee.total_tips >= Number(salesThreshold);
-  return matchesName && matchesSales;
+  const matchesName = employee.first_name.toLowerCase().includes(employeeNameFilter.toLowerCase()) ||
+                      employee.last_name.toLowerCase().includes(employeeNameFilter.toLowerCase());
+  return matchesName;
 });
+
+const chartData = topEmployees
+  ? {
+      labels: filteredEmployees.map(
+        (employee) => `${employee.first_name} ${employee.last_name}`
+      ),
+      datasets: [
+        {
+          label: 'Total Orders Taken',
+          data: filteredEmployees.map((employee) => employee.orders_count),
+          backgroundColor: 'rgba(0, 51, 102, 0.6)',
+          borderColor: 'rgba(0, 51, 102, 1)',
+          borderWidth: 1,
+        },
+        {
+          label: 'Total Tips',
+          data: filteredEmployees.map((employee) => employee.total_tips),
+          backgroundColor: 'rgba(76, 175, 80, 0.6)',
+          borderColor: 'rgba(76, 175, 80, 1)',
+          borderWidth: 1,
+        },
+      ],
+    }
+: null;
+
+const chartOptions = {
+  responsive: true,
+  plugins: {
+    legend: {
+      position: 'top',
+    },
+    tooltip: {
+      callbacks: {
+        label: (context) => `${context.dataset.label}: ${context.raw}`,
+      },
+    },
+  },
+  scales: {
+    x: {
+      title: {
+        display: true,
+        text: 'Employee',
+      },
+    },
+    y: {
+      title: {
+        display: true,
+        text: 'Count / Total Tips',
+      },
+      beginAtZero: true,
+    },
+  },
+};
 
 return (
   <div>
@@ -144,6 +203,18 @@ return (
           value={orderIdFilter}
           onChange={(e) => setOrderIdFilter(e.target.value)}
         />
+        <input
+          type="text"
+          placeholder="Minimum Order Total"
+          value={orderTotalThresholdFilter}
+          onChange={(e) => setOrderTotalThresholdFilter(e.target.value)}
+        />
+        <button
+          className="clear-filters-button"
+          onClick={clearEmployeeOrderFilters}
+        >
+    Clear Filters
+  </button>
       </div>
     <div className="pagination">
         <button onClick={handlePreviousPage} disabled={currentPage === 1}>
@@ -168,25 +239,6 @@ return (
     {topEmployees && (
       <div className="employee-data">
         <h2 className="section-heading">Summary:</h2>
-        <div className="filters">
-          <label>Employee Name:</label>
-          <input
-            type="text"
-            value={employeeFilter}
-            onChange={(e) => setEmployeeFilter(e.target.value)}
-            placeholder="Search by name"
-            />
-          <label>Tips Threshold:          </label>
-          <input
-            type="text"
-            value={salesThreshold}
-            onChange={(e) => setSalesThreshold(e.target.value)}
-            placeholder="Enter minimum tips"
-            />
-            <button className="clear-filters-button" onClick={() => { setEmployeeFilter(''); setSalesThreshold(''); }}>
-              Clear Filters
-            </button>
-          </div>
         <table>
           <thead>
             <tr>
@@ -211,6 +263,10 @@ return (
             ))}
           </tbody>
         </table>
+        <div className="histogram">
+        <h3>Employee Performance Histogram</h3>
+        {chartData && <Bar data={chartData} options={chartOptions} />}
+      </div>
       </div>
     )}
   </div>

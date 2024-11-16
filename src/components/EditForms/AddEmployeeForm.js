@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import React from "react";
 import Form from "../Reusable/Form";
 import Select from "react-select";
+import { toast } from 'react-toastify';
 
 const AddEmployeeForm = ({setModal, employee, callback}) => {
     const onSubmit = async(values, event) => {
@@ -32,8 +33,10 @@ const AddEmployeeForm = ({setModal, employee, callback}) => {
             console.log(data)
             setModal(false);
             callback()
+            toast.success("Success!")
         } catch (err) {
             console.log(`Error posting new employee: ${err}`)
+            toast.error("Error!")
         }
     };
     const [roleOptions, setRoleOptions] = useState([]);
@@ -122,7 +125,6 @@ const AddEmployeeForm = ({setModal, employee, callback}) => {
     return ( 
         <Form
         template={template}
-        watchFields={['First Name']}
         onSubmit={onSubmit}
         preloadedValues={employee}
         autocomplete="new-password"
