@@ -1,11 +1,9 @@
 import React, {useEffect} from "react";
 import { useForm, Controller } from 'react-hook-form';
-import Select from "react-select";
-import axios from "axios";
 
 // Reusable Form Component
-function Form({ template, onSubmit, watchFields, validate, preloadedValues, autocomplete}) {
-    const { register, handleSubmit, formState: { errors }, watch, setError, clearErrors, control } = useForm({
+function Form({ template, onSubmit, preloadedValues, autocomplete}) {
+    const { register, handleSubmit, formState: { errors }, control } = useForm({
         defaultValues: preloadedValues
     });
     // Parameters needed to create Form

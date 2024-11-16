@@ -7,7 +7,9 @@ import InventoryManagement from "./InventoryManagement";
 import EmployeeManagement from "./EmployeeManagement";
 import PromotionManagement from "./PromotionManagement";
 import { BsFillTrashFill, BsFillPencilFill } from "react-icons/bs";
-import '../css/Management.css';  // We'll rename this CSS file too
+import '../css/Management.css';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Management = () => {
     const [items, setItems] = useState([]);
@@ -74,8 +76,10 @@ const Management = () => {
         try {
             await axios.delete(`${process.env.REACT_APP_API_URL}/api/menu_management/${id}`);
             fetchAllItems();
+            toast.success("Successfully deleted Menu Item!")
         } catch (err) {
             console.error(`Error deleting item: ${err}`);
+            toast.error("Error deleting Menu Item!")
         }
     };
 
@@ -113,10 +117,11 @@ const Management = () => {
             }
           }
         }
-      }
+    }
 
     return (
         <div className="management">
+            <ToastContainer position="bottom-right"/>
             <Modal modal={modal} setModal={setModal}>
                 <AddMenuItemForm setModal={setModal} item={item} callback={fetchAllItems}/>
             </Modal>
@@ -165,7 +170,7 @@ const Management = () => {
                                                 </span>
                                                 {item.isActive ? 
                                                     <span className='item-actions'>
-                                                        <BsFillPencilFill onClick={() => toggleModal(item)}/>                       
+                                                        <BsFillPencilFill onClick={() => toggleModal(item)}/>                 
                                                         <BsFillTrashFill className='delete-btn' onClick={() => handleDelete(item.id)}/>
                                                     </span> :
                                                     <button className="reactivate-btn" onClick={() => handleReactivate(item.id)}> Reactivate </button>

@@ -4,9 +4,11 @@ import { BsFillTrashFill, BsFillPencilFill } from "react-icons/bs";
 import '../css/Management.css';
 import Modal from "./Reusable/Modal";
 import AddPromotionForm from "./EditForms/AddPromotionForm";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const PromotionManagement = () => {
-    const [productFilter, setProductFilter] = useState("PROMOTIONS");
+    const [productFilter] = useState("PROMOTIONS");
     const [promotions, setPromotions] = useState([]);
     const [modal, setModal] = useState(false);
     const [promotion, setPromotion] = useState(null);
@@ -59,8 +61,10 @@ const PromotionManagement = () => {
         try {
             await axios.delete(`${process.env.REACT_APP_API_URL}/api/promotions/${id}`);
             fetchAllPromotions();
+            toast.success("Successfully deleted Promotion!")
         } catch (err) {
             console.error(`Error deleting item: ${err}`);
+            toast.error("Error deleting Promotion!")
         }
     };
 
@@ -102,6 +106,7 @@ const PromotionManagement = () => {
 
     return(
         <div className="add-menu-item">
+            <ToastContainer position="bottom-right"/>
             <Modal modal={modal} setModal={setModal}>
                 <AddPromotionForm setModal={setModal} promotion={promotion} callback={fetchAllPromotions}/>
             </Modal>
@@ -159,4 +164,3 @@ const PromotionManagement = () => {
 };
 
 export default PromotionManagement;
-

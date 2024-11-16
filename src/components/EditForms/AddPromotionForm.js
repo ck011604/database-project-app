@@ -1,6 +1,6 @@
 import React from "react";
 import Form from "../Reusable/Form";
-
+import { toast } from 'react-toastify';
 
 const AddPromotionForm = ({setModal, promotion, callback}) => {
     const onSubmit = async(values, event) => {
@@ -31,8 +31,10 @@ const AddPromotionForm = ({setModal, promotion, callback}) => {
             console.log(data)
             setModal(false);
             callback()
+            toast.success("Success!")
         } catch (err) {
             console.log(`Error posting new promotion: ${err}`)
+            toast.error("Error!")
         }
     };
 
@@ -71,7 +73,6 @@ const AddPromotionForm = ({setModal, promotion, callback}) => {
     return ( 
         <Form
         template={template}
-        watchFields={['']}
         onSubmit={onSubmit}
         preloadedValues={promotion}
         />
