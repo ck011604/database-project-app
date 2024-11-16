@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import { Search, ChevronUp, ChevronDown } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LabelList } from 'recharts';
 import "../css/OrdersReport.css"
 //add a filter by price check
 //add a way to see if column is sorted
@@ -30,14 +31,15 @@ const OrdersReport = () => {
     const [paginatedOrders, setPaginatedOrders] = useState([]);
     const [minTotal, setMinTotal] = useState(0);
     const [maxTotal, setMaxTotal] = useState(0);
+    const [dataByHour, setDataByHour] = useState([]);
+    const [dataByDay, setDataByDay] = useState([]);
+    const [dataByMonth, setDataByMonth] = useState([]);
     const itemsPerPage = 5;
     
     useEffect(()=>{
     const fetchdata = async () => {
-        
         try {
-            
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/orders_report`, {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/orders_report/data`, {
                 params: {
                     startDate,
                     endDate
@@ -56,10 +58,7 @@ const OrdersReport = () => {
                 setPaginatedOrders(response.data.orderData);
                 setMinTotal(Math.min(response.data.orderData.map(getSales)));
                 setMaxTotal(Math.min(response.data.orderData.map(getSales)));
-                
-                
             } else {
-                
                 setOrders([]);
                 setFilteredOrders([]);
             }
@@ -70,19 +69,79 @@ const OrdersReport = () => {
         }
         
     };
-    fetchdata();
+    fetchdata(); fetchDataDays(); fetchDataHours(); fetchDataMonths();
 }, [startDate, endDate]);
 
+const fetchDataHours = async () => {   
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/orders_report/hours`, {
+            params: {
+                startDate,
+                endDate
+              }
+        });
+        if (response.data && response.data.success) {
+            setDataByHour(response.data.orderDataHours); 
+            console.log(response.data.orderDataHours);  
+        } else {
+            setDataByHour([]);
+        }
+    } catch (err) {
+        console.error('Error fetching data:', err);
+        setDataByHour([]);
+    }
+};
 
-useEffect(()=>{
-    let min = document.getElementById("minTotalBar");
-    min.value= 0;
-    setMinTotal(0);
-    let max = document.getElementById("maxTotalBar");
-    max.value= 0;
-},[]);
-console.log(`Min: ${minTotal} Max: ${maxTotal}`)
+const fetchDataDays = async () => {
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/orders_report/days`, {
+            params: {
+                startDate,
+                endDate
+              }
+        });
+        if (response.data && response.data.success) {
+            setDataByDay(response.data.orderDataDays);
+            console.log(response.data.orderDataDays);
+        } else {
+            setDataByDay([]);
+        }
+    } catch (err) {
+        console.error('Error fetching data:', err);
+        setDataByDay([]);
+    }
+};
 
+const fetchDataMonths = async () => {
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/orders_report/months`, {
+            params: {
+                startDate,
+                endDate
+              }
+        });
+        if (response.data && response.data.success) {
+            setDataByMonth(response.data.orderDataMonths);
+            console.log(response.data.orderDataMonths);
+        } else {
+            setDataByMonth([]);
+        }
+    } catch (err) {
+        console.error('Error fetching data:', err);
+        setDataByMonth([]);
+    }
+    
+};
+
+
+    useEffect(()=>{
+        let min = document.getElementById("minTotalBar");
+        min.value= 0;
+        setMinTotal(0);
+        let max = document.getElementById("maxTotalBar");
+        max.value= 0;
+    },[]);
+    console.log(`Min: ${minTotal} Max: ${maxTotal}`)
 
 
    useEffect(()=>{
@@ -264,7 +323,7 @@ console.log(`Min: ${minTotal} Max: ${maxTotal}`)
         return new Date(dateString).toISOString().split('T')[0];
       };
     
-      const formatTimestamp = (timestamp) => {
+    const formatTimestamp = (timestamp) => {
         const date = new Date(timestamp);
     
         // Extracting components
@@ -278,81 +337,122 @@ console.log(`Min: ${minTotal} Max: ${maxTotal}`)
         // Constructing formatted string
         return `${year}-${day}-${month}, ${hours}:${minutes}:${seconds}`;
     };
+
+
+    const renderBarChart = ({ chartType, data, color, title }) => {
+        let xAxisKey, tickFormatter, label;
+    
+        if (chartType === "hour") {
+            xAxisKey = "hour";
+            tickFormatter = (tick) => `${tick}:00`; // Formatting as hours (0:00, 1:00, etc.)
+            label = "Hour of Day";
+        } else if (chartType === "day") {
+            xAxisKey = "day"; // Change to "dayname" to reflect the new data structure
+            tickFormatter = (tick) => tick; // Since dayname is already a string (e.g., "Monday"), no need for additional mapping
+            label = "Day of Week";
+        } else if (chartType === "month") {
+            xAxisKey = "month"; // Change to "monthname" to reflect the new data structure
+            tickFormatter = (tick) => tick; // Since monthname is already a string (e.g., "January"), no need for additional mapping
+            label = "Month";
+        }
+    
+        return (
+            <div className="barContainer">
+            <h2>{title}</h2>
+            <ResponsiveContainer width="100%" height={400}>
+                <BarChart data={data}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis 
+                        dataKey={xAxisKey} 
+                        tickFormatter={tickFormatter} 
+                        label={{ value: label, position: "insideBottom", offset: -5 }} 
+                    />
+                    <YAxis label={{ value: "Number of Orders", angle: -90, position: "insideLeft" }} />
+                    <Tooltip/>
+                    
+                    <Bar dataKey="order_count" fill={color} name="Order(s) Placed">
+                        <LabelList dataKey="order_count" position="top" />
+                    </Bar>
+                </BarChart>
+            </ResponsiveContainer>
+            </div>
+        );
+    };
     return (
         
         <div className="ordersGridContainer">
             <h1 className="title">Customer Orders Report</h1>
-            <div className="dateFilter">
-                <div className="dateInputs">
-                    <label for="date">Date Range: </label>
-                    <input 
-                        type="date" 
-                        value={startDate}
-                        onChange={(e) => setStartDate(e.target.value)}
-                        placeholder="Start Date"
-                    />
-                    <span> - </span>
-                    <input 
-                        type="date" 
-                        value={endDate}
-                        onChange={(e) => setEndDate(e.target.value)}
-                        placeholder="End Date"
-                    />
-                   
+            <div className="filterContainer">
+                <div className= "filterContainerLeft">
+                    <div className="dateFilter">
+                        <div className="dateInputs">
+                            <label for="date">Date Range: </label>
+                            <input 
+                                type="date" 
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                                placeholder="Start Date"
+                            />
+                            <span> - </span>
+                            <input 
+                                type="date" 
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                                placeholder="End Date"
+                            />
+                        </div>
+                    </div>
+                    <div className="orderSearch">
+                        <form>
+                            <p>
+                                <label for="searchBar">Search: </label>
+                                <input type="text" name="searchBar" id="searchBar" placeholder="Search by Order ID, Customer ID, Table Number, etc." value={searchQuery} onChange={handleSearch} onKeyDown={handleEnter}></input>
+                            </p>
+                        </form>
+
+                    </div>
+                </div>
+            
+                <div className="filterContainerRight">
+                    <div className="filterByWaiter">
+                        <lable for="watier">Filter By Waiter: </lable>
+                        <select name="waiter" value={selectedWaiter} onChange={handleWaiterChange}>
+                            <option value="">Waiter Name's</option>
+                            {waiters.map(waiter=>(
+                                <option key={waiter} value={waiter}>
+                            {waiter}</option>
+                            )
+                            )
+                            }
+                        </select>
+                    </div>
+                    <div className="filterByTable">
+                        <label for="table">Table Number: </label>
+                        <select name="table" value={selectedTable} onChange={handleTableChange}>
+                            <option value="">Table Number(s)</option>
+                            {tables.map(table=>(
+                                <option key={table} value={table}>
+                            {table}</option>
+                            )
+                            )
+                            }
+                        </select>
+                    </div>
+                    
+                    <span className="filterByTotal">
+                        <form>
+                            <span>
+                                <label for="minTotalBar">Filter By Price Total: </label>
+                                <input type="number"  name="minTotalBar" id ="minTotalBar" placeholder ="Minimum Total" min={0} max={maxTotal-1} onChange={handleMinTotalBarChange} onInput={isNumber} value={minTotal}/>
+                                <label for="maxTotalBar"> - </label>
+                                <input type="number" name="maxTotalBar" id="maxTotalBar" placeholder ="Maximum Total" min={minTotal+1} onChange={handleMaxTotalBarChange} onInput={isNumber} value={maxTotal}/>
+                            </span>
+                        </form>
+                    </span>
                 </div>
             </div>
-            <div className="orderSearch">
-                <form>
-                    <p>
-                        <label for="searchBar">Search: </label>
-                        <input type="text" name="searchBar" id="searchBar" placeholder="Search by Order ID, Customer ID, Table Number, etc." value={searchQuery} onChange={handleSearch} onKeyDown={handleEnter}></input>
-                    </p>
-                </form>
-
-            </div>
-            <div className="filterByWaiter">
-                <lable for="watier">Filter By Waiter: </lable>
-                <select name="waiter" value={selectedWaiter} onChange={handleWaiterChange}>
-                    <option value="">Waiter Name's</option>
-                    {waiters.map(waiter=>(
-                        <option key={waiter} value={waiter}>
-                    {waiter}</option>
-                    )
-                    )
-                    }
-                </select>
-            </div>
-            <div className="filterByTable">
-                <label for="table">Table Number: </label>
-                <select name="table" value={selectedTable} onChange={handleTableChange}>
-                    <option value="">Table Number(s)</option>
-                    {tables.map(table=>(
-                        <option key={table} value={table}>
-                    {table}</option>
-                    )
-                    )
-                    }
-                
-                </select>
-            </div>
-            <span className="filterByTotal">
-                <form>
-                     
-                    <span>
-                        <label for="minTotalBar">Filter By Price Total: </label>
-                        <input type="number"  name="minTotalBar" id ="minTotalBar" placeholder ="Minimum Total" min={0} max={maxTotal-1} onChange={handleMinTotalBarChange} onInput={isNumber} value={minTotal}/>
-                    
-                     
-                    
-                        <label for="maxTotalBar"> - </label>
-                        <input type="number" name="maxTotalBar" id="maxTotalBar" placeholder ="Maximum Total" min={minTotal+1} onChange={handleMaxTotalBarChange} onInput={isNumber} value={maxTotal}/>
-                    </span>
-                    
-                </form>
-            </span>
             <div className="orderDis">
                 <table>
-                    <caption>Orders Table</caption>
                     <thead className = "orderInfo">
                         <tr>
                             <th >
@@ -370,40 +470,21 @@ console.log(`Min: ${minTotal} Max: ${maxTotal}`)
                                 Customer ID {(sortColumn === 'customer_id' && sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />)}
                                 </button>
                             </th>
-                            <th >
-                                <button id="subtotalCol" onClick ={()=>handleSort('subtotal')}>
-                                Subtotal {(sortColumn === 'subtotal' && sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />)}
-                                </button>
-                                </th>
                             <th>
-                                <button id="tipPercentCol" onClick ={()=>handleSort('tip_percent')}>
-                                Tip (%) {(sortColumn === 'tip_percent' && sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />)}
-                                </button>
-                                </th>
-                            <th>
-                                <button id="tipAmountCol" onClick ={()=>handleSort('tip_amount')}>
-                                Tip Amount {(sortColumn === 'tip_amount' && sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />)}
-                                </button>
-                                </th>
-                            <th>
-                                
                                 <button id="totalCol" onClick ={()=>handleSort('total')}>
                                 Total {(sortColumn === 'total' && sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />)}
                                 </button>
                                 </th> 
-                                
                             <th >
                                 <button id="tableNumberCol" onClick={()=>handleSort('table_number')}>
                                 Table Number {(sortColumn === 'table_number' && sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />)}
                                 </button>
                                 </th>
                             <th id="timeCol">Time</th>
-                            
                         </tr>
                     </thead>
                     <tbody className ="orderTable">
                         {paginatedOrders.map((order, key) => (
-                            
                                 <tr key={key}>
                                     <td>{order.order_id}</td>
                                     <td>{order.items.map(jsonItem=>(
@@ -411,14 +492,10 @@ console.log(`Min: ${minTotal} Max: ${maxTotal}`)
                                     </td>
                                     <td>{order.first_name}</td>
                                     <td>{order.customer_id}</td>
-                                    <td>{order.subtotal}</td>
-                                    <td>{order.tip_percent}</td>
-                                    <td>{order.tip_amount}</td>
                                     <td>{order.total}</td>
                                     <td>{order.table_number}</td>
                                     <td>{formatTimestamp(order.time)}</td>   
                                 </tr>
-                    
                         ))}
                     </tbody>
                     <tfoot>
@@ -428,50 +505,49 @@ console.log(`Min: ${minTotal} Max: ${maxTotal}`)
                         <th></th>
                         <th></th>
                         <th></th>
-                        <th></th>
                         <th>Total Orders: {totalOrders}</th>
-                        <th>Total Sales: {parseFloat(totalSales).toFixed(2)}</th>
-                        <th>Total Tips: {parseFloat(totalTips).toFixed(2)}</th>
+
                     </tfoot>
                 </table>
             </div>
 
             <div className="paginationControls">
                 <div id="rowsPerPage">
-                <label for="rowsPerPage">Rows Per Page</label>
-                <select className="rowsPerPage" value={selectedItemsPerPage} onChange={handleItemsPerPageChange}>
-                    <option value="">Rows Per Page</option>
-                    <option key={5} value={5}>5</option>
-                    <option key={10} value={10}>10</option>
-                    <option key={15} value={15}>15</option>
-                    <option key={25} value={25}>25</option>
-                </select>
-                <button onClick ={goToFirstPage} disabled={currentPage ===1}>
-                    First
-                </button>
-                <button onClick ={goToPreviousPage} disabled={currentPage ===1}>
-                    Previous
-                </button>
-                <span>
-                    Page <input type ="number" min="1" max={totalPages} value={currentPage} onChange={handlePageChange} /> 
-                    of {totalPages}
-                </span>
+                    <label for="rowsPerPage">Rows Per Page</label>
+                    <select className="rowsPerPage" value={selectedItemsPerPage} onChange={handleItemsPerPageChange}>
+                        <option value="">Rows Per Page</option>
+                        <option key={5} value={5}>5</option>
+                        <option key={10} value={10}>10</option>
+                        <option key={15} value={15}>15</option>
+                        <option key={25} value={25}>25</option>
+                    </select>
+                    <button onClick ={goToFirstPage} disabled={currentPage ===1}>
+                        First
+                    </button>
+                    <button onClick ={goToPreviousPage} disabled={currentPage ===1}>
+                        Previous
+                    </button>
+                    <span>
+                        Page <input type ="number" min="1" max={totalPages} value={currentPage} onChange={handlePageChange} /> 
+                        of {totalPages}
+                    </span>
 
-                <button onClick={goToNextPage} disabled={currentPage === totalPages}>
-                    Next
-                </button>
-                <button onClick={goToLastPage} disabled={currentPage === totalPages}>
-                    Last
-                </button>
+                    <button onClick={goToNextPage} disabled={currentPage === totalPages}>
+                        Next
+                    </button>
+                    <button onClick={goToLastPage} disabled={currentPage === totalPages}>
+                        Last
+                    </button>
                 </div>
-                
-
+            </div>
+            <div className="barGraphs">
+                {renderBarChart({ chartType: "hour", data: dataByHour, color: '#2563eb', title: "Number of Orders Made per Hour"})}
+                {renderBarChart({ chartType: "day", data: dataByDay, color: '#82ca9d', title: "Number of Orders Made by Day of the Week" })}
+                {renderBarChart({ chartType: "month", data: dataByMonth, color: '#dc2626', title: "Number of Orders Made by Month" })}  
             </div>
 
         </div>  
     );
-
-   
 }
  
 export default OrdersReport; 
