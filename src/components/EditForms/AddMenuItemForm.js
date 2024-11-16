@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import React from "react";
 import Form from "../Reusable/Form";
 import Select from "react-select";
+import { toast } from 'react-toastify';
 
 const AddMenuItemForm = ({setModal, item, callback}) => {
     const onSubmit = async(values, event) => {
@@ -43,8 +44,10 @@ const AddMenuItemForm = ({setModal, item, callback}) => {
             })
             setModal(false);
             callback()
+            toast.success("Success!")
         } catch (err) {
             console.log(`Error posting new menu item: ${err}`)
+            toast.error("Error!")
         }
     };
     const [ingredientsOptions, setIngredientsOptions] = useState([]);
@@ -148,10 +151,9 @@ const AddMenuItemForm = ({setModal, item, callback}) => {
         ]
     }
 
-    return ( 
+    return (
         <Form 
         template={template}
-        watchFields={['itemName']}
         onSubmit={onSubmit}
         preloadedValues={item}
         />

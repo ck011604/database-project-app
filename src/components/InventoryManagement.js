@@ -4,6 +4,8 @@ import { BsFillTrashFill, BsFillPencilFill } from "react-icons/bs";
 import '../css/Management.css';
 import Modal from "./Reusable/Modal";
 import AddIngredientForm from "./EditForms/AddIngredientForm";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const InventoryManagement = () => {
     const [ingredients, setIngredients] = useState([]);
@@ -13,7 +15,6 @@ const InventoryManagement = () => {
     const [message, setMessage] = useState(null);
     const [loading, setLoading] = useState(false);
     const [modal, setModal] = useState(false);
-    const [items, setItems] = useState([])
 
     useEffect(() => {
         fetchIngredients();
@@ -133,8 +134,10 @@ const InventoryManagement = () => {
         try {
             await axios.delete(`${process.env.REACT_APP_API_URL}/api/ingredient/${id}`);
             fetchIngredients();
+            toast.success("Successfully deleted Ingredient")
         } catch (err) {
             console.error(`Error deleting item: ${err}`);
+            toast.error("Error deleting Ingredient!")
         }
     };
 
@@ -177,6 +180,7 @@ const InventoryManagement = () => {
 
     return (
         <div>
+            <ToastContainer position="bottom-right"/>
             <div className="add-menu-item ">
                 <Modal modal={modal} setModal={setModal}>
                     <AddIngredientForm setModal={setModal} ingredient={selectedIngredient} callback={fetchIngredients}/>

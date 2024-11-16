@@ -2,7 +2,6 @@
   display: flex;
   align-items: center;
   padding: 30px;
-  background-color: #f1f1f1;
   color: black;
   text-align: center;
   width: 100%;
@@ -108,7 +107,7 @@ td {
 .pagination button {
   padding: 8px 12px;
   margin: 0 5px;
-  background-color: #4CAF50;
+  background-color: rgb(76, 175, 80);
   color: #fff;
   border: none;
   border-radius: 4px;
