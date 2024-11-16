@@ -2,8 +2,8 @@
 
 **Deployed via Microsoft Azure**  
 https://polite-sand-0f80b0a10.5.azurestaticapps.net/
-
 Please refer to the `Team 3 DB Project Document.pdf` about info of the project.
+
 ---
 
 ## Installation
