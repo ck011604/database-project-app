@@ -51,7 +51,7 @@ const Navbar = () => {
           <div className="finance-dropdown">
             <div className="finance-tab">Finance Reports</div>
             <div className="finance-dropdown-content">
-              <a href="/sales-report">Sales</a>
+              <a href="/sales-report">Employee Performance</a>
               <a href="/orders-report">Orders</a>
             </div>
           </div>

@@ -1,202 +1,86 @@
 .app-header {
   display: flex;
   align-items: center;
-  padding: 50px 35px;
+  padding: 30px;
+  background-color: #f1f1f1;
   color: black;
+  text-align: center;
   width: 100%;
-  top: 0;
-  left: 0;
-  z-index: 1000;
 }
 
 .app-title {
-  font-size: 2.0rem;
+  font-size: 2rem;
   font-weight: bold;
-  margin: 0;
+  margin: 0 auto;
 }
 
-.report-container {
+.EmpOrderTable {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.EmpOrder {
+  font-size: 1.5em;
+  color: #333;
   text-align: center;
-  margin-top: 1px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-  
-.report-container h1 {
-    font-size: 24px;
-    color: #333;
-}
-  
-.button-group {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-}
-  
-.report-button, .submit2-button {
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-  
-.report-button:hover, .submit2-button:hover {
-  background-color: #45a049;
-}
-  
-.report-button:active {
-  background-color: #388e3c;
-}
-  
-.sales-options {
-  margin-top: 20px;
-}
-  
-.option-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-  
-.option-button {
-  padding: 10px 15px;
-  background-color: #2196F3;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-  
-.option-button:hover {
-  background-color: #1976D2;
-}
-  
-.date-prompt {
-  margin-top: 20px;
-}
-  
-.date-input {
-  padding: 8px;
-  font-size: 16px;
-}
-  
-.submit-button {
-  margin-left: 10px;
-  padding: 10px 15px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-  
-.submit-button:hover {
-  background-color: #388e3c;
+  margin-bottom: 15px;
 }
 
+/* Table Styling */
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 30px;
+  margin-top: 10px;
 }
 
 th, td {
-  padding: 10px;
+  padding: 12px;
   text-align: left;
   border-bottom: 1px solid #ddd;
 }
 
-th {
-  background-color: #f4f4f4;
+thead tr {
+  background-color: #4CAF50;
+  color: #fff;
   font-weight: bold;
 }
 
-tr:hover {
-  background-color: #f1f1f1;
+tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
 }
 
-.section-heading {
-  font-size: 1.5em;
-  margin: 20px 0 10px;
-  color: #333;
+tbody tr:hover {
+  background-color: #e0e0e0;
 }
 
-.sales-data, .employee-data {
-  margin-top: 10px;
-  width: 95%;
-  max-width: none;
+td {
+  color: #555;
 }
 
-.report-container table {
-  margin: auto 0;
-}
-
-.batch-message, .error-message, .loading-message {
-  margin-top: 10px;
-  color: rgb(61, 184, 24); 
-}
-
-.sales-data table, .employee-data table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 20px 0;
-  border-radius: 15px;
-  background-color: #f9f9f9;
-  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
-}
-
-.sales-data table th, .sales-data table td,
-.employee-data table th, .employee-data table td {
-  padding: 12px 50px;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
-}
-
-.sales-data table tr:last-child td,
-.employee-data table tr:last-child td {
-  border-bottom: none;
-}
-
-.sales-data table th, .employee-data table th {
-  background-color: rgb(76, 175, 80);
-  color: white;
-  font-weight: bold;
-}
-
-.sales-data h2, .employee-data h2 {
-  margin-top: 0;
-  text-align: center;
-  color: #333;
-}
-
+/* Filters Styling */
 .filters {
   display: flex;
   gap: 10px;
   align-items: center;
-  margin-bottom: 20px;
+  margin: 20px 0;
   justify-content: center;
 }
 
-.filters label {
-  font-weight: bold;
-  margin-right: 10px;
-}
-
-.filters input {
-  padding: 5px;
-  border-radius: 5px;
+.filters input[type="text"] {
+  width: 200px;
+  padding: 8px;
   border: 1px solid #ccc;
-  width: 150px;
+  border-radius: 4px;
+  font-size: 0.9em;
 }
 
-.filters input:focus {
-  border-color: #007bff;
+.filters input[type="text"]:focus {
+  border-color: #4CAF50;
   outline: none;
 }
 
@@ -207,23 +91,85 @@ tr:hover {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  margin-left: 10px;
 }
 
 .clear-filters-button:hover {
   background-color: #0056b3;
 }
 
-.histogram {
-  background-color: white; 
-  padding: 20px;          
-  border-radius: 15px;    
-  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
-  max-width: 100%;
-  margin: 0 auto;
+/* Pagination Styling */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
 }
 
+.pagination button {
+  padding: 8px 12px;
+  margin: 0 5px;
+  background-color: #4CAF50;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1em;
+}
 
-.histogram canvas {
-  max-height: 400px;
+.pagination button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.pagination span {
+  font-size: 1em;
+  color: #333;
+}
+
+/* Report Container */
+.report-container {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.section-heading {
+  font-size: 1.5em;
+  margin: 20px 0;
+  color: #333;
+}
+
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.report-button, .submit2-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.report-button:hover, .submit2-button:hover {
+  background-color: #45a049;
+}
+.report-container .employee-data {
+  width: 90%;
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.report-container h2 {
+  font-size: 1.5em;
+  color: #333;
+  text-align: center;
+  margin-bottom: 15px;
 }

@@ -2,79 +2,65 @@ import React, { useState, useEffect } from "react";
 import "../css/SalesReport.css";
 import axios from 'axios';
 import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Tooltip, Legend } from 'chart.js';
-import { Bar } from 'react-chartjs-2';
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 const SalesReports = () => {
-const [showSalesOptions, setShowSalesOptions] = useState(false);
-const [isOptionSelected, setIsOptionSelected] = useState(false);
-const [selectedOption, setSelectedOption] = useState('');
-const [startDate, setStartDate] = useState('');
-const [endDate, setEndDate] = useState('');
-const [salesData, setSalesData] = useState(null);
-const [topEmployees, setTopEmployees] = useState(null);
-const [batchMessage, setBatchMessage] = useState('');
-const [errorMessage, setErrorMessage] = useState('');
-const [employeeFilter, setEmployeeFilter] = useState('');
-const [salesThreshold, setSalesThreshold] = useState('');
+  const [employeeIdFilter, setEmployeeIdFilter] = useState('');
+  const [employeeNameFilter, setEmployeeNameFilter] = useState('');
+  const [orderIdFilter, setOrderIdFilter] = useState('');
+  const [employeeOrderData, setEmployeeOrderData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 10;
 
-const handleOptionClick = (option) => {
-  setSelectedOption(option);
-};
+  const [isOptionSelected, setIsOptionSelected] = useState(false);
+  const [topEmployees, setTopEmployees] = useState(null);
+  const [employeeFilter, setEmployeeFilter] = useState('');
+  const [salesThreshold, setSalesThreshold] = useState('');
 
-const handleStartDateChange = (e) => {
-  setStartDate(e.target.value);
-  setErrorMessage('');
-  if (selectedOption === 'Daily') {
-    setEndDate(e.target.value);
-  }
-};
-
-const handleEndDateChange = (e) => {
-  setEndDate(e.target.value);
-  setErrorMessage('');
-};
-
-const handleBatchSales = async () => {
-  console.log("Batched sales button clicked");
-  setIsOptionSelected(true);
-  try{
-    const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/batch-sales`);
-    setBatchMessage(response.data.message);
-  } catch (error) {
-    console.error("Error executing batch sales query", error);
-    setBatchMessage("Error executing batch sales query.");
-  }
-  setShowSalesOptions(!showSalesOptions);
-};
-
-const submitReport = async () => {
-  if (!startDate || !endDate) {
-    setErrorMessage('Please select valid date(s)')
-    return;
-  }
-  try {
-    const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/sales-report`, {
-      params: {
-        startDate,
-        endDate
+useEffect(() => {
+  const fetchEmployeeOrderData = async () => {
+    try {
+      console.log("fetch Employee data activated");
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/employee-performance`); // have to change the name
+      if (response.data.success) {
+        setEmployeeOrderData(response.data.tableData);
+        setFilteredData(response.data.tableData);
+      } else {
+        console.error(response.data.message);
+        alert(response.data.message);
       }
-    });
-
-    if (response.data.success) {
-      setSalesData(response.data.salesData);
-    } else {
-      console.error(response.data.message);
-      alert(response.data.message);
+    } catch (error) {
+      console.error("Error getting employee - orders data table", error);
+      alert("There was an error generating table.");
     }
-  } catch (error) {
-    console.error("Error generating report", error);
-    alert("There was an error generating the report.");
-  }
+  };
+  fetchEmployeeOrderData();
+}, []);
+
+useEffect(() => {
+  const filtered = employeeOrderData.filter(row => {
+    const matchesEmployeeName = `${row.first_name} ${row.last_name}`.toLowerCase().includes(employeeNameFilter.toLowerCase());
+    const matchesEmployeeId = employeeIdFilter === '' || row.employee_id.toString().includes(employeeIdFilter);
+    const matchesOrderId = orderIdFilter === '' || row.order_id.toString().includes(orderIdFilter);
+
+    return matchesEmployeeName && matchesEmployeeId && matchesOrderId;
+  });
+  setFilteredData(filtered);
+  setCurrentPage(1); // Reset to page 1 when filters change
+}, [employeeNameFilter, employeeIdFilter, orderIdFilter, employeeOrderData]);
+
+const indexOfLastRow = currentPage * rowsPerPage;
+const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+const currentRows = filteredData.slice(indexOfFirstRow, indexOfLastRow);
+const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+
+const handleNextPage = () => {
+  if (currentPage < totalPages) setCurrentPage(currentPage + 1);
 };
 
-const formatDate = (dateString) => {
-  return new Date(dateString).toISOString().split('T')[0];
+const handlePreviousPage = () => {
+  if (currentPage > 1) setCurrentPage(currentPage - 1);
 };
 
 const submitBestEmployees = async () => {
@@ -98,183 +84,90 @@ const submitBestEmployees = async () => {
 const filteredEmployees = topEmployees?.filter((employee) => {
   const matchesName = employee.first_name.toLowerCase().includes(employeeFilter.toLowerCase()) ||
                       employee.last_name.toLowerCase().includes(employeeFilter.toLowerCase());
-  const matchesSales = salesThreshold === '' || employee.total_sales >= Number(salesThreshold);
+  const matchesSales = salesThreshold === '' || employee.total_tips >= Number(salesThreshold);
   return matchesName && matchesSales;
 });
-
-const calculateTotals = (data) => {
-  if (!data || data.lenght === 0) return null;
-
-  const totals = data.reduce(
-    (acc, row) => {
-      acc.totalSales += parseFloat(row.total_sales);
-      acc.totalCash += parseFloat(row.total_cash);
-      acc.totalTaxes += parseFloat(row.total_taxes);
-      acc.totalDiscounts += parseFloat(row.total_discounts);
-      return acc;
-    },
-    {totalSales: 0, totalCash: 0, totalTaxes: 0, totalDiscounts: 0 }
-  );
-  return totals;
-}
-
-const totals = calculateTotals(salesData);
-
-const prepareHistogram = (data) => {
-  if (!data) return { labels: [], datasets: [] };
-  const labels = data.map(row => formatDate(row.sales_date));
-  const salesAmount = data.map(row => row.total_sales);
-
-  return {
-    labels,
-    datasets: [
-      {
-        label: 'Total Sales',
-        data: salesAmount,
-        backgroundColor: 'rgb(61, 184, 24, 0.75)',
-        borderColor: 'rgba(76, 175, 80)',
-        borderWidth: 1,
-      },
-    ],
-  };
-};
-
-const histogramData = prepareHistogram(salesData);
 
 return (
   <div>
     <header className="app-header">
-      <h1 className="app-title">Resturant Sales Reports</h1>
+      <h1 className="app-title">Employee Performance Report</h1>
     </header>
-
+    <div>
+  </div>
+  <div className="EmpOrderTable">
+    <h2 className="EmpOrder">Employee Orders</h2>
+    <table>
+        <thead>
+          <tr>
+            <th>Employee ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Order ID</th>
+            <th>Discount Amount</th>
+            <th>Tip Amount</th>
+            <th>Subtotal</th>
+            <th>Order Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {currentRows.map((row, index) => (
+            <tr key={index}>
+              <td>{row.employee_id}</td>
+              <td>{row.first_name}</td>
+              <td>{row.last_name}</td>
+              <td>{row.order_id}</td>
+              <td>{row.discount_amount}</td>
+              <td>{row.tip_amount}</td>
+              <td>{row.subtotal}</td>
+              <td>{row.order_total}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div className="filters">
+        <input
+          type="text"
+          placeholder="Filter by Employee Name"
+          value={employeeNameFilter}
+          onChange={(e) => setEmployeeNameFilter(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Filter by Employee ID"
+          value={employeeIdFilter}
+          onChange={(e) => setEmployeeIdFilter(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Filter by Order ID"
+          value={orderIdFilter}
+          onChange={(e) => setOrderIdFilter(e.target.value)}
+        />
+      </div>
+    <div className="pagination">
+        <button onClick={handlePreviousPage} disabled={currentPage === 1}>
+          Previous
+        </button>
+        <span>Page {currentPage} of {totalPages}</span>
+        <button onClick={handleNextPage} disabled={currentPage === totalPages}>
+          Next
+        </button>
+    </div>
+  </div>
   <div className="report-container">
     {!isOptionSelected && (
       <>
-      <h1>Choose the type of report to run:</h1>
       <div className="button-group">
-        <button className="report-button" onClick={handleBatchSales}>
-          Sales Overview
-        </button>
         <button className="submit2-button" onClick={submitBestEmployees}>
-          Employee Performance
+          Summary
         </button>
        </div>
       </>
     )}
-    {batchMessage && (
-      <p className="batch-message">{batchMessage}</p>
-    )} 
-    {showSalesOptions && (
-      <div className="sales-options">
-          <h3>Please select an option:</h3>
-          <div className="option-buttons">
-              <button onClick={() => handleOptionClick('Daily')} className='option-button'>Day of</button>
-              <button onClick={() => handleOptionClick('Time Frame')} className='option-button'>Time Range</button>
-          </div>
-      </div>
-    )}
-    {selectedOption && (
-      <div className = "date-prompt">
-          <h4>{`Select date${selectedOption === 'Daily' ? '' : 's'} for the sales overview`}</h4>
-
-          {selectedOption === 'Daily' ? (
-            <>
-              <label> Date: </label>
-              <input
-              type="date"
-              value={startDate}
-              onChange={handleStartDateChange}
-              className="data-input"
-              />
-            </>
-          ) : (
-            <>
-            <label> Start Date: </label>
-            <input
-            type="date"
-            value={startDate}
-            onChange={handleStartDateChange}
-            className="data-input"
-            />
-            <label> End Date: </label>
-            <input
-            type="date"
-            value={endDate}
-            onChange={handleEndDateChange}
-            className="data-input"
-          />
-        </>
-        )}
-
-        {errorMessage && <p style={{ color: 'red'}} > {errorMessage} </p>}
-
-        <button className="submit-button" onClick={submitReport}>
-            Generate Sales Overview
-        </button>
-      </div>
-    )}
-    {salesData && (
-      <div className="sales-data">
-        <h2 className="section-heading"> 
-          {selectedOption === 'Daily'
-            ? `Sales Overview for the day of ${startDate}`
-            : `Sales Overview for ${startDate} to ${endDate}`} </h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Total Sales</th>
-              <th>Total Cash</th>
-              <th>Total Taxes</th>
-              <th>Total Discounts</th>
-            </tr>
-          </thead>
-        <tbody>
-          {salesData.map((row, index) => (
-            <tr key={index}>
-              <td>{formatDate(row.sales_date)}</td>
-              <td>{row.total_sales}</td>
-              <td>{row.total_cash}</td>
-              <td>{row.total_taxes}</td>
-              <td>{row.total_discounts}</td>
-            </tr>
-          ))}
-          {totals && (
-            <tr className="totals-row">
-              <td><strong>Totals</strong></td>
-              <td>{totals.totalSales.toFixed(2)}</td>
-              <td>{totals.totalCash.toFixed(2)}</td>
-              <td>{totals.totalTaxes.toFixed(2)}</td>
-              <td>{totals.totalDiscounts.toFixed(2)}</td>
-            </tr>
-          )}
-         </tbody>
-        </table>
-        {selectedOption !== 'Daily' && (
-        <div className="histogram">
-          <h3>Sales Performance</h3>
-          <Bar 
-            key={JSON.stringify(salesData)}
-            data={histogramData} 
-            options={{ 
-              maintainAspectRatio: true,
-              scales: {
-                x: {
-                  title: { display: true, text: 'Date' }
-                },
-                y: {
-                  title: { display: true, text: 'Money $' }
-                }
-              }
-            }} 
-          />
-        </div>
-       )}
-      </div>
-    )}
     {topEmployees && (
       <div className="employee-data">
-        <h2 className="section-heading">Employee Performance:</h2>
+        <h2 className="section-heading">Summary:</h2>
         <div className="filters">
           <label>Employee Name:</label>
           <input
@@ -283,12 +176,12 @@ return (
             onChange={(e) => setEmployeeFilter(e.target.value)}
             placeholder="Search by name"
             />
-          <label>Sales Threshold:          </label>
+          <label>Tips Threshold:          </label>
           <input
             type="text"
             value={salesThreshold}
             onChange={(e) => setSalesThreshold(e.target.value)}
-            placeholder="Enter minimum sales"
+            placeholder="Enter minimum tips"
             />
             <button className="clear-filters-button" onClick={() => { setEmployeeFilter(''); setSalesThreshold(''); }}>
               Clear Filters
@@ -298,20 +191,22 @@ return (
           <thead>
             <tr>
               <th>Employee ID</th>
-              <th>Last Name</th>
               <th>First Name</th>
+              <th>Last Name</th>
               <th>Role</th>
-              <th>Total Sales</th>
+              <th>Total Orders Taken</th>
+              <th>Tip Earnings</th>
             </tr>
           </thead>
           <tbody>
             {filteredEmployees.map((employee, index) => (
               <tr key={index}>
                 <td>{employee.employee_id}</td>
-                <td>{employee.last_name}</td>
                 <td>{employee.first_name}</td>
+                <td>{employee.last_name}</td>
                 <td>{employee.role}</td>
-                <td>{employee.total_sales}</td>
+                <td>{employee.orders_count}</td>
+                <td>{employee.total_tips}</td>
               </tr>
             ))}
           </tbody>

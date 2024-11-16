@@ -1,51 +1,57 @@
-Deployed via Microsoft Azure: https://polite-sand-0f80b0a10.5.azurestaticapps.net/
+# Database Project App
 
-# How to run project
+**Deployed via Microsoft Azure**  
+https://polite-sand-0f80b0a10.5.azurestaticapps.net/
 
-## Run locally (localhost)
+---
 
-Copy the environment variables in localHost.txt and replace the variables in the .env file. Remember to replace the .env file back to its original before pushing (can also be found in localHost.txt) or simply don't push the .env changes.
+## Installation
 
-## Download dependencies
+### Prerequisites
 
-### `npm install`
+- Node.js installed  
+- MySQL Server installed  
 
-node_modules never gets put into the repository because of the large size. By running this command, it downloads all of the packages needed. Do this everytime. Usually it will say there are high issues or something like that. Ignore them and whatever you do don't npm audit them or they will cause more issues.
+---
 
-## Turn local database server on
+## Setup Instructions
 
-If you chose to not have it start up with windows, run cmd as administrator and type:
 
-### `net start mysql90`
+1. **Clone the Repository**
+   ```
+   git clone https://github.com/ck011604/database-project-app.git
+   ```
+   
+2. **Start the Local Database Server**
+   - The following command might change depending on the version of MySQL and the OS you are on.
+   - Run this command as administrator in the command prompt (for windows MySQL 9):  
+     ```
+     net start mysql90
+     ```
 
-Assuming you downloaded the same mysql version. To stop the server you do the following. Note that shutting down the computer, the server stops as well.
+3. **Import SQL File**  
+   - Open MySQL Workbench and connect to your local server. Create a database called `restaurantDB` and import `restaurantDB.sql` (found in the root folder).
 
-### `net stop mysql90`
 
-## Import sql file
+4. **Configure Environment Variables**   
+   - in the `.env` file, replace `DB_PASSWORD` with the same password as the locally hosted MySql Server
+     
+5. **Install Dependencies**
+   ```
+   npm install
+   ```
 
- If you are using the "MySQL" Extension by Weijan Chen, right click the database, click import sql, and select the file. (Should be in the root folder of the repo). Before importing you should drop the entire database, recreate it, and then import the .sql file to keep the latest version intact.
+6. **Start the Server**  
+   - In a separate terminal, navigate to the server folder and run the server by using the following command: 
+     ```
+     cd server
+     node server.js
+     ```
 
-## Start server
-
-Navigate to the server.js file `cd server` then the js file.
-
-### `node server.js`
-
-## Start react app
-
-### `npm start`
-
-For development only. Note the website will actively update as your code changes. Right click > inspect > console to see console.logs().
-
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-## Transfer database
-
-Make sure you are in a directory you can access. Add sql bin to your enviroment path to run in any directory. Dump the database using the following command:
-
-### `mysqldump -u root -p databaseproject > databaseproject.sql`
-
-Go to the directory to retrieve the .sql file and place it in the root of the repo when transferring.
-
-If you have the mysql extension, you can right click on the database and select "Dump struct and data"
+7. **Start the React App**  
+   - In a separate terminal (should be in the root folder), run:  
+     ```
+     npm start
+     ```  
+   - Open [http://localhost:3000](http://localhost:3000) to view the app.
+  
